@@ -1,0 +1,47 @@
+version: 2
+evidence:
+  - id: E-001
+    claim: "The pipeline ingests official FRE_IS_YYYYMM ZIP files and validates the expected issuance layout locally."
+    source: scripts/pipeline.py
+    status: verified
+    verified_on: 2026-08-01
+  - id: E-002
+    claim: "Nineteen loaded issuance files from 2024-12 through 2026-06 produced 59,904 security observations and a 19-row monthly dashboard payload."
+    source: app/data/dashboard.json
+    status: verified
+    verified_on: 2026-08-01
+  - id: E-003
+    claim: "The local baseline uses Python standard library tooling, SQLite, and a static browser application with no paid infrastructure."
+    source: package.json
+    status: verified
+    verified_on: 2026-08-01
+  - id: E-004
+    claim: "The browser dashboard consumes monthly aggregates rather than security-level rows."
+    source: scripts/pipeline.py
+    status: verified
+    verified_on: 2026-08-01
+  - id: E-005
+    claim: "The pipeline sample test passes."
+    source: tests/test_pipeline.py
+    status: verified
+    verified_on: 2026-08-01
+  - id: E-006
+    claim: "The project knowledge graph and audit report were rebuilt from the synchronized project records."
+    source: graphify-out/GRAPH_REPORT.md
+    status: verified
+    verified_on: 2026-08-01
+  - id: E-007
+    claim: "Sample loading writes only ignored local artifacts, and automated tests prove that sample loading and released-payload validation do not change app/data/dashboard.json."
+    source: package.json; tests/test_pipeline.py
+    status: verified
+    verified_on: 2026-08-04
+  - id: E-008
+    claim: "The released dashboard payload is validated against the months and metadata fields consumed by app/app.js."
+    source: scripts/validate_dashboard.mjs
+    status: verified
+    verified_on: 2026-08-04
+  - id: E-009
+    claim: "A raw-data rebuild produced the 19-row, 59,904-observation released payload, and the local preview served that payload successfully at http://127.0.0.1:4173."
+    source: app/data/dashboard.json; local preview smoke test
+    status: verified
+    verified_on: 2026-08-04

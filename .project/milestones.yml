@@ -1,0 +1,99 @@
+version: 3
+project: freddie-mac-mbs-disclosure-analytics
+status: end-to-end-refinement-in-progress
+approved_plan: .project/refinement-plan.md
+milestones:
+  - id: M0
+    title: Establish the verified real-data baseline
+    status: completed
+    evidence: [E-001, E-002, E-003]
+    acceptance:
+      - Official issuance ZIP files load locally into SQLite.
+      - The dashboard renders monthly aggregates for the observed period.
+      - The owner confirms authorized Freddie Mac source-file use.
+  - id: M1
+    title: Make verification non-destructive
+    status: completed
+    evidence: [E-007, E-008, E-009]
+    acceptance:
+      - Sample and test commands never write app/data/dashboard.json.
+      - The dashboard validator checks the released aggregate payload.
+      - README documents a verified test, raw-load, and preview path.
+  - id: M2
+    title: Build the trust foundation
+    status: in-progress
+    approval: current_milestone
+    acceptance:
+      - Git revision lineage is initialized with raw source files ignored.
+      - Data and evaluation contracts plus data dictionary and metric glossary exist.
+      - Exact official schema versions and source-period compatibility are enforced.
+      - Per-source input, accepted, excluded, rejected, duplicate, quarantined, and published counts reconcile.
+      - Quality failures block publication and documented business exclusions remain visible.
+      - Dashboard metadata includes period, generation time, pipeline revision, build ID, schemas, and quality counts.
+      - Tests cover official success and failures, schema transition, duplicate handling, aggregate accuracy, and idempotence.
+      - CI runs the same full check and static-preview smoke path used locally.
+  - id: M3
+    title: Complete the issuance decision workflow
+    status: pending-M2
+    acceptance:
+      - Findings and investigation prompts are derived from loaded data.
+      - An approved Prefix-to-product taxonomy powers an issuance-mix view with explicit unknown handling.
+      - The dashboard exposes quality, freshness, methods, and limitations.
+      - Loading, empty, partial, stale, and error states plus year-aware labels are implemented.
+      - Keyboard, responsive, and WCAG 2.2 AA checks pass.
+  - id: M4
+    title: Integrate monthly factor and approved supplemental sources
+    status: pending-data-acquisition-and-contract-approval
+    acceptance:
+      - Authorized factor and supplemental sources have approved field allowlists, timing, keys, and demo rights.
+      - Immutable manifests, schema versions, quarantine, and reconciliation cover each new source family.
+      - Conformed security-period records quantify join coverage and unmatched reasons.
+      - Historical backfill and incremental processing agree.
+  - id: M5
+    title: Implement factor, balance, runoff, and prepayment analytics
+    status: pending-M4
+    acceptance:
+      - Approved measures have versioned formulas, units, timing, denominators, evidence, and limitations.
+      - Security, cohort, and portfolio golden fixtures reconcile.
+      - New issuance, missing periods, corrections, terminations, restatements, and low balances are tested.
+      - Domain review approves every public balance or prepayment claim.
+  - id: M6
+    title: Build the governed analyst product and semantic API
+    status: pending-M5
+    acceptance:
+      - Allowlisted metric, evidence, quality, and investigation-note endpoints are versioned.
+      - Authenticated analyst mode is separated from aggregate-only public mode.
+      - API responses reproduce approved dashboard totals exactly.
+      - Authorization, contract, pagination, error, task-success, and performance tests pass.
+  - id: M7
+    title: Add and evaluate the cited AI analyst assistant
+    status: pending-M6-and-explicit-AI-cost-approval
+    acceptance:
+      - The model accesses data only through approved deterministic tools and retrieval sources.
+      - Golden evaluations cover metrics, citations, ambiguity, prompt injection, missing data, and prohibited advice.
+      - Restricted raw fields never appear in prompts, traces, citations, or responses.
+      - AI improves a measured analyst outcome and passes the approved quality, safety, latency, and cost thresholds.
+  - id: M8
+    title: Create the cloud foundation and deploy a private pilot
+    status: pending-architecture-cloud-budget-and-deployment-approvals
+    acceptance:
+      - Cloud, region, cost ceiling, identity, retention, backup, teardown, and residency decisions are recorded.
+      - Reviewed infrastructure as code creates least-privilege dev, test, and pilot environments.
+      - End-to-end lineage, RBAC, secrets, logging, alerts, rollback, restore, cost, and teardown tests pass.
+      - Exact source, infrastructure, application, and deployment revisions are recorded.
+  - id: M9
+    title: Harden the production release candidate
+    status: pending-M8
+    acceptance:
+      - Threat model, scans, SBOM, security headers, rate limits, incident response, and SLOs are complete.
+      - Accessibility, browser, load, failure-recovery, and data-restatement tests pass.
+      - No unresolved critical or high finding lacks an approved disposition.
+      - Case study, records, evidence, Graphify, and handoff are current.
+  - id: M10
+    title: Publish the reviewer release and portfolio case study
+    status: pending-explicit-publication-approval
+    acceptance:
+      - The exact public payload, host, visibility, budget, domain, screenshots, and teardown path are approved.
+      - Public artifacts contain no restricted data, secrets, internal endpoints, or unsupported claims.
+      - Deployed revision and payload checksum match release evidence.
+      - Human design, deployment, visibility, and publication approvals plus release checks pass.

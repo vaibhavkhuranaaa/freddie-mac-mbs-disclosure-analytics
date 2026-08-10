@@ -1,0 +1,10 @@
+version: 3
+data_use: authorized-freddie-mac-user-confirmed-2026-08-01
+architecture: approved-local-real-data-prototype-2026-08-01
+refinement_plan: approved-for-milestone-implementation-by-owner-2026-08-09
+current_milestone: M2-approved-by-owner-2026-08-09
+ai_services: not-approved
+cloud: not-approved
+deployment: not-approved
+publication: not-requested
+paid_resources: not-requested

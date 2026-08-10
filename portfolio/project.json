@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "slug": "freddie-mac-mbs-disclosure-analytics",
+  "title": "Freddie Mac MBS Issuance Monitoring",
+  "status": "trust-foundation",
+  "summary": "Governed local Freddie Mac MBS issuance monitoring with exact schema control, reconciled quality/provenance, aggregate-only publication, and a static analyst dashboard.",
+  "scope": "Implemented: issuance measures, source-schema and period validation, documented exclusions, fail-closed quality, provenance, and aggregate publication. Planned: composition, factor/runoff/prepayment, governed analyst API, evaluated cited AI, cloud pilot, and public release.",
+  "evidence": ["E-001", "E-002", "E-003", "E-007", "E-008", "E-009", "E-010", "E-011", "E-012", "E-013"]
+}

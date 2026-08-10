@@ -1,0 +1,12 @@
+flowchart LR
+  A[Authorized Freddie Mac FRE_IS ZIP files] --> B[Exact schema and period validation]
+  B --> C[Accepted security observations]
+  B --> D[Source manifest and reconciliation]
+  B --> Q[Quality events and exclusions]
+  C --> G{All source gates pass?}
+  D --> G
+  Q --> G
+  G -->|Yes| E[Versioned aggregate payload]
+  G -->|No| X[Block publication and investigate]
+  E --> F[Static issuance-monitoring dashboard]
+  H[Monthly factor and supplemental files — planned] -. future integration .-> C

@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.env
+.DS_Store
+local/
+data/raw/*
+!data/raw/.gitkeep
+graphify-out/.graphify_python
+graphify-out/.graphify_root
+graphify-out/.graphify_labels.json.sig
+graphify-out/cache/
+graphify-out/20*/

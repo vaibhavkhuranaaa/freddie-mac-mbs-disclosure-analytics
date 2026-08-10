@@ -1,0 +1,187 @@
+{
+  "app/app.js": {
+    "mtime": 1785635790.423744,
+    "ast_hash": "fdef99cdca94a7fcf6005e6ae4f7a1cb",
+    "semantic_hash": "fdef99cdca94a7fcf6005e6ae4f7a1cb"
+  },
+  "app/data/dashboard.json": {
+    "mtime": 1786326158.1248848,
+    "ast_hash": "49ef4199719b37e865ad79ccb16251ae",
+    "semantic_hash": ""
+  },
+  "app/data/synthetic_monthly_aggregate.json": {
+    "mtime": 1785619382.8193007,
+    "ast_hash": "44045942becb20e637cd1f83388964b6",
+    "semantic_hash": "44045942becb20e637cd1f83388964b6"
+  },
+  "package.json": {
+    "mtime": 1786325811.8086298,
+    "ast_hash": "0bd6919a50f4429e65c7fc1faf0c4b68",
+    "semantic_hash": ""
+  },
+  "portfolio/project.json": {
+    "mtime": 1786326283.5861313,
+    "ast_hash": "5ca559c21a6961614debd6decbe7af94",
+    "semantic_hash": ""
+  },
+  "scripts/pipeline.py": {
+    "mtime": 1786325947.4185238,
+    "ast_hash": "d2fe8da14b0a77f31bb9afa2a4e08cda",
+    "semantic_hash": ""
+  },
+  "scripts/project_kit.py": {
+    "mtime": 1786326465.727956,
+    "ast_hash": "1385f2c196c44061d06ab6975f082333",
+    "semantic_hash": ""
+  },
+  "tests/test_pipeline.py": {
+    "mtime": 1786326152.9650717,
+    "ast_hash": "1f1328e246199b5995d9ac14344281b7",
+    "semantic_hash": ""
+  },
+  ".project/architecture.md": {
+    "mtime": 1786326282.979845,
+    "ast_hash": "7713a700d5d9213647cf89375dd74ef0",
+    "semantic_hash": ""
+  },
+  ".project/handoff.md": {
+    "mtime": 1786326558.6862235,
+    "ast_hash": "7c3ae85d4e2390539ca2a6eb811e816a",
+    "semantic_hash": ""
+  },
+  ".project/milestones.yml": {
+    "mtime": 1786326130.3565705,
+    "ast_hash": "9dd808c8e67768241c799dd5cc0762b4",
+    "semantic_hash": ""
+  },
+  "PROJECT.md": {
+    "mtime": 1786326282.7751412,
+    "ast_hash": "76fd7934deb92dd8d6ef2e149f230413",
+    "semantic_hash": ""
+  },
+  "README.md": {
+    "mtime": 1786326283.1876805,
+    "ast_hash": "b82360f0d31ee14badc7f112d7138d06",
+    "semantic_hash": ""
+  },
+  "app/index.html": {
+    "mtime": 1785635790.5203233,
+    "ast_hash": "ea45dab79a27ad7ddea15721a0dcae29",
+    "semantic_hash": "ea45dab79a27ad7ddea15721a0dcae29"
+  },
+  "docs/HIRING_MANAGER_REVIEW.md": {
+    "mtime": 1785903472.741176,
+    "ast_hash": "ccbfe2c1f49e9efb4d20b7d2a07f2fa6",
+    "semantic_hash": "ccbfe2c1f49e9efb4d20b7d2a07f2fa6"
+  },
+  "docs/METHODOLOGY.md": {
+    "mtime": 1786326283.4011326,
+    "ast_hash": "a9c926673f88c732e8eb281c40ed28d5",
+    "semantic_hash": ""
+  },
+  "docs/NEXT_CHAT_PROMPT.md": {
+    "mtime": 1785903472.8200002,
+    "ast_hash": "d1b924864c90c3ca1e7bb603f1b90f5d",
+    "semantic_hash": ""
+  },
+  "scripts/validate_dashboard.mjs": {
+    "mtime": 1786325947.5197005,
+    "ast_hash": "bc08a26733beacdca32476f9b85d3c9e",
+    "semantic_hash": ""
+  },
+  ".project/evidence.yml": {
+    "mtime": 1785903563.3911138,
+    "ast_hash": "f200f0aa152915580e5b55848005dba5",
+    "semantic_hash": "f200f0aa152915580e5b55848005dba5"
+  },
+  "scripts/smoke_static.py": {
+    "mtime": 1786326316.2170608,
+    "ast_hash": "a6ac15f4e7b20deb3eb552c900d74103",
+    "semantic_hash": ""
+  },
+  ".github/copilot-instructions.md": {
+    "mtime": 1785636969.994601,
+    "ast_hash": "22a2fb3e9ecc3c573d5621152fc4a28c",
+    "semantic_hash": ""
+  },
+  ".github/workflows/quality.yml": {
+    "mtime": 1786325811.9088285,
+    "ast_hash": "0a2dbeef3a8f05c707dc109c011babd2",
+    "semantic_hash": ""
+  },
+  ".project/approvals.yml": {
+    "mtime": 1786326130.1660385,
+    "ast_hash": "e5847d60630f060dc42f367c452f119c",
+    "semantic_hash": ""
+  },
+  ".project/data.md": {
+    "mtime": 1786326130.4416416,
+    "ast_hash": "59bd1e5a227ebbc5ad1abe85807e1fd6",
+    "semantic_hash": ""
+  },
+  ".project/evaluation.md": {
+    "mtime": 1786326130.5249703,
+    "ast_hash": "27a5162cd3d35524a3258348cdf90116",
+    "semantic_hash": ""
+  },
+  ".project/publication.md": {
+    "mtime": 1786326130.7711923,
+    "ast_hash": "e47ad066ac882f4655ac2237db3e7b50",
+    "semantic_hash": ""
+  },
+  ".project/refinement-plan.md": {
+    "mtime": 1786326130.0842886,
+    "ast_hash": "473c2f6e30206c6ebaf41f27d9e0ef4b",
+    "semantic_hash": ""
+  },
+  ".project/state.md": {
+    "mtime": 1786326558.4046035,
+    "ast_hash": "d945b99fe4d2f9bbfd6a9ea18c88d7e3",
+    "semantic_hash": ""
+  },
+  "AGENTS.md": {
+    "mtime": 1785636869.715743,
+    "ast_hash": "4ac24ec6c82086c61346cb778e65d934",
+    "semantic_hash": ""
+  },
+  "CASE-STUDY.md": {
+    "mtime": 1786326130.9090118,
+    "ast_hash": "946ce6e39e747e3844615797ee750438",
+    "semantic_hash": ""
+  },
+  "CLAUDE.md": {
+    "mtime": 1785636969.7727058,
+    "ast_hash": "e9844f3e9d250fab938390460f0a6350",
+    "semantic_hash": ""
+  },
+  "DEPLOYMENT.md": {
+    "mtime": 1786326283.4945657,
+    "ast_hash": "d2d5f1c7fabe83c059b451c6f64ac997",
+    "semantic_hash": ""
+  },
+  "DESIGN.md": {
+    "mtime": 1785619218.5733333,
+    "ast_hash": "074ff1227be29ca19ed67097fd401762",
+    "semantic_hash": ""
+  },
+  "docs/data-dictionary.md": {
+    "mtime": 1786326130.6054547,
+    "ast_hash": "ce7c00740d822f1ea6bf5be3d241ec6c",
+    "semantic_hash": ""
+  },
+  "docs/metric-glossary.md": {
+    "mtime": 1786326130.6905694,
+    "ast_hash": "972dea5ada07b1efde78c203b2f6d4b2",
+    "semantic_hash": ""
+  },
+  "docs/rules/category.md": {
+    "mtime": 1785619218.574084,
+    "ast_hash": "de1bdd6e703c89c6371b33f247511e1d",
+    "semantic_hash": ""
+  },
+  "docs/rules/industry.md": {
+    "mtime": 1785619218.5741515,
+    "ast_hash": "50edac09725a2bc32b81f34f2d964e0b",
+    "semantic_hash": ""
+  }
+}
