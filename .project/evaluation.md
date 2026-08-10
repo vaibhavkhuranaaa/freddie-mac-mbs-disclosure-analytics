@@ -1,70 +1,87 @@
 # Evaluation contract
 
-Status: `M2 approved and verified locally; later-milestone targets remain proposed`
+Status: M0–M3 verified; M4 implementation gates ready
 
-## M2 trust-foundation metrics
+## Verified baseline
 
-| Metric | Method | Target | Verified result | Decision supported | Limitation |
-| --- | --- | --- | --- | --- | --- |
-| Source reconciliation | Sum per-file manifest counts | Input = accepted + excluded + rejected + duplicates | 60,604 = 59,904 + 700 + 0 + 0 | Whether the aggregate build is complete enough to publish | Does not prove source-provider completeness beyond delivered files |
-| Publication reconciliation | Compare accepted rows, stored observations, and published count | All equal | 59,904 = 59,904 = 59,904 | Whether the dashboard payload traces to accepted records | Aggregate-only validation does not inspect every upstream source meaning |
-| Quality status | Fail-closed manifest gate | `pass` for every source | 19 of 19 pass | Whether publication is allowed | Status-`C` exclusion is a documented business rule, not an error |
-| Schema recognition | Ordered-header SHA-256 plus period bounds | 100% known and period-compatible | 12 legacy-v1 files; 7 fico-v2 files | Whether transformation semantics are known | A future provider schema requires review before loading |
-| Duplicate rate | Duplicate `(report_month, security_id)` / input | 0 for release | 0 / 60,604 | Whether security-period measures could be double counted | Key is issuance-specific and may change for later sources |
-| Rejected-row rate | Rejected / input | 0 for release | 0 / 60,604 | Whether invalid data entered the aggregate | Valid exclusions are reported separately |
-| Idempotence | Rebuild identical inputs twice and compare normalized payload | Exact match except generation timestamp | Passing automated test | Whether a rebuild is reproducible | Git revision changes legitimately change metadata |
-| Released-payload safety | Compare released payload checksum around sample/check paths | Unchanged | Passing regression test | Whether reviewer data can be overwritten accidentally | Intentional `load:raw` rebuild remains authorized behavior |
+| Gate | Target | Verified result |
+| --- | --- | --- |
+| Source reconciliation | input = accepted + excluded + rejected + duplicate | 60,604 = 59,904 + 700 + 0 + 0 |
+| Publication reconciliation | accepted = stored = published | 59,904 = 59,904 = 59,904 |
+| Source quality | all files pass | 19/19 pass |
+| Schema recognition | all period-compatible | 12 legacy-v1; 7 fico-v2 |
+| Duplicate/rejected rate | zero for release | zero |
+| Idempotence | normalized rebuilds equal | automated test passes |
+| Released-payload safety | check/sample paths do not alter release | regression test passes |
+| Issuance mix | group totals reconcile; unknown explicit | 95 rows; 99.29% UPB mapped |
+| UI behavior | derived findings and resilient accessible states | automated/static checks pass |
 
-## Engineering gates
+## M4 source and conformance gates
 
-- Unit/integration tests cover official success, schema transition, missing headers, period mismatch, malformed archive layout, invalid values, duplicate keys, aggregate accuracy, idempotence, sample isolation, and payload failure.
-- Static preview smoke test must serve the HTML, JavaScript, CSS, and validated aggregate payload locally.
-- CI must run `npm run check` on pushes and pull requests.
-- Raw files must remain ignored and absent from Git tracking.
+- All 71 monthly-security and 35 loan-level archives must pass exact package, member, schema/layout, validity-period, row, and reconciliation rules.
+- Every physical record receives one documented disposition; accepted records reconcile to conformed facts.
+- Eligible joins reconcile to matched, unmatched, ambiguous, late, ineligible, and terminated reasons by family/period.
+- Backfill and incremental processing produce identical normalized conformed outputs for the same as-of view.
+- Original-publication and latest-known correction views reproduce golden correction fixtures.
+- No restricted row value appears in Git, public artifacts, logs, command summaries, or test failure snapshots.
+- Tests include each schema transition, the April 2026 consolidation, malformed/unknown layouts, duplicate keys, missing periods, corrections, and join failures.
 
-## M3 product and accessibility targets
+## M5 metric gates
 
-- Five analyst tasks: confirm release health, identify peak/latest change, inspect composition, trace a finding to methodology, and identify the next investigation.
-- No critical automated or manual WCAG 2.2 AA issue.
-- Complete loading, empty, partial, stale, and error states.
-- Every chart has an equivalent plain-language summary and accessible evidence table.
-- Findings remain correct when peak, trough, latest period, and year boundary change.
+- 100% of released measures have the complete metric contract required by `docs/BI_PRODUCT_SPEC.md`.
+- Security, loan, cohort, vintage, segment, and portfolio totals reconcile to additive components within a documented tolerance; count/UPB bridges target exact equality.
+- Weighted measures reproduce independently calculated golden numerators and denominators.
+- Snapshot metrics are not summed across time; zero/invalid denominators are suppressed and explained.
+- Corrections, issuance, removals, terminations, missing periods, low balances, schema transitions, and score-model transitions are covered.
+- SMM/CPR, runoff, roll/cure, and HHI remain unreleased until a domain reviewer approves their formula fixtures.
+- Voluntary, scheduled, curtailment, involuntary, and correction principal movements are never silently combined.
 
-Current M3 implementation evidence:
+## M6 semantic-model gates
 
-- Monthly mix security counts, UPB, and shares reconcile to every monthly total in the payload validator.
-- Pure analytics tests cover payload rejection, zero-denominator handling, cross-year month labels, latest mix ordering, and derived findings.
-- Loading and error states use an `aria-live` status region and a named retry action; the default HTML renders a loading explanation before JavaScript completes.
-- Trend labels include month and year, the chart has a generated accessible description, and the evidence table remains available.
-- Impeccable's mechanical detector returned no findings for the changed HTML, CSS, and JavaScript.
-- Local HTTP smoke returned 200 for the application and served a passing 19-month/95-mix-row payload.
+- Every certified Power BI measure matches the metric engine exactly under representative filter combinations.
+- Relationship direction/cardinality, unknown members, role-playing dates, and many-to-many exceptions are tested.
+- Restricted fields are absent from unauthorized metadata, visuals, exports, drill-through, and role tests.
+- Full and incremental refresh agree across range boundaries and late corrections.
+- Executive pages meet the agreed refresh and interaction target on current and synthetic 10x structural fixtures; actual thresholds are recorded before release.
 
-## M4–M6 analytical and product targets
+## M7–M8 stakeholder and UX gates
 
-- The M4 intake readiness gate must remain blocked while the source contract is pending, emit no disclosure row values, recognize the 19 governed issuance archives, and reject missing required families or unapproved schema fingerprints.
-- Cross-source joins quantify matched, unmatched, duplicate, corrected, and late records by period.
-- Every measure records definition, formula, timing, denominator, unit, desired direction, evidence, supported decision, and limitation.
-- Security, cohort, portfolio, API, and dashboard totals reconcile exactly on golden fixtures.
-- Public and authorized analyst access boundaries pass negative authorization tests.
-- A 10x-data performance test establishes scale triggers before a managed analytical database is introduced.
+Test at least five representative users or conduct a documented expert walkthrough when access is limited.
 
-Current readiness evidence: six source-inventory tests cover the pending-contract blocker, row-value non-disclosure, exact approved archive/member/schema matching, unapproved-schema failure, required governance fields, and the command's fail-closed exit status. The actual restricted inventory reports 19 governed issuance archives, zero approved M4 archives, and blocked readiness.
+| Task | Target |
+| --- | --- |
+| Confirm whether the release is usable | at least 90% correct without coaching |
+| Identify the largest material change and period | at least 90% correct |
+| Identify a primary driver/cohort | at least 85% correct |
+| Recognize a correction/non-comparable period | at least 90% correct |
+| Reach evidence and state a next investigation | at least 85% complete within 3 minutes |
+| Interpret metric direction/limitation | no material misunderstanding in final round |
 
-## M7 AI targets
+Accessibility gates: WCAG 2.2 AA contrast, complete keyboard order, visible focus, screen-reader labels, high-contrast mode, 200% zoom, color-independent status, and an accessible alternative for every visual conclusion. No page exceeds seven decision-bearing visuals.
+
+## M8–M9 governance/API gates
+
+- Every executive exception drills to a reproducible filter/evidence context.
+- Investigation create/update actions preserve source facts and produce audit records.
+- Authorized and reviewer modes pass negative access and artifact-inspection tests.
+- API, metric engine, and Power BI totals match exactly; no arbitrary SQL/raw-row endpoint exists.
+- Contract, filter, pagination, concurrency, error, and 10x performance tests pass.
+
+## M10 optional AI gates
 
 These targets do not authorize an AI service:
 
 - 100% deterministic metric agreement on the golden set.
 - At least 95% grounded-answer pass rate and 98% citation precision.
 - At most 1% unsupported material-claim rate.
-- 100% refusal/redirect pass rate for prohibited investment, valuation, hedging, lending, and causal-advice prompts.
-- No restricted raw fields in prompts, traces, retrieval documents, citations, or responses.
-- A measured analyst outcome improves relative to the non-AI workflow.
+- 100% refusal/redirect for investment, valuation, hedging, lending, and unsupported causal prompts.
+- No restricted raw fields in prompts, traces, retrieval, citations, or responses.
+- Measurable improvement in investigation time or accuracy versus the non-AI workflow.
 
-## Fairness and responsible-use evaluation
+## Responsible use
 
-The current product performs aggregate security/disclosure monitoring and does not make borrower decisions. Fairness evaluation therefore focuses on preventing unsupported subgroup interpretation, protecting restricted attributes, and ensuring the UI/AI layer does not turn descriptive portfolio fields into lending or investment recommendations. Any later use of borrower-composition fields requires a separate stakeholder, legal, privacy, fairness, and public-claims review.
+The product is descriptive security/portfolio analytics, not borrower decisioning. Segment fields must not be turned into lending, protected-class, investment, or causal judgments. Any expanded borrower use requires separate legal, privacy, fairness, stakeholder, and public-claims review.
 
-## Cloud/release targets
+## Cloud/release gates
 
-Cloud performance, availability, recovery, security, cost, and teardown targets must be finalized only after the platform, region, tiers, usage assumptions, identity model, and budget receive explicit approval. Publication requires exact deployed revision/payload evidence and a public-artifact leakage review.
+Performance, availability, recovery, security, cost, and teardown thresholds are finalized only after provider/region/tier/usage approval. Publication requires exact source and deployment revisions, approved payload/model checksum, accessibility and live verification, restricted-artifact inspection, rollback proof, and recorded owner approval.

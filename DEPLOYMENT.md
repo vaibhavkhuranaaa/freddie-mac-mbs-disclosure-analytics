@@ -2,17 +2,9 @@
 
 ## Current state
 
-The dashboard runs locally at `http://127.0.0.1:4173`. A local Git repository now provides revision lineage, but no remote, public hosting, account connection, or paid resource has been created.
+The verified static issuance dashboard runs locally at `http://127.0.0.1:4173`. Git revision lineage exists, but no remote, hosted environment, cloud account connection, public visibility, or paid resource is configured.
 
-## Deployment-ready work
-
-Before public deployment, complete the P0 and P1 milestones in `.project/milestones.yml`:
-
-1. Complete the remaining M3–M9 product, analytical, security, and release-candidate gates.
-2. Choose and approve the exact aggregate release payload; raw files and security-level rows are prohibited.
-3. Approve a host, expected visibility, cost ceiling, domain, screenshots, and teardown procedure.
-
-## Local preview
+## Local workflow
 
 ```sh
 npm run load:raw
@@ -20,10 +12,15 @@ npm run check
 npm run serve
 ```
 
-## Hosting option
+Power BI M6 begins as a local Import model. Power BI Service, gateway, tenant roles, RLS/OLS, refresh capacity, licensing, and sharing are deployment decisions, not local-development assumptions.
 
-`netlify.toml` is included for a no-build static deployment of `app/`. Hosting remains a human decision; this document does not authorize a deployment or publication.
+## Deployment gates
 
-## Release verification
+1. Complete M4–M9 data, metric, semantic-model, dashboard, investigation, and API evidence.
+2. Approve provider/tenant, region, residency, identity, licensing, cost ceiling, retention, backup, recovery, and teardown for M11.
+3. Pass infrastructure, security, access, observability, load, failure-recovery, rollback, restore, and cost tests in a private pilot.
+4. Approve the exact reviewer model/payload, host, visibility, checksum, source revision, screenshots, domain, budget, and teardown for M12.
 
-CI now runs the complete local `npm run check` path, including tests, released-payload validation, static preview smoke, and project-record checks. Deployment remains incomplete until the deployed revision, payload checksum, source period, approvals, and verified live URL are recorded.
+`netlify.toml` supports the current static application's no-build local/reviewer shape only. Its presence does not authorize deployment or public release.
+
+GitHub Actions runs the complete local verification path. A deployed release is complete only when exact source/infrastructure/application revisions, model/payload checksum, approvals, and a verified live URL are recorded.

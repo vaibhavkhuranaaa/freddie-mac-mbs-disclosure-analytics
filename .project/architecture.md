@@ -1,77 +1,103 @@
 # Architecture decision
 
-## Decision
+## Approved status
 
-- **Status:** governed real-data local issuance product; end-to-end roadmap approved 2026-08-09
-- **Data access:** authorized Freddie Mac user; restricted official files remain local and out of Git/public artifacts
-- **Current delivery:** local static reviewer application backed by local SQLite and an aggregate payload
+- **Current architecture:** governed local real-data issuance product
+- **Next architecture:** local conformed security/loan facts, versioned metric engine, and certified Power BI semantic model
+- **Data access:** authorized row-level Freddie Mac source use; restricted files stay outside Git and reviewer artifacts
+- **Retention:** seven years from acquisition, deleted earlier if authorization ends
 - **Current cost:** $0 operating baseline
-- **Cloud authority:** not approved; the Azure-first reference remains a proposal
-- **AI authority:** not approved; deterministic metric and evidence APIs must precede any assistant
+- **Cloud/AI/deployment/publication:** not approved
 
-## Implemented trust architecture
+## Verified baseline
 
 ```text
 Authorized FRE_IS ZIPs
-        ↓
-Archive/member + exact ordered-header fingerprint + period validation
-        ↓
-Row rules + documented exclusion + duplicate detection
-        ├── accepted security observations (restricted local SQLite)
-        ├── source manifest and count reconciliation
-        └── value-free quality events
-        ↓
-All sources pass? ── no → block publication and investigate
-        │
-       yes
-        ↓
-Versioned monthly aggregate JSON → static reviewer dashboard
+  → exact package/schema/period validation
+  → row rules, exclusions, duplicate detection, reconciliation
+  → restricted SQLite facts + manifest + value-free quality events
+  → all-pass publication gate
+  → versioned aggregate JSON
+  → local static issuance dashboard
 ```
 
-The verified build processes 60,604 physical rows from 19 files. It publishes 59,904 issuance observations, records 700 status-`C` blank-balance exclusions, and reports zero rejected and duplicate rows. Twelve files use `fre-is-legacy-v1`; seven use `fre-is-fico-v2` beginning in December 2025.
+The verified build processes 60,604 physical rows from 19 files and publishes 59,904 issuance observations after 700 documented exclusions, with zero rejected and duplicate rows.
 
-## Current technical choices
+## Target logical architecture
 
-| Choice | Reason | Scale trigger |
-| --- | --- | --- |
-| Python standard library pipeline | Direct ZIP/CSV/SQLite support with no runtime dependency install | Multiple source families, complex orchestration, or performance evidence requires a pinned container dependency set |
-| Exact header fingerprints | Any provider schema change is visible and reviewed | Add a new version only with data-contract and fixture evidence |
-| SQLite | Reproducible restricted local analytical store at current size | Concurrent authorized analysts, API query load, scheduled jobs, or 10x test failure |
-| Static HTML/CSS/JS | Fast, low-cost reviewer mode with no server data exposure | Analyst drill-down and saved investigations require an authenticated API |
-| Aggregate JSON | Deterministic public/reviewer boundary | Larger segment payloads or governed queries require a versioned semantic API |
-
-## M4 intake boundary
-
-The local source inventory now sits before any new-source parser. It hashes archives, inspects member metadata and ordered headers, and counts physical rows without emitting disclosure row values. Filename/member discovery is not authorization: a candidate becomes an approved M4 source only when `.project/m4-source-contract.json` records rights, retention, exact patterns, schema fingerprints and validity periods, fields, measures, and join behavior. Missing approval, a missing required family, an unknown schema, or an invalid package keeps readiness blocked.
-
-## Approved logical target
-
-```text
-Restricted landing → versioned validation/quarantine → conformed security-period data
-        → governed metric transformations → approved aggregate products
-        → public static reviewer mode
-        → authenticated analyst API/UI
-
-Approved documentation/evidence → governed retrieval index
-Authenticated metric/evidence tools + retrieval → optional cited assistant
-
-Identity, secrets, CI/CD, IaC, logs, alerts, budgets, backup, and recovery govern every cloud component.
+```mermaid
+flowchart LR
+  A["Restricted official archives"] --> B["Immutable manifest and schema registry"]
+  B --> C["Validation, quarantine, and correction ledger"]
+  C --> D["Conformed issuance, security-period, and loan-period facts"]
+  D --> E["Versioned metric engine and golden tests"]
+  E --> F["Certified Power BI semantic model"]
+  F --> G["Authorized analyst report"]
+  E --> H["Explicit reviewer allowlist"]
+  H --> I["Reviewer dashboard"]
+  E --> J["Governed semantic API"]
+  J --> K["Optional cited assistant"]
 ```
 
-## Azure-first proposal (not authorized to provision)
+Identity, access, secrets, audit, observability, cost, backup, recovery, deployment, and teardown govern cloud components only after approval.
 
-| Capability | Proposed service | Boundary |
+## Data architecture
+
+| Layer | Grain / responsibility | Required controls |
 | --- | --- | --- |
-| Restricted storage | ADLS Gen2 | Immutable landing and curated zones |
-| Monthly jobs | Event Grid + Container Apps Jobs | Serverless batch; no continuously running cluster |
-| Serving | Materialized aggregates first; Functions API when needed | Managed analytical database only after a measured scale trigger |
-| UI and identity | Static Web Apps + Entra ID | Public and authorized modes remain separated |
-| Secrets/telemetry | Key Vault + managed identity + Application Insights | No committed secrets; auditable job/API behavior |
-| AI after M7 approval | Azure OpenAI/AI Foundry + AI Search | Tool-only deterministic metrics and approved cited documents |
-| Delivery after M8 approval | GitHub Actions + Bicep | Reviewed revision-to-environment lineage |
+| Restricted landing | immutable acquired archive | checksum, member inventory, acquisition time, retention/deletion clock |
+| Validated staging | native source row/record type | schema validity, type/range rules, correction identity, disposition reconciliation |
+| Conformed facts | issuance security, security-period, loan-period, supplemental native grain | surrogate keys, original/latest views, matched/unmatched reason taxonomy |
+| Metric engine | numerator/denominator components and certified measures | formula version, golden fixtures, comparison eligibility, limitation |
+| Semantic model | star schema facts/dimensions and explicit measures | single-direction relationships, security classification, parity/performance tests |
+| Release models | authorized detail or explicit reviewer aggregate | independent allowlist, negative access tests, artifact inspection |
 
-The platform, region, services, tiers, cost ceiling, identity, retention, backup, teardown, and data-residency choices require explicit approval before infrastructure is applied.
+Do not flatten security-period and loan-period data into one wide fact table. Weighted measures must carry additive numerator and denominator components. Classic FICO and VS4 remain separate score systems. The April 2026 file consolidation is modeled as source metadata, not an economic event.
 
-## Public claims
+## Correction and as-of design
 
-Current claims are limited to authorized local issuance ingestion, exact schema/period validation, reconciled quality/provenance, monthly aggregates and issuance mix, automated verification, the static local dashboard, and the fail-closed M4 intake gate. Factor/runoff/prepayment, authenticated APIs, AI, cloud, and hosted release remain planned until their milestone evidence exists.
+- Append immutable source versions and retain provider correction indicators.
+- Provide `As reported` and `Latest known` views.
+- Record affected row count, UPB, fields, source version, load time, and precedence reason.
+- Never overwrite evidence of an original publication.
+- Rebuilds and incremental loads must agree for the same as-of view.
+
+## Power BI design
+
+- Local Power BI Desktop Import model is the initial target.
+- Star schema uses explicit measures and conformed dimensions defined in `docs/BI_PRODUCT_SPEC.md`.
+- Incremental refresh is introduced only after range-boundary, late-arriving, and correction tests pass.
+- Field parameters provide controlled metric/segment selection; they do not grant arbitrary field access.
+- Row-level and object-level security, export restrictions, Build permissions, and workspace roles are implemented and tested only when Power BI Service is approved.
+- The current static dashboard remains the release baseline until Power BI metric parity, accessibility, stakeholder tasks, and rollback evidence pass.
+
+## Technology choices and triggers
+
+| Choice | Use now | Scale/change trigger |
+| --- | --- | --- |
+| Python governed transformations | Yes | Keep; package/containerize when dependencies or scheduling require it |
+| SQLite restricted baseline | Yes | Move when concurrent analysts, service queries, or 10x tests breach recorded thresholds |
+| Power BI Import semantic model | M6 target | Composite/DirectQuery only with measured size, latency, or freshness need |
+| Static reviewer payload | Yes | Replace only with an approved reviewer semantic model/API |
+| Semantic API | M9 | Required before any AI or non-BI client |
+| AI assistant | No | M10 evidence plus explicit AI and cost approval |
+
+## Cloud reference option
+
+Azure remains a reference mapping, not a platform decision or provisioning authority:
+
+| Capability | Reference service |
+| --- | --- |
+| Restricted landing/curated storage | ADLS Gen2 |
+| Monthly containerized transformations | Container Apps Jobs with event/schedule orchestration |
+| Governed serving | materialized products first; authenticated Functions/API when justified |
+| BI identity and service | Power BI/Fabric tenant controls plus Microsoft Entra ID, subject to licensing approval |
+| Secrets and telemetry | Key Vault, managed identities, Application Insights/Log Analytics |
+| Delivery | reviewed GitHub Actions and Bicep |
+| Optional AI | Azure OpenAI/AI Foundry plus approved retrieval, after M10 gate |
+
+Provider, tenant, region, residency, tiers, cost ceiling, identity, backup, recovery, and teardown require explicit recorded approval before implementation.
+
+## Claim boundary
+
+Current claims remain issuance, quality, provenance, composition, and source-intake readiness. Longitudinal factor/balance, prepayment, delinquency, collateral, concentration, investigation, Power BI, API, AI, cloud, and hosted-release claims become valid only after their milestone evidence is verified.

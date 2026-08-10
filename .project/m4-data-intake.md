@@ -1,8 +1,70 @@
-# M4 factor and supplemental data intake
+# M4 monthly security and loan data intake
 
-Status: `pending owner file acquisition and data-contract approval`
+Status: `requested security and loan acquisition complete; M4 contract implementation is next`
 
-This record converts the M4 dependency into a fail-closed intake procedure. It does not approve a source, field, calculation, public claim, or distribution right.
+This record converts the acquired M4 population into a fail-closed implementation procedure. Row-level local use is authorized; exact machine fields, joins, calculations, and reviewer/public rights still require their documented gates.
+
+## Verified acquisition progress
+
+The owner confirmed authorized row-level Freddie Mac use for the restricted analyst workflow and acquired the requested history for all applicable monthly-security and monthly loan-level families from the authenticated disclosure source. Public redistribution or publication was not authorized.
+
+The owner approved a seven-year retention period from acquisition for restricted raw and security-level derived data, with earlier deletion if authorization ends.
+
+The archives are retained under ignored `data/raw/` storage. Safe structural inspection verified:
+
+| Family | Archive/member | Rows | Structure | Archive SHA-256 |
+| --- | --- | ---: | --- | --- |
+| Core File 1 | `fd241205.zip` / `fd241205.txt` | 395,068 | Headered; 96 columns; header `d5115758...207f46` | `00071c3d...415fd` |
+| Core File 2 | `ar250107.zip` / `ar250107.txt` | 24,539 | Headered; 96 columns; header `60d8e87d...52128` | `013db149...c8c7` |
+| Supplemental File 1 | `fq250107.zip` / `fq250107.txt` | 18,948,484 | Headerless multi-record; 30 observed record types | `2947e19d...572f` |
+| Supplemental File 2 | `ge250107.zip` / `ge250107.txt` | 1,079,438 | Headerless multi-record; 44 observed record types | `42479676...6267` |
+
+The four samples contain 20,447,529 physical records and zero unknown record types or record-width failures under the observed structural layouts. The supplemental files do not contain a header row; their first field selects a record-specific layout. The intake gate now validates those record-type/column-count contracts without emitting row values.
+
+The initial samples established packaging/layouts; the completed backfill below establishes the requested implementation window. It does not by itself define correction handling or certify M4 fields, joins, or measures.
+
+### 2025 backfill
+
+All 48 required 2025 packages are present: 12 monthly files for each of `fd`, `ar`, `fq`, and `ge`.
+
+The partial backfill verifies three source-layout changes:
+
+- Core Files 1 and 2 use their 96-column legacy layouts through the November 2025 publication and switch to the same 98-column FICO/VS4 layout in December 2025 (`03eb8bde...5a541`).
+- Supplemental File 1 adds record type `52` with nine columns in March 2025.
+- Supplemental File 1 changes record type `1` from 19 to 21 columns and record type `6` from eight to nine columns in December 2025, aligned to the FICO/VS4 transition.
+- Supplemental File 2 changes record type `1` from 19 to 21 columns, record type `6` from eight to nine columns, and record types `32` and `39` from eight to nine columns in December 2025.
+
+The machine contract records separate validity periods for each observed 2025 layout. Record type `35` is present through May and absent from June onward; absence is allowed because supplemental record types are optional within the approved layout set.
+
+### 2026 backfill and consolidation
+
+The requested 2026 backfill is complete through the latest available August publication: eight `fd`, eight `fq`, three `ar`, and three `ge` packages. Together with the 2025 backfill and the December 2024 Core File 1 sample, restricted storage contains 71 monthly-security archives.
+
+Safe structural inspection confirms the documented consolidation boundary:
+
+- Core File 1 and Supplemental File 1 continue from January through August 2026.
+- Core File 2 and Supplemental File 2 end with the March 2026 publication.
+- From April 2026, Supplemental File 1 contains the consolidated record families formerly split across Files 1 and 2.
+- The shared 98-column Core FICO/VS4 layout continues across all observed 2026 Core files.
+- The machine contract contains a separate April-through-August 2026 consolidated Supplemental File 1 layout. No raw field values or identifiers were emitted while profiling it.
+
+The acquired monthly-security scope is complete for December 2024 through August 2026 under the selected family/period rules. Corrections/restatements remain a separate policy and acquisition decision.
+
+### Adjacent source-family roadmap
+
+The portal contains additional files, but access authority alone does not make unlike grains safely interchangeable. They are staged by analytical value and contract readiness:
+
+| Source family | Decision | Reason |
+| --- | --- | --- |
+| Monthly loan-level Files 1/2 (`fu`/`au`) | Acquired: `fu` January 2025–August 2026 and `au` January 2025–March 2026 | Implement next under a distinct loan-period grain, schema, correction, and security-linkage contract. |
+| Security correction/restatement packages | Acquire for every covered period in which a correction exists | Required to define original-versus-latest precedence and reproducible as-of reporting before M4 transformation approval. |
+| Daily prepayment reports | Defer until monthly factor/loan measures reconcile | Separate daily grain; useful for timing and validation, but it should not define the first monthly metric contract. |
+| Daily issuance files | Defer | The governed month-end `FRE_IS` history already answers the current monthly issuance workflow; daily files add intramonth timing rather than missing M4 factor fields. |
+| Multiclass, resecuritization, pseudopool, mission, green, or social files | Out of the current product universe | Different products, structures, and joins; add only through an explicit scope milestone so unlike populations are not mixed silently. |
+
+History range and retention are separate controls. The present monthly-security analytical history is the requested recent window used to establish schemas and the 2026 consolidation boundary. Seven-year retention means each acquired restricted file is kept for seven years from acquisition, with earlier deletion if authorization ends; it does not automatically create seven years of historical observations. For robust seasonality and rate-cycle prepayment analysis, extend the analytical history backward after the monthly security and loan-level parsers prove schema-safe; target at least five years and preferably seven years if the official packages and local capacity support it.
+
+The adjacent loan-level window is complete through the applicable August/March 2026 endpoints: twenty `fu` packages covering January 2025–August 2026 and fifteen `au` packages covering January 2025–March 2026, totaling about 9.1 GiB compressed. All 35 ZIPs pass archive-integrity checks and contain exactly named `.txt` members. Header-only inspection found 116 columns throughout, a December 2025 FICO/VS4 semantic transition in both families, and no additional header change at the April 2026 File 1/File 2 consolidation boundary. These files remain outside the M4 security-source contract and are not yet approved for row transformation.
 
 ## Verified official source candidates and transition
 
@@ -34,13 +96,13 @@ Primary references, accessed 2026-08-09:
 Before `.project/m4-source-contract.json` may be changed to `approved`, record:
 
 1. Exact acquired archive and embedded-member conventions for every required source family.
-2. Authorized-use basis, reviewer/public demo rights, retention, and deletion boundary.
+2. Public demo rights remain unapproved. Authorized restricted row-level use and the seven-year/authorization-end deletion boundary are confirmed.
 3. Source grain, reporting/effective period, release timing, historical coverage, and the April 2026 File 1/File 2 consolidation boundary.
 4. Original and correction/restatement behavior, including `FRE_RIS`/`FRE_RISS` handling and which delivery supersedes another.
 5. Primary/business keys and the allowed join from issuance to security-period records.
 6. Exact ordered-header fingerprints and validity periods for every observed schema version.
 7. Field allowlist with meaning, type, unit, sensitivity, null/sentinel behavior, and public aggregation rule.
-8. Intended measures; factor, balance, runoff, paydown, and prepayment remain unapproved until M5 formulas receive domain review.
+8. Intended measures; descriptive source fields enter the M5 catalog, while factor-derived runoff, paydown, SMM/CPR, roll/cure, and concentration formulas remain gated until golden fixtures and domain review pass.
 9. Required source families and policy for optional, missing, late, unmatched, terminated, or reissued securities.
 
 ## Machine-enforced contract
@@ -48,18 +110,18 @@ Before `.project/m4-source-contract.json` may be changed to `approved`, record:
 `scripts/source_inventory.py` reads the JSON contract, scans restricted raw storage without emitting row values, and reports:
 
 - archive checksum and size;
-- embedded member name, size, encryption flag, physical row count, column count, and ordered-header fingerprint;
+- embedded member name, size, encryption flag, physical row count, ordered-header fingerprint for headered files, and record-type/column-count coverage for headerless multi-record files;
 - governed issuance, approved M4, unapproved candidate, invalid, and unrelated classifications;
 - missing required families, unrecognized schemas, invalid archives, and contract blockers.
 
-Readiness remains blocked unless the contract is approved and every required family has at least one archive/member/schema match. Discovery never grants approval. Run:
+The fail-closed readiness command remains blocked until M4 approves the machine contract and every required family matches. That blocker is an implementation gate, not a missing-file request. Discovery never grants formula or release approval. Run:
 
 ```sh
 npm run inventory:sources
 python3 scripts/source_inventory.py --input data/raw --contract .project/m4-source-contract.json --require-ready
 ```
 
-The second command intentionally exits with status 2 while M4 dependencies remain unsatisfied.
+The second command intentionally exits with status 2 until the M4 contract is completed and approved.
 
 ## No-go rules
 

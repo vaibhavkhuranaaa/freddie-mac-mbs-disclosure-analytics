@@ -1,56 +1,98 @@
 # Data dictionary
 
-## Restricted local tables
+Status: current issuance schema plus implementation contract for M4–M6. Exact source-to-column mappings remain machine-versioned in source contracts.
+
+## Classification
+
+| Class | Examples | Authorized analyst | Reviewer/public |
+| --- | --- | --- | --- |
+| Restricted identifier | loan identifier, security identifier, CUSIP, source row | Yes | No |
+| Restricted detail | loan/security-period row, seller/servicer detail, correction detail | Yes | No unless separately approved |
+| Governed aggregate | approved count, UPB, rate, distribution, quality summary | Yes | Only by explicit release allowlist |
+| Safe metadata | schema version, period, build ID, quality status | Yes | Yes when approved |
+
+## Implemented restricted tables
 
 ### `monthly_security`
 
-| Field | Meaning | Unit/type | Public? | Limitation |
-| --- | --- | --- | --- | --- |
-| `report_month` | Validated source period | `YYYY-MM` | Aggregate only | Derived from filename |
-| `security_id` | Freddie Mac security identifier | Text | No | Restricted business key |
-| `security_type` | Source Prefix | Text | Approved aggregate only | Product taxonomy not yet approved |
-| `issuance_upb` | Investor security UPB at issuance | US dollars | Aggregate only | Describes issuance, not later balance runoff |
-| `current_upb` | Current UPB carried in the issuance source | US dollars | Aggregate only | Not a longitudinal performance measure in the current source |
-| `factor` | Security factor in the issuance source | Ratio `(0,1]` | Aggregate only | Commonly 1.0 at issuance; not a performance insight yet |
-| `cpr_pct` | Placeholder used only by the sample schema | Percent | No current public claim | Official issuance ingestion sets this to 0 and does not claim CPR |
-| `published_files` | Sample-only disclosure count | Integer | No current public claim | Official issuance ingestion sets this to 1 |
-| `expected_files` | Sample-only expected count | Integer | No current public claim | Official issuance ingestion sets this to 1 |
-| `release_lag_days` | Sample-only lag | Days | No current public claim | Official issuance ingestion sets this to 0 |
-| `revision_flag` | Source correction indicator | Boolean integer | Aggregate count | Meaning is limited to the source indicator |
-| `source_file` | Originating local filename | Text | No | Local provenance only |
-| `source_row` | Originating row number | Integer | No | Local investigation aid |
-| `schema_version` | Reviewed input contract version | Text | Safe metadata | Does not replace source documentation |
+| Field | Meaning | Type/unit | Release boundary |
+| --- | --- | --- | --- |
+| `report_month` | validated issuance source period | `YYYY-MM` | aggregate grouping |
+| `security_id` | Freddie Mac security identifier | text | restricted |
+| `security_type` | source Prefix | text | approved taxonomy aggregate only |
+| `issuance_upb` | investor security UPB at issuance | USD | aggregate only |
+| `current_upb` | current UPB carried by the issuance source | USD | not longitudinal performance |
+| `factor` | factor carried by the issuance source | ratio | validation only in current release |
+| `revision_flag` | normalized source correction indicator | boolean | aggregate count |
+| `source_file`, `source_row` | local lineage | text/integer | restricted |
+| `schema_version` | reviewed input contract version | text | safe metadata |
+
+The sample fixture contains compatibility-only fields used by pipeline tests. They are not certified business measures and do not appear in the reviewer metric catalog.
 
 ### `source_manifest`
 
-| Field group | Meaning |
-| --- | --- |
-| Identity | Source file, report period, SHA-256, load time, pipeline version, schema version |
-| Reconciliation | Input, accepted, excluded, rejected, duplicate, quarantined, and published counts |
-| Gate | `quality_status` is `pass` or `fail`; only all-pass manifests can publish |
+Identity fields record file/family, report period, archive/member checksum, acquisition/load time, schema/layout version, pipeline revision, and build ID. Reconciliation fields record physical input, accepted, excluded, rejected, duplicate, quarantined, conformed, and published counts. `quality_status` must pass before release.
 
 ### `quality_issue`
 
-Stores source file, row number, severity, rule code, and a value-free explanation. Informational exclusions remain visible; error events block publication.
+Records source, row/record reference, severity, rule code, and a value-free explanation. Informational exclusions remain visible; errors block publication.
 
-## Public aggregate payload
+## M4 target facts
 
-| Field | Meaning | Unit/type |
+| Fact | Grain | Core measures/attributes | Classification |
+| --- | --- | --- | --- |
+| `FactIssuance` | one accepted security at issuance month | issuance UPB, prefix/product, correction, source lineage | restricted detail |
+| `FactSecurityPeriod` | one security per reporting period and correction view | factor, current UPB, loan count, weighted rates/term/age/credit, removal count/UPB, mission/green/social indicators | restricted detail |
+| `FactLoanPeriod` | one loan per reporting period and correction view | current UPB, rates, maturity/age, credit/collateral, delinquency, modification, deferral, assistance, geography, seller/servicer | restricted detail |
+| `FactSupplementalDistribution` | provider-defined record type and period | bucket/distribution counts, balances, and source keys | restricted detail |
+| `FactSourceQuality` | file/family/period/load | dispositions, schema, freshness, coverage, join results | safe metadata/aggregate |
+| `FactRestatement` | original record/version to latest record/version | affected fields, count, UPB, reason, as-of times | restricted detail |
+| `FactInvestigation` | one analyst-created investigation | owner, priority, status, filters, evidence, note, outcome | restricted operational |
+
+## Conformed dimensions
+
+| Dimension | Representative fields | Notes |
 | --- | --- | --- |
-| `month` | Reporting month | `YYYY-MM` |
-| `security_count` | Accepted issued securities | Count |
-| `issuance_upb` | Sum of accepted issuance UPB | US dollars |
-| `current_upb` | Sum of current UPB in accepted issuance rows | US dollars |
-| `average_factor` | Unweighted mean source factor | Ratio |
-| `correction_count` | Sum of source correction flags | Count |
-| `metadata.period_start/end` | Aggregate coverage | `YYYY-MM` |
-| `metadata.generated_at` | Build time | UTC ISO-8601 |
-| `metadata.pipeline_version/revision` | Transformation lineage | Text |
-| `metadata.build_id` | Deterministic source/pipeline fingerprint | SHA-256 |
-| `metadata.schema_versions` | Reviewed schemas used | List of text values |
-| `metadata.quality` | Reconciled release counts and pass status | Object |
-| `mix[].product_group` | Approved official term-family group or explicit unmapped group | Text |
-| `mix[].security_count` | Accepted securities in month/group | Count |
-| `mix[].issuance_upb` | Issuance UPB in month/group | US dollars |
-| `mix[].issuance_share` | Group issuance UPB / monthly issuance UPB | Ratio `(0,1]` |
-| `metadata.mix` | Taxonomy version/source plus mapped and unmapped coverage | Object |
+| `DimDate` | reporting, issuance, origination, maturity, acquisition calendars | role-playing dates |
+| `DimSecurity` | restricted security/CUSIP keys, prefix, structure flags | identifiers hidden outside authorized detail |
+| `DimLoan` | restricted loan key | authorized detail only |
+| `DimProduct` | prefix, term family, security type, eligibility | unknown remains explicit |
+| `DimVintage` | issuance/origination month, quarter, year | stable cohort comparisons |
+| `DimGeography` | state and approved region | map plus accessible table |
+| `DimSeller`, `DimServicer` | source names/locations and governed display groups | top-N/Other rules versioned |
+| `DimCreditBand` | score model, score band, unknown/not-applicable | Classic FICO and VS4 never blended silently |
+| `DimLtvBand` | metric type, approved band, unknown/not-applicable | LTV/CLTV/ELTV context explicit |
+| `DimLoanPurpose` | purchase/refinance/other source categories | source meanings preserved |
+| `DimOccupancy` | primary/second/investment/unknown | source meanings preserved |
+| `DimPropertyType` | source property categories | source meanings preserved |
+| `DimChannel` | source origination channel | source meanings preserved |
+| `DimAssistanceProgram` | modification, deferral, alternative resolution, plan | no causal/success inference |
+| `DimSourceFile`, `DimSchemaVersion` | file/family/version/validity and acquisition metadata | lineage and comparability |
+
+## Public aggregate payload currently implemented
+
+| Field | Meaning | Type/unit |
+| --- | --- | --- |
+| `month` | reporting month | `YYYY-MM` |
+| `security_count` | accepted issued securities | count |
+| `issuance_upb` | accepted issuance UPB | USD |
+| `current_upb` | current UPB in accepted issuance records | USD; not runoff |
+| `average_factor` | unweighted issuance-source factor | ratio; not a performance insight |
+| `correction_count` | accepted source correction flags | count |
+| `mix[].product_group` | approved term family or explicit unmapped group | text |
+| `mix[].security_count`, `issuance_upb`, `issuance_share` | monthly group measures | count/USD/ratio |
+| `metadata.period_start/end`, `generated_at` | coverage and build time | period/UTC timestamp |
+| `metadata.pipeline_version/revision`, `build_id`, `schema_versions` | transformation lineage | text/hash/list |
+| `metadata.quality`, `metadata.mix` | release reconciliation and taxonomy coverage | objects |
+
+## Source-field domains for M4/M5
+
+- Identity/structure: Prefix, security identifier, CUSIP, status, correction, notification, issue/maturity, issuer/description, resecuritization/IO/ARM/step flags.
+- Balances/factors: issuance/current security UPB, factor, original/issuance/current loan UPB, interest-bearing and deferred amounts, removal count/UPB.
+- Rates/term: original/issuance/current/net rates, term, WAM/WALA, margins, indexes, caps, floors, adjustments.
+- Credit/collateral: Classic FICO, VS4, LTV, CLTV, ELTV, DTI, loan amount, units, purpose, occupancy, property type, valuation method, channel, state, first-time buyer, MI, guarantee.
+- Counterparty: seller and servicer names/locations.
+- Performance/assistance: days delinquent, loan performance history, modifications/program/type/count/capitalized amount, deferrals, alternative resolution, borrower assistance.
+- Mission: mission density/criteria, green/social, eligibility-program indicators.
+
+Exact official labels, types, null rules, validity windows, sensitivity, and transformations belong in the M4 machine contracts. Presence in a header does not by itself approve a metric.

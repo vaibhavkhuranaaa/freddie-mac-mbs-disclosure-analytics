@@ -1,6 +1,6 @@
 # Data contract
 
-Status: `approved authorized issuance baseline; new source families require separate approval`
+Status: `authorized row-level local use and retention approved; M4 transformation contract is next`
 
 ## Rights and release boundary
 
@@ -8,7 +8,8 @@ Status: `approved authorized issuance baseline; new source families require sepa
 - Official source ZIPs remain under ignored `data/raw/` storage and are never committed or included in a public artifact.
 - The reviewer-facing application receives monthly aggregates and safe quality/provenance metadata only.
 - Security identifiers, CUSIPs, seller/servicer attributes, descriptions, and security-level rows are restricted to the authorized local workflow.
-- Monthly factor and supplemental files are not yet acquired or approved under this contract.
+- The requested `fd`, `ar`, `fq`, and `ge` monthly-security history is acquired under restricted raw storage: all 48 packages for 2025, plus 22 packages through the applicable August/March 2026 family endpoints and one December 2024 Core File 1 sample.
+- The requested `fu` and `au` monthly loan-level history is also acquired. The owner authorizes local row-level use; M4 must machine-version exact fields, schemas, joins, corrections, and release modes before transformation output is treated as governed.
 
 ## Current source family
 
@@ -76,13 +77,24 @@ The taxonomy groups official term-related prefixes for composition monitoring; i
 
 ## Retention and privacy
 
-- Raw files and the detailed SQLite database remain local/restricted until an approved cloud data-retention and identity decision exists.
+- Restricted raw and security-level derived data are retained for seven years from acquisition and deleted earlier if authorization ends.
+- Cloud retention, identity, backup, and residency require separate approval before provisioning.
 - Public payloads contain no security identifiers or security-level rows.
 - Quality event details contain rule descriptions and row numbers, not raw values.
 - The project performs portfolio/security analytics and does not use borrower-level decisioning.
 
-## New-source gate
+## Observed M4 candidates
 
-Before M4 integration begins, every factor or supplemental source must record provenance, license/demo rights, grain, timing, correction behavior, keys, field allowlist, sensitivity, retention, and public aggregation rules. `.project/m4-source-contract.json` is the machine-readable approval boundary, and `.project/m4-data-intake.md` records the verified official candidates and owner checklist. The current contract is pending and defines no approved M4 source family.
+The four restricted samples contain 20,447,529 physical records. `fd241205.zip` and `ar250107.zip` are 96-column headered Core files with distinct reviewed header fingerprints. `fq250107.zip` and `ge250107.zip` are headerless Supplemental multi-record files with 30 and 44 observed record types; the first field chooses a record-specific column layout. Structural validation found zero unknown record types and zero record-width failures. These are safe structural facts, not approval of row processing, measures, publication, or redistribution.
 
-`scripts/source_inventory.py` may inspect archive checksums, sizes, member names, encryption flags, physical row counts, column counts, and ordered-header fingerprints. It must not emit disclosure row values. A discovered file remains an unapproved candidate unless it matches an approved family, member convention, schema fingerprint, schema validity period, and required-family contract.
+The requested monthly-security backfill is complete with 71 archives: one December 2024 Core File 1 sample, 48 packages for 2025, and 22 packages for 2026. It verifies a shared 98-column Core FICO/VS4 schema beginning with the December 2025 publication, a new Supplemental File 1 record type `52` beginning in March 2025, December Supplemental width changes, retirement of Files 2 after March 2026, and the consolidated Supplemental File 1 layout from April through August 2026.
+
+## Observed loan-level candidates
+
+Restricted raw storage contains twenty Monthly Loan-Level File 1 (`fu`) packages from January 2025 through August 2026 and fifteen Monthly Loan-Level File 2 (`au`) packages from January 2025 through its March 2026 retirement. The 35 archives total about 9.1 GiB compressed, pass ZIP-integrity and exact-member-name checks, and remain outside approved transformation scope. Both families expose 116 headered columns; December 2025 replaces legacy credit-score/filler positions with Classic FICO and VS4 fields without changing the column count. The same FICO/VS4 header continues through the observed April 2026 consolidation and August endpoint.
+
+## M4 implementation gate
+
+M4 begins by recording provenance, rights/release boundary, native grain, timing, correction behavior, keys, field allowlist, sensitivity, retention, and authorized/reviewer rules for every security and loan family. `.project/m4-source-contract.json` is the current monthly-security machine boundary; M4 adds the corresponding loan contract and approves both before governed transformation output is released. `.project/m4-data-intake.md` records the verified acquisition and schema evidence.
+
+`scripts/source_inventory.py` may inspect archive checksums, sizes, member names, encryption flags, physical row counts, ordered-header fingerprints, and headerless record-type/column-count distributions. It must not emit disclosure row values. A discovered file remains an unapproved candidate unless it matches an approved family, member convention, schema/layout version, validity period, and required-family contract.

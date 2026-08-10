@@ -1,32 +1,31 @@
 # Freddie Mac MBS Disclosure Intelligence
 
-Status: draft — issuance decision workflow implemented; later analytical and release milestones pending
+Status: verified issuance product with an implementation-ready BI expansion
 
 ## Problem
 
-Month-end disclosure files can support issuance monitoring only when the analyst can distinguish accepted observations, documented exclusions, quality failures, duplicates, and provider schema changes. A polished chart without that lineage can hide incomplete totals.
-
-## Current workflow
-
-The authorized local workflow validates official Freddie Mac issuance ZIP names, embedded members, exact ordered-header fingerprints, source-period compatibility, row-level business rules, and duplicate keys. It writes accepted security observations, a source manifest, and value-free quality events to local SQLite. Publication occurs only after every source passes and all counts reconcile.
+Disclosure analytics fails business users when polished charts hide missing records, schema changes, correction effects, incompatible cohorts, or ambiguous denominators. The product must prove whether a release can be trusted before asking what changed.
 
 ## Verified result
 
-- 19 official files covering 2024-12 through 2026-06.
-- 60,604 physical source rows.
-- 59,904 accepted and published issuance observations.
-- 700 documented status-`C` blank-balance exclusions.
+- 19 official issuance files covering 2024-12 through 2026-06.
+- 60,604 physical rows reconciled to 59,904 accepted/published observations and 700 documented exclusions.
 - Zero rejected rows and zero duplicate business keys.
-- Two explicit schemas, including the observed December 2025 FICO/VS4 transition.
-- Aggregate-only dashboard payload with build, schema, period, and quality metadata.
-- Verified source revision `b0a4cf876448` and deterministic build `7c0f195305e1...`.
-- Issuance decision workflow revision `c72602c3febd` and mix-enabled build `5c6977cfad48...`.
-- A fail-closed M4 intake gate recognizes the 19 governed issuance archives, emits no disclosure row values, and reports zero approved factor/supplemental archives while the contract is pending.
+- Exact legacy and FICO/VS4 schemas with period-validity enforcement.
+- Aggregate-only release carrying build, source, schema, period, quality, and taxonomy metadata.
+- Active-data issuance/count/composition findings, explicit unmapped prefixes, evidence, limitations, and resilient accessible states.
+- Non-destructive automated verification and a fail-closed source-intake gate.
 
-## Analyst use
+## Product expansion
 
-The product supports release validation and descriptive issuance/composition monitoring. An analyst can verify that totals trace to accepted records, compare monthly UPB and security count, inspect official UMBS term-family mix, and follow a data-derived investigation prompt without treating movement as causal.
+The acquired restricted set now includes 71 monthly-security and 35 monthly loan-level archives. The roadmap converts these sources into a certified Power BI product for nine stakeholder workflows: executive overview, release health/revisions, issuance/balance, factor/prepayment, delinquency/assistance, collateral/credit, geography/counterparties, vintage/cohorts, and investigation/methods.
 
-## Limitations
+The metric contract spans disclosure quality, issuance, outstanding balance, factor, runoff, approved SMM/CPR, delinquency transitions, modifications, deferrals, credit/collateral distributions, geography, seller/servicer concentration, and mission indicators. It explicitly separates implemented, methodology-gated, and external-data metrics.
 
-The implemented data is issuance-only. It does not yet support longitudinal balance runoff, paydown, prepayment, disclosure timeliness, valuation, trading, hedging, or borrower decisions. Monthly factor and supplemental integration is prepared but still requires separate acquisition and approval. The application is local and has not been deployed or published.
+## Decision value
+
+A nontechnical stakeholder should be able to decide whether a release is usable, identify a material change, isolate the segment/cohort driving it, recognize corrections or comparability issues, and assign an evidence-backed investigation without SQL. Authorized analysts retain full governed detail; a reviewer release is generated separately from an approved aggregate allowlist.
+
+## Boundaries
+
+The current release remains issuance-only until M4–M8 evidence is complete. The product does not infer voluntary prepayment from total balance decline and does not claim price, yield, OAS, duration, convexity, valuation, trading, hedging, loss severity, borrower decisioning, or causation without separately governed data/methods. It is local and unpublished; cloud, AI, deployment, and publication are not approved.

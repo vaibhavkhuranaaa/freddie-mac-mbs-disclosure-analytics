@@ -1,7 +1,9 @@
-version: 3
+version: 4
 project: freddie-mac-mbs-disclosure-analytics
-status: end-to-end-refinement-in-progress
+status: implementation-ready
 approved_plan: .project/refinement-plan.md
+product_spec: docs/BI_PRODUCT_SPEC.md
+execution_rule: Complete the first unblocked milestone and verify every acceptance criterion before advancing.
 milestones:
   - id: M0
     title: Establish the verified real-data baseline
@@ -9,94 +11,153 @@ milestones:
     evidence: [E-001, E-002, E-003]
     acceptance:
       - Official issuance ZIP files load locally into SQLite.
-      - The dashboard renders monthly aggregates for the observed period.
-      - The owner confirms authorized Freddie Mac source-file use.
+      - The dashboard renders governed monthly aggregates.
+      - Authorized Freddie Mac source-file use is recorded.
+
   - id: M1
     title: Make verification non-destructive
     status: completed
     evidence: [E-007, E-008, E-009]
     acceptance:
-      - Sample and test commands never write app/data/dashboard.json.
-      - The dashboard validator checks the released aggregate payload.
-      - README documents a verified test, raw-load, and preview path.
+      - Sample and test commands never overwrite the released payload.
+      - The released payload is validated and served by the local smoke path.
+      - Reviewer and raw-data commands are documented separately.
+
   - id: M2
     title: Build the trust foundation
     status: completed
-    approval: current_milestone
     evidence: [E-010, E-011, E-012, E-013, E-014]
     acceptance:
-      - Git revision lineage is initialized with raw source files ignored.
-      - Data and evaluation contracts plus data dictionary and metric glossary exist.
-      - Exact official schema versions and source-period compatibility are enforced.
-      - Per-source input, accepted, excluded, rejected, duplicate, quarantined, and published counts reconcile.
-      - Quality failures block publication and documented business exclusions remain visible.
-      - Dashboard metadata includes period, generation time, pipeline revision, build ID, schemas, and quality counts.
-      - Tests cover official success and failures, schema transition, duplicate handling, aggregate accuracy, and idempotence.
-      - CI runs the same full check and static-preview smoke path used locally.
+      - Exact schema versions and source-period compatibility are enforced.
+      - Every physical row reconciles to an explicit disposition.
+      - Publication fails closed on schema, row, duplicate, or reconciliation failure.
+      - Build, schema, source, period, and quality lineage is reproducible.
+
   - id: M3
     title: Complete the issuance decision workflow
     status: completed
     evidence: [E-015, E-016, E-017]
     acceptance:
-      - Findings and investigation prompts are derived from loaded data.
-      - An approved Prefix-to-product taxonomy powers an issuance-mix view with explicit unknown handling.
-      - The dashboard exposes quality, freshness, methods, and limitations.
-      - Loading, empty, partial, stale, and error states plus year-aware labels are implemented.
-      - Keyboard, responsive, and WCAG 2.2 AA checks pass.
+      - Findings and investigation prompts are derived from active data.
+      - Approved term-family composition and explicit unknown handling are visible.
+      - Quality, freshness, methods, limitations, and resilient accessible states pass.
+
   - id: M4
-    title: Integrate monthly factor and approved supplemental sources
-    status: blocked-pending-data-acquisition-and-contract-approval
-    readiness_evidence: [E-018]
+    title: Approve and implement conformed source contracts
+    status: next-unblocked
+    readiness_evidence: [E-018, E-024, E-026]
+    objective: Turn the acquired monthly security and loan-level archives into versioned, fail-closed conformed inputs without publishing restricted rows.
+    deliverables:
+      - Final monthly-security and loan-level field allowlists, keys, timing, correction precedence, schema validity windows, sensitivity, and release-mode rules.
+      - Original-publication and latest-known correction views with immutable manifests.
+      - Parsed restricted staging tables for all approved families and schema versions.
+      - Conformed security-period and loan-period keys with matched, unmatched, ambiguous, corrected, and late reason codes.
+      - Historical-backfill and incremental-load parity tests.
     acceptance:
-      - Authorized factor and supplemental sources have approved field allowlists, timing, keys, and demo rights.
-      - Immutable manifests, schema versions, quarantine, and reconciliation cover each new source family.
-      - Conformed security-period records quantify join coverage and unmatched reasons.
-      - Historical backfill and incremental processing agree.
+      - All 71 monthly-security and 35 loan-level archives pass exact package, schema, row, and reconciliation controls.
+      - Input records reconcile to accepted, excluded, rejected, duplicate, quarantined, and published-to-conformed dispositions by source.
+      - Join coverage and unmatched reasons reconcile by period and family.
+      - Restricted values never enter Git, public artifacts, logs, or test output.
+      - The machine-readable contract is approved before transformed measures are released.
+
   - id: M5
-    title: Implement factor, balance, runoff, and prepayment analytics
-    status: pending-M4
+    title: Build the industry metric engine
+    status: blocked-by-M4
+    objective: Implement the complete disclosure-supported metric catalog with versioned formulas and golden evidence.
+    deliverables:
+      - Issuance, outstanding balance, factor, paydown, correction, composition, credit, collateral, delinquency, assistance, mission, and concentration measures.
+      - Explicit formula gates for SMM, CPR, roll/cure, runoff bridge, and concentration indexes.
+      - Additive, semi-additive, and non-additive behavior plus valid comparison windows.
+      - Golden security, loan, cohort, vintage, segment, and portfolio fixtures.
     acceptance:
-      - Approved measures have versioned formulas, units, timing, denominators, evidence, and limitations.
-      - Security, cohort, and portfolio golden fixtures reconcile.
-      - New issuance, missing periods, corrections, terminations, restatements, and low balances are tested.
-      - Domain review approves every public balance or prepayment claim.
+      - Every measure satisfies the metric-contract standard in docs/BI_PRODUCT_SPEC.md.
+      - Source-to-security-to-loan-to-cohort-to-portfolio totals reconcile within documented tolerances.
+      - Corrections, new issuance, missing periods, terminations, involuntary removals, low balances, zero denominators, and schema transitions are tested.
+      - Voluntary prepayment is never inferred from total balance decline or involuntary removal.
+      - External-data metrics remain absent until their source contracts are approved.
+
   - id: M6
-    title: Build the governed analyst product and semantic API
-    status: pending-M5
+    title: Build the governed Power BI semantic model
+    status: blocked-by-M5
+    objective: Provide one certified star-schema model for executive summaries and authorized drill-through.
+    deliverables:
+      - Conformed fact and dimension model defined in docs/BI_PRODUCT_SPEC.md.
+      - Explicit measures, display folders, descriptions, formats, hierarchies, sort orders, and field parameters.
+      - As-reported and latest-known correction views.
+      - Restricted-detail security design, export classification, incremental-refresh policy, and performance baselines.
     acceptance:
-      - Allowlisted metric, evidence, quality, and investigation-note endpoints are versioned.
-      - Authenticated analyst mode is separated from aggregate-only public mode.
-      - API responses reproduce approved dashboard totals exactly.
-      - Authorization, contract, pagination, error, task-success, and performance tests pass.
+      - Power BI totals reproduce golden metric-engine outputs exactly.
+      - Relationships are one-to-many and single-direction unless a documented exception is tested.
+      - Restricted identifiers and fields are hidden from unauthorized roles.
+      - Refresh is idempotent and correction-aware; a 10x performance test records scale triggers.
+
   - id: M7
-    title: Add and evaluate the cited AI analyst assistant
-    status: pending-M6-and-explicit-AI-cost-approval
+    title: Deliver the nontechnical dashboard MVP
+    status: blocked-by-M6
+    objective: Implement pages 1 through 6 of the BI product specification for the trust-to-explanation workflow.
+    deliverables:
+      - Executive, release health, issuance/balance, factor/prepayment, delinquency/assistance, and collateral/credit pages.
+      - Plain-language takeaways, business definitions, filter context, quality/comparability banners, reset controls, and drill-through.
+      - Accessible tables or descriptions for every visual conclusion.
     acceptance:
-      - The model accesses data only through approved deterministic tools and retrieval sources.
-      - Golden evaluations cover metrics, citations, ambiguity, prompt injection, missing data, and prohibited advice.
-      - Restricted raw fields never appear in prompts, traces, citations, or responses.
-      - AI improves a measured analyst outcome and passes the approved quality, safety, latency, and cost thresholds.
+      - Representative nontechnical users complete trust, change-detection, driver, comparability, and next-action tasks without SQL.
+      - No page exceeds seven decision-bearing visuals or introduces an ungoverned calculation.
+      - Keyboard, screen-reader labels, contrast, high-contrast mode, 200-percent zoom, and color-independent meaning pass.
+      - The current issuance dashboard is not replaced until parity and release checks pass.
+
   - id: M8
-    title: Create the cloud foundation and deploy a private pilot
-    status: pending-architecture-cloud-budget-and-deployment-approvals
+    title: Complete cohort, concentration, and investigation workflows
+    status: blocked-by-M7
+    objective: Add pages 7 through 9 and make insights operationally assignable and reproducible.
+    deliverables:
+      - Geography/counterparty, vintage/cohort, and investigation/methods pages.
+      - Governed detail export, source lineage, saved filter context, assignment, status, priority, evidence, and resolution note.
+      - Reviewer-mode payload/model generated from an explicit field and aggregation allowlist.
     acceptance:
-      - Cloud, region, cost ceiling, identity, retention, backup, teardown, and residency decisions are recorded.
-      - Reviewed infrastructure as code creates least-privilege dev, test, and pilot environments.
-      - End-to-end lineage, RBAC, secrets, logging, alerts, rollback, restore, cost, and teardown tests pass.
-      - Exact source, infrastructure, application, and deployment revisions are recorded.
+      - Every executive exception drills to a reproducible cohort or evidence record.
+      - Investigation notes never duplicate or mutate source facts.
+      - Authorized and reviewer modes pass negative access and artifact-inspection tests.
+      - Stakeholder task completion, usefulness, and interpretation tests meet .project/evaluation.md thresholds.
+
   - id: M9
-    title: Harden the production release candidate
-    status: pending-M8
+    title: Add the governed semantic API
+    status: blocked-by-M8
+    objective: Expose allowlisted metrics, evidence, and investigation operations independently of the BI client.
+    deliverables:
+      - Versioned metric, evidence, quality, lineage, and investigation endpoints.
+      - Authentication/authorization boundary and complete audit events.
+      - Contract, pagination, filtering, failure, concurrency, and performance tests.
     acceptance:
-      - Threat model, scans, SBOM, security headers, rate limits, incident response, and SLOs are complete.
-      - Accessibility, browser, load, failure-recovery, and data-restatement tests pass.
-      - No unresolved critical or high finding lacks an approved disposition.
-      - Case study, records, evidence, Graphify, and handoff are current.
+      - API, metric engine, and Power BI totals agree exactly under identical filters.
+      - No arbitrary SQL or unrestricted row endpoint exists.
+      - Negative authorization tests cover every restricted object and operation.
+
   - id: M10
-    title: Publish the reviewer release and portfolio case study
-    status: pending-explicit-publication-approval
+    title: Evaluate the optional cited analyst assistant
+    status: blocked-by-M9-and-explicit-AI-cost-approval
+    objective: Determine whether an assistant improves investigation outcomes using deterministic tools and governed documents only.
     acceptance:
-      - The exact public payload, host, visibility, budget, domain, screenshots, and teardown path are approved.
-      - Public artifacts contain no restricted data, secrets, internal endpoints, or unsupported claims.
-      - Deployed revision and payload checksum match release evidence.
-      - Human design, deployment, visibility, and publication approvals plus release checks pass.
+      - Golden evaluations meet the accuracy, citation, safety, privacy, latency, and cost gates in .project/evaluation.md.
+      - Restricted raw fields never appear in prompts, traces, retrieval, citations, or responses.
+      - The assistant refuses investment, valuation, hedging, lending, and unsupported causal advice.
+      - The feature ships only if it measurably improves the non-AI workflow.
+
+  - id: M11
+    title: Create the private cloud pilot and production release candidate
+    status: blocked-by-M9-and-explicit-cloud-budget-deployment-approvals
+    objective: Deploy the governed product privately with least privilege, observability, recovery, and cost controls.
+    acceptance:
+      - Provider, region, data residency, identity, retention, backup, recovery targets, cost ceiling, and teardown are approved.
+      - Reviewed infrastructure as code creates isolated environments and records exact revisions.
+      - Threat model, dependency and secret scans, SBOM, rate limits, logs, alerts, rollback, restore, load, and failure-recovery tests pass.
+      - No unresolved critical or high finding lacks an approved disposition.
+
+  - id: M12
+    title: Publish the reviewer release and case study
+    status: blocked-by-M11-and-explicit-publication-approval
+    objective: Publish only the approved reviewer boundary with evidence-backed claims.
+    acceptance:
+      - Exact host, visibility, payload/model, checksum, source revision, screenshots, budget, domain, and teardown are approved.
+      - Public artifacts contain no restricted data, secrets, internal endpoints, or unsupported metrics.
+      - Live behavior, accessibility, deployed revision, and rollback are independently verified.
+      - Case study, architecture, evidence, Graphify, state, handoff, and publication records match the live release.

@@ -1,8 +1,0 @@
-[
-  {"month":"2026-01","issuance_count":184,"original_upb_millions":4621.8,"current_upb_millions":4499.2,"factor":0.9735,"cpr_pct":6.8,"disclosure_completeness_pct":100,"expected_files":12,"published_files":12,"revision_flag":false,"release_lag_days":1},
-  {"month":"2026-02","issuance_count":176,"original_upb_millions":4389.6,"current_upb_millions":4242.5,"factor":0.9665,"cpr_pct":7.1,"disclosure_completeness_pct":100,"expected_files":12,"published_files":12,"revision_flag":false,"release_lag_days":1},
-  {"month":"2026-03","issuance_count":193,"original_upb_millions":4875.2,"current_upb_millions":4678.9,"factor":0.9597,"cpr_pct":7.4,"disclosure_completeness_pct":100,"expected_files":12,"published_files":12,"revision_flag":false,"release_lag_days":2},
-  {"month":"2026-04","issuance_count":201,"original_upb_millions":5108.4,"current_upb_millions":4856.6,"factor":0.9507,"cpr_pct":7.9,"disclosure_completeness_pct":91.7,"expected_files":12,"published_files":11,"revision_flag":true,"release_lag_days":4},
-  {"month":"2026-05","issuance_count":189,"original_upb_millions":4756.1,"current_upb_millions":4477.5,"factor":0.9414,"cpr_pct":8.2,"disclosure_completeness_pct":100,"expected_files":12,"published_files":12,"revision_flag":false,"release_lag_days":1},
-  {"month":"2026-06","issuance_count":214,"original_upb_millions":5382.7,"current_upb_millions":5014.8,"factor":0.9317,"cpr_pct":8.6,"disclosure_completeness_pct":100,"expected_files":12,"published_files":12,"revision_flag":false,"release_lag_days":1}
-]

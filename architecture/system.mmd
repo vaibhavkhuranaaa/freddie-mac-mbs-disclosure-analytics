@@ -1,16 +1,17 @@
 flowchart LR
-  A[Authorized Freddie Mac FRE_IS ZIP files] --> B[Exact schema and period validation]
-  B --> C[Accepted security observations]
-  B --> D[Source manifest and reconciliation]
-  B --> Q[Quality events and exclusions]
-  C --> G{All source gates pass?}
-  D --> G
-  Q --> G
-  G -->|Yes| E[Versioned aggregate payload]
-  G -->|No| X[Block publication and investigate]
-  E --> F[Static issuance-monitoring dashboard]
-  H[Monthly factor and supplemental files — pending owner acquisition] --> I[M4 value-free source inventory]
-  J[Approved M4 source contract] --> I
-  I --> K{Contract, required families, and schemas pass?}
-  K -->|No| X
-  K -. future approved integration .-> C
+  A[Authorized issuance archives] --> B[Verified issuance pipeline]
+  B --> C[Restricted issuance facts]
+  B --> D[Aggregate release payload]
+  D --> E[Current static dashboard]
+  F[Acquired monthly security archives] --> G[M4 source contracts and validation]
+  H[Acquired monthly loan archives] --> G
+  G --> I[Conformed security-period and loan-period facts]
+  I --> J[M5 versioned metric engine]
+  J --> K[M6 certified Power BI semantic model]
+  K --> L[M7-M8 authorized BI decision product]
+  J --> M[Explicit reviewer allowlist]
+  M --> N[Reviewer product]
+  J --> O[M9 governed semantic API]
+  O -. M10 approval-gated .-> P[Optional cited assistant]
+  L -. M11 approval-gated .-> Q[Private cloud release candidate]
+  N -. M12 approval-gated .-> R[Published reviewer release]

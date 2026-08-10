@@ -16,7 +16,7 @@ from typing import Any
 
 import pipeline
 
-PENDING_STATUS = "pending-owner-data-and-contract-approval"
+PENDING_STATUS = "authorized-data-pending-machine-contract-approval"
 APPROVED_STATUS = "approved"
 CONTRACT_STATUSES = {PENDING_STATUS, APPROVED_STATUS}
 
@@ -119,6 +119,8 @@ def validate_family(family: Any) -> None:
         "required",
         "archive_pattern",
         "member_pattern",
+        "has_header",
+        "record_type_column",
         "period_source",
         "period_pattern",
         "schema_versions",
@@ -126,8 +128,21 @@ def validate_family(family: Any) -> None:
     missing = sorted(required - set(family))
     if missing:
         raise InventoryError(f"source family missing keys: {', '.join(missing)}")
-    if not family["id"] or not isinstance(family["required"], bool):
-        raise InventoryError("source family id and boolean required flag are mandatory")
+    if (
+        not family["id"]
+        or not isinstance(family["required"], bool)
+        or not isinstance(family["has_header"], bool)
+    ):
+        raise InventoryError(
+            "source family id, required flag, and has_header flag are mandatory"
+        )
+    if family["has_header"] and family["record_type_column"] is not None:
+        raise InventoryError("headered source family must use a null record_type_column")
+    if not family["has_header"] and (
+        not isinstance(family["record_type_column"], int)
+        or family["record_type_column"] < 0
+    ):
+        raise InventoryError("headerless source family requires a record_type_column")
     try:
         re.compile(family["archive_pattern"])
         re.compile(family["member_pattern"])
@@ -141,12 +156,54 @@ def validate_family(family: Any) -> None:
     if not family["schema_versions"]:
         raise InventoryError(f"source family {family['id']} has no schema versions")
     for schema in family["schema_versions"]:
-        if set(schema) != {"version", "header_sha256", "column_count", "period_min", "period_max"}:
+        if set(schema) != {
+            "version",
+            "header_sha256",
+            "column_count",
+            "record_layouts",
+            "period_min",
+            "period_max",
+        }:
             raise InventoryError(f"source family {family['id']} has an invalid schema contract")
-        if not re.fullmatch(r"[0-9a-f]{64}", schema["header_sha256"]):
-            raise InventoryError(f"source family {family['id']} has an invalid header fingerprint")
-        if not isinstance(schema["column_count"], int) or schema["column_count"] < 1:
-            raise InventoryError(f"source family {family['id']} has an invalid column count")
+        if family["has_header"]:
+            if not isinstance(schema["header_sha256"], str) or not re.fullmatch(
+                r"[0-9a-f]{64}", schema["header_sha256"]
+            ):
+                raise InventoryError(
+                    f"source family {family['id']} has an invalid header fingerprint"
+                )
+            if schema["record_layouts"] is not None:
+                raise InventoryError(
+                    f"headered source family {family['id']} must not define record layouts"
+                )
+            if not isinstance(schema["column_count"], int) or schema["column_count"] < 1:
+                raise InventoryError(
+                    f"source family {family['id']} has an invalid column count"
+                )
+        elif schema["header_sha256"] is not None:
+            raise InventoryError(
+                f"headerless source family {family['id']} must use a null header fingerprint"
+            )
+        else:
+            layouts = schema["record_layouts"]
+            if schema["column_count"] is not None:
+                raise InventoryError(
+                    f"headerless source family {family['id']} must use a null column count"
+                )
+            if not isinstance(layouts, dict) or not layouts:
+                raise InventoryError(
+                    f"headerless source family {family['id']} requires record layouts"
+                )
+            if any(
+                not isinstance(code, str)
+                or not code
+                or not isinstance(count, int)
+                or count < 1
+                for code, count in layouts.items()
+            ):
+                raise InventoryError(
+                    f"headerless source family {family['id']} has invalid record layouts"
+                )
 
 
 def extract_report_period(
@@ -167,28 +224,83 @@ def extract_report_period(
     return period
 
 
-def inspect_text_member(archive: zipfile.ZipFile, member: zipfile.ZipInfo) -> dict[str, Any]:
+def inspect_text_member(
+    archive: zipfile.ZipFile,
+    member: zipfile.ZipInfo,
+    *,
+    has_header: bool,
+    record_type_column: int | None = None,
+    allowed_record_layouts: dict[str, set[int]] | None = None,
+) -> dict[str, Any]:
     with archive.open(member) as binary:
-        header_line = binary.readline().decode("utf-8-sig").rstrip("\r\n")
-        headers = next(csv.reader([header_line], delimiter="|"), [])
-        row_count = sum(1 for line in binary if line.strip())
-    fingerprint = hashlib.sha256("|".join(headers).encode("utf-8")).hexdigest()
+        first_line = binary.readline().decode("utf-8-sig").rstrip("\r\n")
+        first_fields = next(csv.reader([first_line], delimiter="|"), [])
+        row_count = 0
+        invalid_column_count = 0
+        unknown_record_type_count = 0
+        record_layout_counts: dict[str, int] = {}
+        observed_record_layouts: dict[str, int] = {}
+
+        def inspect_line(line: str) -> None:
+            nonlocal row_count, invalid_column_count, unknown_record_type_count
+            row_count += 1
+            fields = line.split("|")
+            if has_header:
+                if len(fields) != len(first_fields):
+                    invalid_column_count += 1
+                return
+            if record_type_column is None or record_type_column >= len(fields):
+                unknown_record_type_count += 1
+                return
+            record_type = fields[record_type_column]
+            expected_counts = (allowed_record_layouts or {}).get(record_type)
+            if expected_counts is None:
+                unknown_record_type_count += 1
+                return
+            record_layout_counts[record_type] = record_layout_counts.get(record_type, 0) + 1
+            observed_record_layouts[record_type] = len(fields)
+            if len(fields) not in expected_counts:
+                invalid_column_count += 1
+
+        if not has_header and first_line:
+            inspect_line(first_line)
+        for raw_line in binary:
+            if raw_line.strip():
+                inspect_line(raw_line.decode("utf-8").rstrip("\r\n"))
+    fingerprint = (
+        hashlib.sha256("|".join(first_fields).encode("utf-8")).hexdigest()
+        if has_header
+        else None
+    )
     return {
         "name": member.filename,
         "size_bytes": member.file_size,
         "encrypted": bool(member.flag_bits & 0x1),
-        "column_count": len(headers),
+        "has_header": has_header,
+        "column_count": len(first_fields) if has_header else None,
         "header_sha256": fingerprint,
         "physical_row_count": row_count,
+        "invalid_column_count": invalid_column_count,
+        "unknown_record_type_count": unknown_record_type_count,
+        "record_layouts": observed_record_layouts if not has_header else None,
+        "record_layout_counts": record_layout_counts if not has_header else None,
     }
 
 
-def inspect_zip(path: Path) -> dict[str, Any]:
+def inspect_zip(path: Path, contract: dict[str, Any]) -> dict[str, Any]:
+    inspect_rows = (
+        not contract["source_families"]
+        or bool(pipeline.OFFICIAL_ZIP_PATTERN.fullmatch(path.name))
+        or any(
+            re.fullmatch(family["archive_pattern"], path.name)
+            for family in contract["source_families"]
+        )
+    )
     result: dict[str, Any] = {
         "name": path.name,
         "size_bytes": path.stat().st_size,
         "sha256": sha256_file(path),
-        "kind": "unapproved-candidate",
+        "kind": "unapproved-candidate" if inspect_rows else "unrelated-file",
         "status": "observed",
         "source_family": None,
         "members": [],
@@ -203,8 +315,49 @@ def inspect_zip(path: Path) -> dict[str, Any]:
             if not members:
                 result["issues"].append("archive contains no files")
             for member in members:
-                if member.filename.lower().endswith(".txt") and not member.flag_bits & 0x1:
-                    result["members"].append(inspect_text_member(archive, member))
+                if (
+                    inspect_rows
+                    and member.filename.lower().endswith(".txt")
+                    and not member.flag_bits & 0x1
+                ):
+                    matching_families = [
+                        family
+                        for family in contract["source_families"]
+                        if re.fullmatch(family["member_pattern"], member.filename)
+                    ]
+                    has_header = (
+                        matching_families[0]["has_header"]
+                        if len(matching_families) == 1
+                        else True
+                    )
+                    record_type_column = (
+                        matching_families[0]["record_type_column"]
+                        if len(matching_families) == 1
+                        else None
+                    )
+                    allowed_record_layouts: dict[str, set[int]] = {}
+                    if len(matching_families) == 1:
+                        for schema in matching_families[0]["schema_versions"]:
+                            for code, count in (schema["record_layouts"] or {}).items():
+                                allowed_record_layouts.setdefault(code, set()).add(count)
+                    inspected = inspect_text_member(
+                        archive,
+                        member,
+                        has_header=has_header,
+                        record_type_column=record_type_column,
+                        allowed_record_layouts=allowed_record_layouts,
+                    )
+                    if inspected["invalid_column_count"]:
+                        result["issues"].append(
+                            f"{member.filename} has {inspected['invalid_column_count']} row(s) "
+                            "with an unexpected column count"
+                        )
+                    if inspected["unknown_record_type_count"]:
+                        result["issues"].append(
+                            f"{member.filename} has {inspected['unknown_record_type_count']} "
+                            "row(s) with an unknown record type"
+                        )
+                    result["members"].append(inspected)
                 else:
                     if member.flag_bits & 0x1:
                         result["issues"].append(
@@ -260,23 +413,39 @@ def match_family(item: dict[str, Any], family: dict[str, Any]) -> bool:
         )
         return False
     member = candidates[0]
-    schemas = {
-        schema["header_sha256"]: schema for schema in family["schema_versions"]
-    }
-    schema = schemas.get(member.get("header_sha256"))
-    if not schema or member.get("column_count") != schema["column_count"]:
-        item["issues"].append(f"{family['id']} has an unapproved schema fingerprint")
-        return False
     report_period = extract_report_period(item, member, family)
     if not report_period:
         item["issues"].append(f"{family['id']} report period cannot be derived")
         return False
-    if schema["period_min"] and report_period < schema["period_min"]:
-        item["issues"].append(f"{family['id']} schema is not valid before {schema['period_min']}")
+    schemas = [
+        schema
+        for schema in family["schema_versions"]
+        if member.get("has_header") == family["has_header"]
+        and (
+            (
+                family["has_header"]
+                and member.get("column_count") == schema["column_count"]
+                and member.get("header_sha256") == schema["header_sha256"]
+            )
+            or (
+                not family["has_header"]
+                and member.get("unknown_record_type_count") == 0
+                and member.get("invalid_column_count") == 0
+                and all(
+                    schema["record_layouts"].get(code) == column_count
+                    for code, column_count in (member.get("record_layouts") or {}).items()
+                )
+            )
+        )
+        and (not schema["period_min"] or report_period >= schema["period_min"])
+        and (not schema["period_max"] or report_period <= schema["period_max"])
+    ]
+    if len(schemas) != 1:
+        item["issues"].append(
+            f"{family['id']} has no unique approved schema for {report_period}"
+        )
         return False
-    if schema["period_max"] and report_period > schema["period_max"]:
-        item["issues"].append(f"{family['id']} schema is not valid after {schema['period_max']}")
-        return False
+    schema = schemas[0]
     item["kind"] = "approved-m4"
     item["source_family"] = family["id"]
     item["schema_version"] = schema["version"]
@@ -305,7 +474,7 @@ def build_inventory(input_dir: Path, contract: dict[str, Any]) -> dict[str, Any]
                 }
             )
             continue
-        item = inspect_zip(path)
+        item = inspect_zip(path, contract)
         issuance_named = bool(pipeline.OFFICIAL_ZIP_PATTERN.fullmatch(item["name"]))
         issuance_recognized = recognize_issuance(item)
         if issuance_named and not issuance_recognized:

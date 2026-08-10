@@ -1,38 +1,34 @@
 # Handoff
 
-## Current result
+## Outcome
 
-M3 is complete at implementation revision `c72602c3febd`. The dashboard derives findings from active data, removes issuance-date factor as a selectable insight, shows latest-month issuance by approved official UMBS term families, preserves an explicit unmapped group, exposes quality/freshness/methodology, and handles loading and fetch errors with recovery.
+The repository now defines one implementation-ready BI product rather than separate stale prototype plans. `docs/BI_PRODUCT_SPEC.md` is the canonical product/metric/visual/semantic-model contract, `.project/refinement-plan.md` explains the delivery rationale, and `.project/milestones.yml` defines M0–M12 acceptance gates.
 
-Build `5c6977cfad48...` contains 19 monthly rows and 95 mix rows. Official term-family mappings cover 99.29% of observed issuance UPB; 458 observations remain explicit under `Other / Unmapped prefix`. Automated pipeline/analytics tests, payload reconciliation, Impeccable detection, project records, and local HTTP smoke pass.
+M0–M3 remain verified. The next milestone is M4: implement approved, fail-closed conformed monthly-security and loan-level inputs using the already acquired 71 security and 35 loan archives. Row-level local use and seven-year retention are approved. Reviewer/public redistribution is not approved.
 
-M4 intake preparation is committed at `29db1f055d32`. The command validates a machine-readable governance contract, exact archive/member/schema/period rules, required families, and value-free metadata. Eighteen Python tests now pass without resource warnings.
+## M4 implementation order
 
-## Blocking next milestone
+1. Read the required project records and query Graphify before editing.
+2. Update `.project/m4-source-contract.json` and create a loan-level machine contract with exact schema validity, fields, keys, correction precedence, sensitivity, and release modes.
+3. Add golden fixtures for the legacy/FICO-VS4 transitions, April 2026 consolidation, corrections, duplicates, missing periods, and unmatched joins.
+4. Implement restricted staging, immutable manifests, dispositions, and correction lineage.
+5. Build native-grain conformed `FactSecurityPeriod` and `FactLoanPeriod` outputs with original/latest views and reason-coded joins.
+6. Prove source, row, join, backfill, incremental, restricted-output, and idempotence gates.
+7. Update data dictionary, architecture, evaluation, evidence, state, handoff, and Graphify from verified results.
 
-M4 requires authorized monthly security-factor and any approved supplemental source files. They are not present in the workspace. A fail-closed intake gate is now implemented: it recognizes all 19 existing issuance archives, emits no disclosure row values, reports zero approved M4 archives, and exits 2 when readiness is required.
-
-Before integration, the owner must place the authorized files under restricted raw storage and approve `.project/m4-source-contract.json`. Use `.project/m4-data-intake.md` to record exact archive/member conventions, rights/demo boundary, retention, grain, effective period, correction behavior, keys, schema fingerprints/validity, field allowlist, intended measures, and required families. Discovery alone must not change the contract to approved.
-
-Do not substitute synthetic data for the reviewer-facing workflow and do not implement runoff/prepayment claims from issuance-date factor/current-UPB fields.
-
-## Guardrails
-
-- The term-family taxonomy is composition monitoring, not an equivalence or investment claim.
-- Raw sources and local SQLite remain restricted and ignored.
-- Factor, runoff, prepayment, AI, cloud, deployment, and publication remain gated.
+Do not implement M5 formulas inside M4 except the reconciliation measures required to prove conformance. Do not treat Classic FICO and VS4 as one score, April consolidation as an economic event, total balance decline as prepayment, or source discovery as public-release permission.
 
 ## Recovery commands
 
 ```sh
-npm run load:raw
-npm run inventory:sources
 npm run check
-npm run serve
-```
-
-After the owner supplies and approves M4 sources, run the fail-closed gate before writing a parser:
-
-```sh
+npm run inventory:sources
 python3 scripts/source_inventory.py --input data/raw --contract .project/m4-source-contract.json --require-ready
 ```
+
+The final command is expected to remain blocked until the M4 machine contract is approved during implementation.
+
+## External blockers
+
+- GitHub cannot be updated until `gh auth login -h github.com` succeeds and a target repository/remote is selected.
+- Cloud, AI, paid resources, deployment, and publication require the approvals recorded in `.project/approvals.yml`.

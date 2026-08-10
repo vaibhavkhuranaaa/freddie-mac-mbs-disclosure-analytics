@@ -1,16 +1,16 @@
 # Current state
 
-- Lifecycle: end-to-end refinement in progress; M3 issuance decision workflow completed
-- Data authorization: project owner confirms authorized Freddie Mac issuance source-file use
-- Observed coverage: December 2024 through June 2026
-- Governed population: 60,604 physical rows; 59,904 accepted/published; 700 documented exclusions; 0 rejected; 0 duplicates
-- Dashboard payload: 19 monthly rows and 95 mix rows; pipeline `0.3.0`; revision `c72602c3febd`; build `5c6977cfad48...`
-- Mix coverage: 59,446 mapped observations; 458 explicit unmapped; 99.29% of issuance UPB mapped to official term families
-- Product workflow: release health, dynamic trend findings, term-family composition, investigation prompts, methods, and evidence table
-- Resilience/accessibility: loading/error/retry, payload validation, year-aware chart description, keyboard focus, forced colors, responsive layouts
-- M4 readiness: fail-closed source inventory and machine-readable contract implemented; 19 issuance archives recognized, 0 approved M4 archives, contract pending, readiness blocked
-- Verification: 18 Python tests, dashboard analytics tests, governed payload validator, Impeccable detector, project records, and local HTTP smoke pass
-- Source control: local `main`; M3 implementation revision `c72602c3febd`; M4 intake revision `29db1f055d32`; no remote or public visibility
-- Deployment: local preview only; no cloud, public host, AI service, or paid resource
-- Current completed milestone: M3 — issuance decision workflow, verified 2026-08-09
-- Next milestone: M4 — blocked pending authorized factor/supplemental files and approved data contract
+- Lifecycle: implementation-ready BI product roadmap; M0–M3 completed
+- Product contract: `docs/BI_PRODUCT_SPEC.md`; executable roadmap: M0–M12 in `.project/milestones.yml`
+- Next milestone: M4 — approve and implement conformed monthly-security and loan-level source contracts
+- Data authorization: row-level local use approved for the owner; reviewer/public redistribution not approved
+- Retention: seven years from acquisition, delete earlier if authorization ends
+- Governed issuance: 19 files, 2024-12 through 2026-06; 60,604 physical rows; 59,904 accepted/published; 700 documented exclusions; 0 rejected; 0 duplicate keys
+- Dashboard payload: 19 monthly and 95 mix rows; pipeline `0.3.0`; mix coverage 99.29% of issuance UPB with 458 observations explicit/unmapped
+- Acquired monthly security: 71 archives through applicable August/March 2026 endpoints; schemas include December 2025 FICO/VS4 and April 2026 consolidation transitions
+- Acquired monthly loan-level: 35 archives (`fu` 20, `au` 15), approximately 9.1 GiB compressed; 116-column December 2025 FICO/VS4 transition verified structurally
+- M4 machine state: data is present and authorized; exact fields, correction precedence, joins, dispositions, and original/latest views must be completed and approved before governed transformation output
+- Target product: certified Power BI model and nine-page trust-to-investigation workflow with full authorized detail and separate reviewer boundary
+- Verification: 20 Python tests over the real inventory plus dashboard analytics, released-payload validation, static artifact smoke, Graphify synchronization, and project-record checks pass for this planning revision
+- Source control: branch `product/bi-dashboard-roadmap`; local Git only; no remote; GitHub authentication currently invalid
+- Deployment: local only; AI, cloud, paid resources, deployment, and publication not approved

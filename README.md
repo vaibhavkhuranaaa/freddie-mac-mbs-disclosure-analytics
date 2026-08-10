@@ -1,17 +1,24 @@
 # Freddie Mac MBS Disclosure Intelligence
 
-A governed data-engineering and analytics case study. The implemented release processes authorized official Freddie Mac month-end issuance files locally, proves how every physical source row was handled, and presents aggregate issuance monitoring without exposing security-level data.
+A governed MBS disclosure analytics product in progress. The verified baseline processes official Freddie Mac issuance files locally, reconciles every source row, and presents aggregate issuance monitoring. The implementation roadmap expands it into a full authorized Power BI decision workflow using the acquired monthly security and loan-level history.
 
-## Verified release data
+## Verified baseline
 
-- 19 observed files from December 2024 through June 2026.
-- 60,604 physical source rows reconciled to 59,904 published observations and 700 documented status-`C` exclusions.
-- Zero rejected rows and zero duplicate business keys in the verified build.
-- Two exact source schemas, with the FICO/VS4 transition enforced from December 2025.
-- A 19-row aggregate payload carrying period, build, pipeline, schema, and quality metadata.
-- A 95-row monthly mix payload; 99.29% of observed issuance UPB maps to an official UMBS term family and all other prefixes remain explicit.
+- 19 issuance files from 2024-12 through 2026-06.
+- 60,604 physical rows = 59,904 accepted/published + 700 documented status-`C` exclusions + 0 rejected + 0 duplicates.
+- Two exact issuance schemas, including the December 2025 FICO/VS4 transition.
+- 19 monthly aggregate rows and 95 term-family mix rows; 99.29% of issuance UPB is mapped and the remainder stays explicit.
+- Active-data findings, resilient accessible states, source/build/schema/quality metadata, and a fail-closed release gate.
 
-## Run the reviewer workflow
+## Acquired implementation inputs
+
+- 71 monthly-security archives: one December 2024 sample, all 48 applicable 2025 packages, and all 22 applicable 2026 packages through the August/March family endpoints.
+- 35 monthly loan-level archives: 20 `fu` files through August 2026 and 15 `au` files through its March 2026 retirement, approximately 9.1 GiB compressed.
+- Restricted row-level use is authorized. Retention is seven years from acquisition, with earlier deletion if authorization ends.
+
+These files are ignored by Git and are not public assets. Public/demo redistribution is separately gated.
+
+## Run locally
 
 ```sh
 npm run check
@@ -23,34 +30,26 @@ npm run serve
 
 Open [http://127.0.0.1:4173](http://127.0.0.1:4173).
 
-`npm run check` is non-destructive. It runs the pipeline, source-intake, and release tests, validates the actual released aggregate payload, smoke-tests the static preview, and checks the project records. `npm run inventory:sources` emits only safe archive/member metadata and an M4 readiness result; it never emits disclosure row values. Sample output stays under ignored `local/` paths. `npm run load:raw` is the intentional rebuild from authorized ignored source files.
+`npm run check` is non-destructive: it runs Python and dashboard tests, validates the released payload, smoke-tests the static application, and checks project/Graphify freshness. `npm run inventory:sources` records only safe archive/member/schema metadata. `npm run load:raw` intentionally rebuilds the verified issuance release from authorized ignored files.
 
-## How the quality gate works
+## Current and target scope
 
-1. Validate the official ZIP name and its single matching text member.
-2. Match the ordered header to a reviewed SHA-256 schema fingerprint and allowed period.
-3. Validate balances, factor, correction flag, security key, and duplicate business keys.
-4. Count accepted, documented exclusions, rejected, duplicate, quarantined, and published rows per source.
-5. Block publication unless every source passes and all counts reconcile.
-6. Publish monthly aggregates and safe build/quality metadata only.
+Implemented through M3: issuance UPB/count, corrections, official term-family composition, exact schemas, provenance, reconciliation, data-derived findings, resilient UI states, and aggregate-only local publication.
 
-The 700 excluded rows are all status-`C` securities whose issuance UPB, current UPB, and factor are blank. They are recorded explicitly rather than silently discarded. Any other incomplete balance combination fails the build.
+M4 is the next implementation milestone: approve and implement the security/loan source contract, corrections, conformed grains, joins, and backfill/incremental parity. M5–M9 add the metric engine, certified Power BI semantic model, nontechnical dashboard, investigation workflow, and governed API. M10–M12 remain separately gated AI, private-cloud, and reviewer-publication work.
 
-## Current scope
+The [BI product specification](docs/BI_PRODUCT_SPEC.md) defines the pages, industry metric catalog, semantic model, visuals, user experience, governance, and history recommendation. The [milestone plan](.project/milestones.yml) is the execution contract.
 
-Implemented: issuance UPB, issued-security count, source correction count, exact schema control, provenance, quality reconciliation, official term-family mix, data-derived findings, resilient UI states, and aggregate-only local dashboard publication.
-
-Planned under approval-gated milestones: monthly factor and supplemental source integration, balance/runoff/prepayment measures, authenticated analyst workflow, governed semantic API, evaluated cited assistant, cloud pilot, and public portfolio release. The factor-data intake contract and fail-closed inventory gate are implemented; actual integration remains blocked until authorized files and the contract amendment are approved.
-
-The project does not make borrower, investment, valuation, trading, or hedging decisions.
+The project does not make borrower, investment, valuation, trading, hedging, or unsupported causal decisions.
 
 ## Project records
 
-- `PROJECT.md` — approved business and product contract
-- `.project/data.md` — source rights, grain, fields, quality, privacy, and release boundary
-- `.project/evaluation.md` — verified and proposed evaluation gates
-- `.project/milestones.yml` — approved M0–M10 executable roadmap
-- `.project/refinement-plan.md` — end-to-end architecture, AI safety, and risk plan
-- `.project/m4-data-intake.md` — factor/supplemental source research and owner approval checklist
-- `.project/handoff.md` — exact continuation state
-- `CASE-STUDY.md` — stakeholder-readable current result and limitations
+- `PROJECT.md` — business and scope contract
+- `DESIGN.md` — BI visual, interaction, language, and accessibility rules
+- `docs/BI_PRODUCT_SPEC.md` — complete decision product and metric specification
+- `.project/refinement-plan.md` — architectural and delivery rationale
+- `.project/milestones.yml` — executable M0–M12 roadmap
+- `.project/data.md` — rights, grain, fields, quality, retention, and release boundary
+- `.project/evaluation.md` — verification and stakeholder success gates
+- `.project/state.md` and `.project/handoff.md` — exact continuation state
+- `CASE-STUDY.md` — current verified result and target value

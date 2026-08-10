@@ -1,9 +1,11 @@
 {
-  "version": 2,
+  "version": 3,
   "slug": "freddie-mac-mbs-disclosure-analytics",
-  "title": "Freddie Mac MBS Issuance Monitoring",
+  "title": "Freddie Mac MBS Disclosure Intelligence",
   "status": "issuance-workflow",
-  "summary": "Governed local Freddie Mac MBS issuance monitoring with exact schema control, reconciled quality/provenance, aggregate-only publication, and a static analyst dashboard.",
-  "scope": "Implemented: issuance measures and composition, source-schema and period validation, documented exclusions, fail-closed quality/provenance, aggregate publication, and a value-free M4 source-intake gate. Planned: factor/runoff/prepayment, governed analyst API, evaluated cited AI, cloud pilot, and public release.",
-  "evidence": ["E-001", "E-002", "E-003", "E-007", "E-008", "E-009", "E-010", "E-011", "E-012", "E-013", "E-014", "E-015", "E-016", "E-017", "E-018"]
+  "summary": "Verified governed issuance analytics with an implementation-ready Power BI roadmap for disclosure trust, balance and prepayment, credit and collateral, concentration, and investigation decisions.",
+  "scope": "Implemented through M3: issuance, composition, schema control, reconciled quality/provenance, aggregate release, and value-free source intake. Next M4: conformed monthly security and loan-level contracts using 106 acquired archives. M5-M9: metric engine, certified Power BI model, nontechnical dashboard, investigation workflow, and semantic API. AI, private cloud, and publication remain separately gated.",
+  "productSpec": "docs/BI_PRODUCT_SPEC.md",
+  "milestones": ".project/milestones.yml",
+  "evidence": ["E-001", "E-002", "E-003", "E-007", "E-008", "E-009", "E-010", "E-011", "E-012", "E-013", "E-014", "E-015", "E-016", "E-017", "E-018", "E-023", "E-024", "E-026", "E-027", "E-028"]
 }

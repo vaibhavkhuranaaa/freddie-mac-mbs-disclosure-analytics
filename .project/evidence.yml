@@ -61,7 +61,7 @@ evidence:
     status: verified
     verified_on: 2026-08-09
   - id: E-013
-    claim: "A local Git repository on main records the M2 implementation under configured human identity at revision b0a4cf876448; raw ZIPs and local SQLite artifacts are ignored."
+    claim: "Local Git history records the M2 implementation under configured human identity at revision b0a4cf876448; raw ZIPs and local SQLite artifacts are ignored."
     source: .git; .gitignore
     status: verified
     verified_on: 2026-08-09
@@ -86,7 +86,32 @@ evidence:
     status: verified
     verified_on: 2026-08-09
   - id: E-018
-    claim: "Revision 29db1f055d32 adds a fail-closed M4 intake gate that inventories 19 governed issuance archives without emitting disclosure row values, reports zero approved M4 archives, and remains blocked until the source contract and required factor/supplemental files pass exact governance and schema checks."
+    claim: "Revision 29db1f055d32 adds a fail-closed M4 intake gate that inventories source archives without emitting disclosure row values and blocks transformed use until the machine contract and required family/schema checks pass."
     source: scripts/source_inventory.py; tests/test_source_inventory.py; .project/m4-source-contract.json; .project/m4-data-intake.md
     status: verified
     verified_on: 2026-08-09
+  - id: E-023
+    claim: "The owner approved seven-year retention from acquisition for restricted raw and security-level derived data, with earlier deletion if authorization ends."
+    source: owner approval; .project/approvals.yml; .project/m4-source-contract.json; .project/data.md
+    status: verified
+    verified_on: 2026-08-09
+  - id: E-024
+    claim: "The requested monthly-security backfill contains 71 archives: one December 2024 Core File 1 sample, all 48 packages for 2025, and all 22 applicable packages through August/March 2026; structural validation confirms the April 2026 consolidation boundary and versioned layouts without emitting restricted values."
+    source: data/raw; scripts/source_inventory.py; .project/m4-source-contract.json; .project/m4-data-intake.md
+    status: verified
+    verified_on: 2026-08-10
+  - id: E-026
+    claim: "The requested adjacent loan-level window is complete with twenty `fu` archives through August 2026 and fifteen `au` archives through the File 2 retirement in March 2026; all 35 packages pass ZIP/member checks, and the December 2025 FICO/VS4 116-column header continues through the observed 2026 consolidation boundary."
+    source: data/raw; .project/data.md; .project/m4-data-intake.md
+    status: verified
+    verified_on: 2026-08-10
+  - id: E-027
+    claim: "The repository defines one implementation-ready M0-M12 BI product plan covering a certified Power BI semantic model, nine stakeholder pages, disclosure-supported metric families, correction/as-of behavior, authorized/reviewer boundaries, evaluation gates, and the exact M4 continuation prompt."
+    source: docs/BI_PRODUCT_SPEC.md; .project/refinement-plan.md; .project/milestones.yml; DESIGN.md; docs/NEXT_CHAT_PROMPT.md
+    status: verified
+    verified_on: 2026-08-10
+  - id: E-028
+    claim: "The implementation-ready BI planning revision passes 20 Python tests over the real source inventory, dashboard analytics tests, released-payload validation for 19 months and 59,904 observations, static artifact smoke verification, Graphify synchronization, and project-record checks."
+    source: npm run check; graphify-out/GRAPH_REPORT.md; .project/graph-source.sha256
+    status: verified
+    verified_on: 2026-08-10

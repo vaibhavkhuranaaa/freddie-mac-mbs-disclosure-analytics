@@ -3,55 +3,54 @@
 ## Charter
 
 - **Industry:** mortgage-backed securities disclosure analytics
-- **Current implemented release:** month-end Freddie Mac security-level issuance monitoring with fail-closed quality and provenance
-- **Target product:** governed issuance, composition, factor, balance/runoff, prepayment, revision, and disclosure-quality investigation workflow
-- **Primary stakeholder:** MBS disclosure operations or market-data analyst
-- **Authorized data use:** the project owner is an authorized Freddie Mac user and may acquire and process the relevant source files for this project
-- **Current delivery:** local static dashboard, local SQLite processing, $0 operating baseline
-- **Current data coverage:** 19 official issuance files from December 2024 through June 2026
+- **Current verified release:** governed month-end Freddie Mac issuance monitoring
+- **Target product:** authorized row-level Power BI decision product for issuance, balance/factor, prepayment, credit, collateral, concentration, correction, quality, and investigation workflows
+- **Primary stakeholder:** MBS disclosure operations or market-data analyst; executive summaries support nontechnical leadership
+- **Authorized data use:** the owner is authorized to use the acquired Freddie Mac source files at row level for this project
+- **Retention:** seven years from acquisition; delete earlier if authorization ends
+- **Current delivery:** local Python/SQLite/static dashboard with a $0 operating baseline
+- **Current governed issuance coverage:** 19 files, 2024-12 through 2026-06
+- **Current acquired expansion:** 71 monthly-security and 35 monthly loan-level archives in restricted ignored storage
 
 ## Purpose
 
-Build a reproducible analyst workflow that answers what changed, whether the change is data-related or activity-related, what evidence supports it, and what should be investigated next. Preserve an aggregate-only reviewer mode while developing a separately governed authorized analyst mode.
+Help a stakeholder decide whether a disclosure release is trustworthy, what changed, which segments drove the movement, whether correction or comparability issues explain it, and what investigation to assign. Calculations, lineage, quality, and limitations must be reproducible from source to decision.
 
-## Current business question
+## Product modes
 
-Where did issuance accelerate, cool, and change composition over the observed period, and what should an operations or market-data team investigate next?
+- **Authorized analyst mode:** full approved security-period and loan-period detail, certified metrics, governed drill-through, and investigation evidence.
+- **Reviewer mode:** a separately generated, explicitly approved aggregate boundary. Internal row-level authorization does not grant public redistribution.
 
-## Implemented capabilities
+## Implemented baseline
 
-- Validates exact official `FRE_IS_YYYYMM.zip` archive names, members, ordered-header fingerprints, and source periods.
-- Recognizes the legacy issuance schema through November 2025 and the FICO/VS4 schema beginning December 2025.
-- Reconciles physical input, accepted, documented-exclusion, rejected, duplicate, quarantined, and published counts per source file.
-- Blocks publication when a schema, row, duplicate, or reconciliation rule fails.
-- Stores accepted security observations, SHA-256 source manifests, and value-free quality events in local SQLite.
-- Publishes aggregate-only monthly dashboard data with period, generation, pipeline, build, schema, and quality metadata.
-- Publishes a tested issuance-mix view using official CL/ZL, CT/ZT, CI/ZI, and CN/ZN term-family mappings with an explicit unmapped group.
-- Generates latest change, observed range, mix finding, and investigation prompts from the active payload rather than fixed months.
-- Provides resilient loading/error/retry states, year-aware chart labels and summaries, keyboard focus, forced-color support, and responsive evidence views.
-- Runs automated official-file, failure-path, idempotence, payload, non-destructive, and static-preview checks.
-- Inventories restricted source archives without logging disclosure row values and keeps M4 blocked until an approved source contract, exact schemas, and required factor/supplemental families are present.
+- Exact archive/member, ordered-header, schema-period, value, duplicate, and reconciliation controls.
+- 60,604 physical issuance rows reconciled to 59,904 accepted observations and 700 documented exclusions; zero rejected and duplicate keys.
+- Restricted SQLite observations, source manifests, value-free quality events, and aggregate-only release payload.
+- Issuance UPB/count, corrections, approved term-family composition, active-data findings, investigation prompts, evidence, and limitations.
+- Loading/error/retry, year-aware descriptions, keyboard focus, forced colors, responsive layout, automated tests, and static smoke verification.
+- Value-free inventory of the acquired monthly-security and loan-level source population.
 
-## Verified baseline
+## Target decision product
 
-- 60,604 physical rows across 19 official files.
-- 59,904 accepted and published issuance observations.
-- 700 documented status-`C` blank-balance exclusions.
-- Zero rejected rows and zero duplicate business keys in the verified build.
-- 19 monthly aggregate rows covering 2024-12 through 2026-06.
+The complete page, metric, semantic-model, visual, accessibility, governance, and history contract is `docs/BI_PRODUCT_SPEC.md`. The executable M0–M12 sequence is `.project/milestones.yml`.
 
-## Current limitations
+The target covers:
 
-- The implemented source set is issuance-only. Issuance-date factor and current UPB are not measures of subsequent runoff.
-- Mix is term-family monitoring only; 458 observations outside the approved UMBS mapping remain `Other / Unmapped prefix`.
-- Balance movement, paydown, CPR/prepayment, timeliness, and supplemental monitoring require separately approved monthly factor and supplemental files; the machine-readable intake contract is still pending.
-- Authenticated analyst mode, AI, cloud infrastructure, deployment, and public publication are not implemented or authorized.
-- The product is descriptive operational analytics; it does not make borrower decisions or provide investment, valuation, hedging, or trading recommendations.
+- release completeness, schema, revisions, freshness, reconciliation, join coverage, and comparability;
+- issuance, outstanding balances, security/loan counts, WAC, WALA, WAM, factors, removals, and balance bridges;
+- approved paydown, runoff, SMM/CPR, seasoning, and cohort behavior;
+- delinquency bands, transitions, cures, modifications, deferrals, assistance, and guarantees;
+- FICO/VS4, LTV/CLTV/ELTV, DTI, purpose, occupancy, property, channel, geography, seller, servicer, mission, green, and social composition;
+- executive summaries, cohort exploration, evidence drill-through, and governed investigation notes.
+
+Price, yield, OAS, spreads, duration, convexity, WAL, market return, MSR, macro sensitivity, and loss severity remain external-data extensions. They must not be simulated or implied from the current disclosures.
+
+## Current implementation boundary
+
+M0–M3 are complete. M4 is next and is authorized for local implementation: finalize the monthly-security and loan-level field/join/correction contract, parse all approved families, create conformed security-period and loan-period records, and prove reconciliation/backfill parity. The acquired files alone do not authorize an unverified formula or public claim.
+
+AI services, cloud infrastructure, paid resources, deployment, and publication are not approved. The product is descriptive operational analytics and does not make borrower, investment, valuation, trading, hedging, or causal recommendations.
 
 ## Success criteria
 
-The end-to-end product is complete when the analyst workflow, data contracts, governed measures, authorized/public access boundary, evaluation, security, operations, deployment evidence, case study, and publication records satisfy M0–M10 in `.project/milestones.yml`.
-
-## Delivery roadmap
-
-The approved executable plan is `.project/milestones.yml`; the detailed architecture, AI safety, risks, and approval gates are in `.project/refinement-plan.md`.
+The product is complete when every M0–M12 acceptance gate applicable to the selected release passes, a nontechnical stakeholder completes the trust-to-investigation workflow without SQL, all displayed metrics reconcile to the certified model, restricted data stays inside the authorized boundary, and public claims match verified evidence.

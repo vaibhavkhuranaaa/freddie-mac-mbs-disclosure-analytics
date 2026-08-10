@@ -1,8 +1,10 @@
-# Analytics delivery rules
+# Business intelligence delivery rules
 
-- Use versioned public, synthetic, anonymized, or licensed data only.
-- Define the decision owner and metric contract before modeling.
-- Establish a documented baseline before adding a more complex model.
-- Make data preparation reproducible and test schema, freshness, duplicates, and failures.
-- Label representative analysis separately from operational performance.
-- Keep dashboards decision-oriented, accessible, and explicit about data scope and limitations.
+- Define the stakeholder decision, grain, filter behavior, denominator, comparison eligibility, and desired interpretation before building a visual.
+- Use one certified semantic model with explicit measures; do not duplicate calculations in report pages.
+- Model facts and conformed dimensions as a star schema and document every nonstandard relationship.
+- Reconcile source, transformation, semantic-model, API, and report totals on golden fixtures.
+- Make refresh time, coverage, quality, corrections, comparability, active filters, missing data, and limitations visible.
+- Use authorized or licensed row-level data inside the governed analyst boundary and separately approve every reviewer/public aggregate.
+- Test accessibility, nontechnical task completion, interpretation, performance, security, export behavior, and failure states.
+- Keep a verified release until its replacement passes metric parity and rollback checks.
