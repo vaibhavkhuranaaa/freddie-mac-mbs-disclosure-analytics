@@ -1,0 +1,29 @@
+{
+  "classification": "non-sensitive synthetic test fixture; never reviewer data",
+  "schema_cases": [
+    {"id": "security-legacy", "period": "2025-11", "score_fields": ["legacy_credit_score"]},
+    {"id": "security-fico-vs4", "period": "2025-12", "score_fields": ["classic_fico", "vs4"]},
+    {"id": "loan-legacy", "period": "2025-11", "score_fields": ["legacy_credit_score"]},
+    {"id": "loan-fico-vs4", "period": "2025-12", "score_fields": ["classic_fico", "vs4"]},
+    {"id": "april-2026-consolidation", "period": "2026-04", "economic_event": false}
+  ],
+  "correction_versions": [
+    {"source_version": 1, "as_of": "2026-01-07T23:59:59Z", "record_hash": "original"},
+    {"source_version": 2, "as_of": "2026-01-08T23:59:59Z", "record_hash": "corrected"}
+  ],
+  "join_cases": [
+    {"id": "matched", "correction": "N", "security_id": "GSEC01", "security_statuses": ["A"], "late": false, "expected": "matched"},
+    {"id": "unmatched", "correction": "N", "security_id": "GSEC02", "security_statuses": [], "late": false, "expected": "unmatched"},
+    {"id": "ambiguous", "correction": "N", "security_id": "GSEC03", "security_statuses": ["A", "A"], "late": false, "expected": "ambiguous"},
+    {"id": "late", "correction": "N", "security_id": "GSEC04", "security_statuses": [], "late": true, "expected": "late"},
+    {"id": "ineligible", "correction": "N", "security_id": null, "security_statuses": [], "late": false, "expected": "ineligible"},
+    {"id": "terminated-deletion", "correction": "D", "security_id": "GSEC05", "security_statuses": [], "late": false, "expected": "terminated"},
+    {"id": "terminated-security", "correction": "N", "security_id": "GSEC06", "security_statuses": ["P"], "late": false, "expected": "terminated"}
+  ],
+  "failure_cases": [
+    "duplicate-business-key",
+    "missing-required-period",
+    "malformed-row-layout",
+    "unknown-supplemental-record-type"
+  ]
+}

@@ -56,11 +56,19 @@ def approved_contract(headers):
     contract = pending_contract()
     contract.update(
         {
+            "contract_id": "fixture-contract",
             "status": source_inventory.APPROVED_STATUS,
             "approved_on": "2026-08-09",
             "authorization": "authorized internal use",
             "public_demo_rights": "aggregates only",
             "retention": "restricted local storage",
+            "native_grain": {"fixture": "one row"},
+            "timing": {"report_period": "fixture period"},
+            "keys": {"business_key": ["fixture_id"]},
+            "correction_precedence": {"precedence": ["as_of"]},
+            "release_modes": {"authorized": "fixture", "reviewer": "excluded"},
+            "retention_policy": {"duration_years_from_acquisition": 7},
+            "dispositions": ["accepted", "excluded", "rejected", "duplicate", "quarantined", "published-to-conformed"],
             "source_families": [
                 {
                     "id": "monthly-security-core-1",
@@ -90,8 +98,19 @@ def approved_contract(headers):
                 "correction_behavior": "latest approved correction supersedes original",
                 "unmatched_policy": "retain and report reason",
             },
-            "field_allowlist": ["Security Identifier", "Security Factor"],
-            "intended_measures": ["observed factor change"],
+            "field_allowlist": [
+                {
+                    "target": "security_id",
+                    "source_names": ["Security Identifier"],
+                    "type": "text",
+                    "nullable": False,
+                    "null_tokens": [],
+                    "sensitivity": "restricted",
+                    "authorized_use": "fixture",
+                    "reviewer_rule": "excluded",
+                }
+            ],
+            "intended_measures": [{"name": "source reconciliation"}],
         }
     )
     return contract
@@ -225,14 +244,42 @@ class SourceInventoryTests(unittest.TestCase):
             with self.assertRaisesRegex(source_inventory.InventoryError, "authorization"):
                 source_inventory.load_contract(path)
 
-    def test_repository_pending_contract_and_raw_inventory_are_fail_closed(self):
-        contract = source_inventory.load_contract(ROOT / ".project/m4-source-contract.json")
-        inventory = source_inventory.build_inventory(ROOT / "data/raw", contract)
-        self.assertEqual(inventory["m4_readiness"]["status"], "blocked")
+    def test_repository_approved_contracts_and_raw_inventory_are_ready(self):
+        contract = source_inventory.load_contract_bundle(
+            [
+                ROOT / ".project/m4-source-contract.json",
+                ROOT / ".project/m4-loan-source-contract.json",
+            ]
+        )
+        inventory = source_inventory.build_inventory(
+            ROOT / "data/raw", contract, ROOT / "local/m4-inventory-cache.json"
+        )
+        self.assertEqual(inventory["m4_readiness"]["status"], "ready")
         self.assertEqual(inventory["summary"]["governed_issuance"], 19)
-        self.assertEqual(inventory["summary"]["approved_m4"], 0)
-        self.assertGreaterEqual(inventory["summary"]["unapproved_candidates"], 4)
+        self.assertEqual(inventory["summary"]["approved_m4"], 106)
+        self.assertEqual(inventory["summary"]["unapproved_candidates"], 0)
         self.assertEqual(inventory["summary"]["invalid"], 0)
+
+    def test_missing_required_period_is_reported(self):
+        headers = ["Security Identifier", "Security Factor"]
+        contract = approved_contract(headers)
+        schema = contract["source_families"][0]["schema_versions"][0]
+        schema["period_min"] = "2026-01"
+        schema["period_max"] = "2026-03"
+        with tempfile.TemporaryDirectory() as folder:
+            write_zip(
+                folder,
+                "factor-202601.zip",
+                "fd260107.txt",
+                headers,
+                [["GOLD01", "0.9"]],
+            )
+            inventory = source_inventory.build_inventory(Path(folder), contract)
+        self.assertEqual(inventory["m4_readiness"]["status"], "blocked")
+        self.assertEqual(
+            inventory["m4_readiness"]["missing_required_periods"],
+            {"monthly-security-core-1": ["2026-02", "2026-03"]},
+        )
 
     def test_require_ready_exits_two_for_repository_blocker(self):
         with tempfile.TemporaryDirectory() as folder:

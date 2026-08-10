@@ -288,6 +288,7 @@ def source_signature(root: Path) -> str:
 
 
 def graph_sync(_: argparse.Namespace) -> None:
+    """Refresh the local code graph before stamping source freshness."""
     root = Path.cwd()
     run(["graphify", "update", "."], root)
     write(root / SIGNATURE_FILE, source_signature(root))

@@ -10,7 +10,7 @@
   "8": "Issuance Monitoring Business Question",
   "9": "Recruiter-Facing Issuance Dashboard",
   "10": "Issuance Monitoring Methodology",
-  "11": "Next Chat Continuation Prompt",
+  "11": "m4_conformance.py",
   "12": "Verified Project Evidence",
   "13": "Delivery sequence",
   "14": "source_inventory.py",
@@ -33,5 +33,7 @@
   "31": "industry.md",
   "32": "copilot-instructions.md",
   "33": "publication.md",
-  "34": "state.md"
+  "34": "state.md",
+  "35": "test_m4_conformance.py",
+  "37": "verify_m4_safety.py"
 }

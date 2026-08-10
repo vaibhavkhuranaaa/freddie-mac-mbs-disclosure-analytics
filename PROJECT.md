@@ -3,7 +3,7 @@
 ## Charter
 
 - **Industry:** mortgage-backed securities disclosure analytics
-- **Current verified release:** governed month-end Freddie Mac issuance monitoring
+- **Current verified release:** governed month-end Freddie Mac issuance monitoring plus restricted M4 conformed security/loan inputs
 - **Target product:** authorized row-level Power BI decision product for issuance, balance/factor, prepayment, credit, collateral, concentration, correction, quality, and investigation workflows
 - **Primary stakeholder:** MBS disclosure operations or market-data analyst; executive summaries support nontechnical leadership
 - **Authorized data use:** the owner is authorized to use the acquired Freddie Mac source files at row level for this project
@@ -26,6 +26,8 @@ Help a stakeholder decide whether a disclosure release is trustworthy, what chan
 - Exact archive/member, ordered-header, schema-period, value, duplicate, and reconciliation controls.
 - 60,604 physical issuance rows reconciled to 59,904 accepted observations and 700 documented exclusions; zero rejected and duplicate keys.
 - Restricted SQLite observations, source manifests, value-free quality events, and aggregate-only release payload.
+- Approved monthly-security and monthly-loan contracts, 9,240,038 security-period facts, and 264,922,553 loan-period facts in ignored restricted storage.
+- 693,640,933 M4 source rows reconciled with zero rejected, duplicate, or quarantined rows; every loan/security join is reason coded.
 - Issuance UPB/count, corrections, approved term-family composition, active-data findings, investigation prompts, evidence, and limitations.
 - Loading/error/retry, year-aware descriptions, keyboard focus, forced colors, responsive layout, automated tests, and static smoke verification.
 - Value-free inventory of the acquired monthly-security and loan-level source population.
@@ -47,7 +49,7 @@ Price, yield, OAS, spreads, duration, convexity, WAL, market return, MSR, macro 
 
 ## Current implementation boundary
 
-M0–M3 are complete. M4 is next and is authorized for local implementation: finalize the monthly-security and loan-level field/join/correction contract, parse all approved families, create conformed security-period and loan-period records, and prove reconciliation/backfill parity. The acquired files alone do not authorize an unverified formula or public claim.
+M0–M4 are complete. M5 is the first unblocked milestone: implement only approved disclosure-supported business formulas from the conformed facts, with separate formula gates for factor-derived runoff/paydown, SMM/CPR, delinquency transitions, and concentration. M4 conformance does not authorize an unverified formula or public claim.
 
 AI services, cloud infrastructure, paid resources, deployment, and publication are not approved. The product is descriptive operational analytics and does not make borrower, investment, valuation, trading, hedging, or causal recommendations.
 

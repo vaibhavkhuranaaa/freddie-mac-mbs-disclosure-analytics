@@ -1,10 +1,48 @@
 {
   "version": 1,
-  "status": "authorized-data-pending-machine-contract-approval",
-  "approved_on": null,
+  "contract_id": "m4-monthly-security-v1",
+  "status": "approved",
+  "approved_on": "2026-08-10",
   "authorization": "Owner-confirmed authorized row-level Freddie Mac use for the restricted analyst workflow; no aggregate-only restriction applies inside that boundary",
   "public_demo_rights": "Not approved; restricted rows and derived security-level products remain excluded from public artifacts pending explicit license and publication approval",
   "retention": "Retain restricted raw and security-level derived data for seven years from acquisition; delete earlier if authorization ends",
+  "native_grain": {
+    "core": "one disclosed security per Security Factor Date and source delivery",
+    "supplemental": "one provider record at its record-type-specific native grain; M4 validates and dispositions these records but does not flatten them into FactSecurityPeriod"
+  },
+  "timing": {
+    "publication_date_source": "YYMMDD in the exact embedded member name",
+    "publication_period": "calendar month containing publication_date",
+    "report_period": "Security Factor Date for core rows; it must equal publication_period in the acquired monthly files",
+    "release_timing": "fourth business day at 4:30 P.M. per Disclosure Guide v6.2",
+    "consolidation": "File 2 families end after 2026-03; File 1 contains the consolidated population beginning 2026-04; this is source-layout metadata, not economic activity"
+  },
+  "keys": {
+    "core_business_key": ["Security Identifier", "Security Factor Date"],
+    "core_version_key": ["Security Identifier", "Security Factor Date", "source_version_id"],
+    "supplemental_native_key": ["source_file", "source_row", "record_type"],
+    "same_version_duplicate_policy": "quarantine every repeated business key and fail the source period",
+    "cross_family_duplicate_policy": "classify as ambiguous, prevent publication to a latest view, and fail the source period"
+  },
+  "correction_precedence": {
+    "immutable_rule": "append each accepted source delivery; never overwrite an earlier accepted version",
+    "original_view": "earliest accepted source version for a business key as of the requested cutoff",
+    "latest_view": "latest accepted source version for a business key as of the requested cutoff",
+    "precedence": ["as_of_timestamp", "publication_date", "source_version_id"],
+    "indicator": "Security Data Correction Indicator Y records provider-declared correction lineage; N records no declared correction",
+    "same_precedence_tie": "quarantine as ambiguous and fail closed"
+  },
+  "release_modes": {
+    "authorized": "restricted local FactSecurityPeriod detail and value-free reconciliation metadata",
+    "reviewer": "not approved; no row/detail value or derived security-level product may be emitted",
+    "public": "not approved"
+  },
+  "retention_policy": {
+    "duration_years_from_acquisition": 7,
+    "early_delete_condition": "authorization ends",
+    "applies_to": ["raw", "staging", "conformed", "lineage"]
+  },
+  "dispositions": ["accepted", "excluded", "rejected", "duplicate", "quarantined", "published-to-conformed"],
   "source_families": [
     {
       "id": "monthly-security-core-1",
@@ -367,15 +405,35 @@
     }
   ],
   "join_contract": {
-    "grain": "Candidate: one security observation per Security Factor Date",
-    "effective_period": "Candidate: Security Factor Date; the filename date is the publication date",
+    "grain": "one security observation per Security Factor Date and accepted source version",
+    "effective_period": "Security Factor Date; embedded member date is publication date and must have the same calendar month",
     "business_keys": [
       "Security Identifier",
       "Security Factor Date"
     ],
-    "correction_behavior": null,
-    "unmatched_policy": "Retain unmatched observations with a governed reason and block unexplained many-to-many joins"
+    "correction_behavior": "original and latest views apply correction_precedence without overwriting immutable versions",
+    "unmatched_policy": "retain every loan relationship with exactly one of matched, unmatched, ambiguous, late, ineligible, or terminated; block unexplained many-to-many joins"
   },
-  "field_allowlist": [],
-  "intended_measures": []
+  "field_allowlist": [
+    {"target": "prefix", "source_names": ["Prefix"], "type": "text", "nullable": false, "null_tokens": [], "sensitivity": "restricted", "authorized_use": "conformance and join evidence", "reviewer_rule": "excluded"},
+    {"target": "security_id", "source_names": ["Security Identifier"], "type": "text", "nullable": false, "null_tokens": [], "sensitivity": "restricted", "authorized_use": "business key and authorized drill-through", "reviewer_rule": "excluded"},
+    {"target": "security_factor_date", "source_names": ["Security Factor Date"], "type": "date", "nullable": false, "null_tokens": [], "sensitivity": "restricted", "authorized_use": "native reporting period", "reviewer_rule": "aggregate-only after separate approval"},
+    {"target": "security_factor", "source_names": ["Security Factor"], "type": "decimal", "nullable": true, "null_tokens": [""], "sensitivity": "restricted", "authorized_use": "conformed source value only; no M4 paydown or prepayment formula", "reviewer_rule": "excluded"},
+    {"target": "security_correction_indicator", "source_names": ["Security Data Correction Indicator"], "type": "enum", "nullable": false, "null_tokens": [], "sensitivity": "restricted", "authorized_use": "correction lineage", "reviewer_rule": "count-only after separate approval"},
+    {"target": "security_status", "source_names": ["Security Status Indicator"], "type": "enum", "nullable": false, "null_tokens": [], "sensitivity": "restricted", "authorized_use": "eligibility and termination classification", "reviewer_rule": "count-only after separate approval"},
+    {"target": "issuance_security_upb", "source_names": ["Issuance Investor Security UPB"], "type": "decimal", "nullable": true, "null_tokens": [""], "sensitivity": "restricted", "authorized_use": "conformed source value", "reviewer_rule": "aggregate-only after separate approval"},
+    {"target": "current_security_upb", "source_names": ["Current Investor Security UPB"], "type": "decimal", "nullable": true, "null_tokens": [""], "sensitivity": "restricted", "authorized_use": "conformed source value", "reviewer_rule": "aggregate-only after separate approval"},
+    {"target": "loan_count", "source_names": ["Loan Count"], "type": "integer", "nullable": true, "null_tokens": [""], "sensitivity": "restricted", "authorized_use": "conformed source value", "reviewer_rule": "aggregate-only after separate approval"},
+    {"target": "legacy_credit_score", "source_names": ["WA Borrower Credit Score"], "type": "integer", "nullable": true, "null_tokens": [""], "sensitivity": "restricted", "authorized_use": "legacy score-system segment", "reviewer_rule": "excluded"},
+    {"target": "classic_fico", "source_names": ["WA Classic FICO"], "type": "integer", "nullable": true, "null_tokens": [""], "sensitivity": "restricted", "authorized_use": "Classic FICO segment only", "reviewer_rule": "excluded"},
+    {"target": "vs4", "source_names": ["WA VS4"], "type": "integer", "nullable": true, "null_tokens": [""], "sensitivity": "restricted", "authorized_use": "VS4 segment only", "reviewer_rule": "excluded"},
+    {"target": "involuntary_removal_upb", "source_names": ["Involuntary Loan Removal (Prior Month UPB)"], "type": "decimal", "nullable": true, "null_tokens": [""], "sensitivity": "restricted", "authorized_use": "conformed source value; never labeled voluntary prepayment", "reviewer_rule": "aggregate-only after separate approval"},
+    {"target": "involuntary_removal_count", "source_names": ["Involuntary Loan Removal (Loan Count)"], "type": "integer", "nullable": true, "null_tokens": [""], "sensitivity": "restricted", "authorized_use": "conformed source value", "reviewer_rule": "aggregate-only after separate approval"},
+    {"target": "supplemental_record_type", "source_names": ["column_0"], "type": "text", "nullable": false, "null_tokens": [], "sensitivity": "restricted", "authorized_use": "native-layout validation and disposition only", "reviewer_rule": "count-only after separate approval"}
+  ],
+  "intended_measures": [
+    {"name": "source_record_reconciliation", "scope": "M4 conformance counts only"},
+    {"name": "security_version_and_correction_counts", "scope": "M4 lineage counts only"},
+    {"name": "security_loan_join_reconciliation", "scope": "M4 reason counts only"}
+  ]
 }

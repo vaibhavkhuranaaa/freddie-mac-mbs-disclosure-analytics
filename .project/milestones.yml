@@ -44,7 +44,8 @@ milestones:
 
   - id: M4
     title: Approve and implement conformed source contracts
-    status: next-unblocked
+    status: completed
+    evidence: [E-029, E-030, E-031]
     readiness_evidence: [E-018, E-024, E-026]
     objective: Turn the acquired monthly security and loan-level archives into versioned, fail-closed conformed inputs without publishing restricted rows.
     deliverables:
@@ -62,7 +63,7 @@ milestones:
 
   - id: M5
     title: Build the industry metric engine
-    status: blocked-by-M4
+    status: next-unblocked
     objective: Implement the complete disclosure-supported metric catalog with versioned formulas and golden evidence.
     deliverables:
       - Issuance, outstanding balance, factor, paydown, correction, composition, credit, collateral, delinquency, assistance, mission, and concentration measures.

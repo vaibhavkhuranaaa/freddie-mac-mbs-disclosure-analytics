@@ -2,8 +2,8 @@
 
 ## Approved status
 
-- **Current architecture:** governed local real-data issuance product
-- **Next architecture:** local conformed security/loan facts, versioned metric engine, and certified Power BI semantic model
+- **Current architecture:** governed local issuance product plus restricted M4 conformed security/loan facts
+- **Next architecture:** versioned metric engine and certified Power BI semantic model over M4 facts
 - **Data access:** authorized row-level Freddie Mac source use; restricted files stay outside Git and reviewer artifacts
 - **Retention:** seven years from acquisition, deleted earlier if authorization ends
 - **Current cost:** $0 operating baseline
@@ -22,6 +22,19 @@ Authorized FRE_IS ZIPs
 ```
 
 The verified build processes 60,604 physical rows from 19 files and publishes 59,904 issuance observations after 700 documented exclusions, with zero rejected and duplicate rows.
+
+## Verified M4 conformance
+
+```text
+106 restricted monthly-security/loan archives
+  -> cached exact package/member/schema/layout/period inventory
+  -> streaming value/type/key validation and immutable manifests
+  -> 9,240,038 SQLite security-period facts
+  -> 35 compressed period/source loan partitions with 264,922,553 facts
+  -> reason-coded joins, correction/as-of lineage, and aggregate reconciliation
+```
+
+The M4 build reconciles 693,640,933 physical rows to 274,162,591 accepted/published facts and 419,478,342 explicit supplemental exclusions. Zero rows are rejected, duplicated, or quarantined. All loan joins match in the acquired population. Backfill and unchanged incremental runs produce the same normalized snapshot checksum.
 
 ## Target logical architecture
 
@@ -46,8 +59,8 @@ Identity, access, secrets, audit, observability, cost, backup, recovery, deploym
 | Layer | Grain / responsibility | Required controls |
 | --- | --- | --- |
 | Restricted landing | immutable acquired archive | checksum, member inventory, acquisition time, retention/deletion clock |
-| Validated staging | native source row/record type | schema validity, type/range rules, correction identity, disposition reconciliation |
-| Conformed facts | issuance security, security-period, loan-period, supplemental native grain | surrogate keys, original/latest views, matched/unmatched reason taxonomy |
+| Validated staging | streaming native source row/record type | schema validity, type/range rules, correction identity, disposition reconciliation; accepted rows are not duplicated into a wide staging copy |
+| Conformed facts | issuance security, SQLite security-period, compressed period/source loan-period partitions | source keys, immutable partition checksums, original/latest rules, matched/unmatched reason taxonomy |
 | Metric engine | numerator/denominator components and certified measures | formula version, golden fixtures, comparison eligibility, limitation |
 | Semantic model | star schema facts/dimensions and explicit measures | single-direction relationships, security classification, parity/performance tests |
 | Release models | authorized detail or explicit reviewer aggregate | independent allowlist, negative access tests, artifact inspection |
@@ -76,7 +89,7 @@ Do not flatten security-period and loan-period data into one wide fact table. We
 | Choice | Use now | Scale/change trigger |
 | --- | --- | --- |
 | Python governed transformations | Yes | Keep; package/containerize when dependencies or scheduling require it |
-| SQLite restricted baseline | Yes | Move when concurrent analysts, service queries, or 10x tests breach recorded thresholds |
+| SQLite control/security facts plus compressed loan partitions | Yes; avoids a disk-unsafe 264.9M-row wide SQLite loan table | Move only when M5/M6 query/performance evidence justifies a governed analytical engine |
 | Power BI Import semantic model | M6 target | Composite/DirectQuery only with measured size, latency, or freshness need |
 | Static reviewer payload | Yes | Replace only with an approved reviewer semantic model/API |
 | Semantic API | M9 | Required before any AI or non-BI client |
@@ -100,4 +113,4 @@ Provider, tenant, region, residency, tiers, cost ceiling, identity, backup, reco
 
 ## Claim boundary
 
-Current claims remain issuance, quality, provenance, composition, and source-intake readiness. Longitudinal factor/balance, prepayment, delinquency, collateral, concentration, investigation, Power BI, API, AI, cloud, and hosted-release claims become valid only after their milestone evidence is verified.
+Current claims include issuance plus M4 source contracts, native-grain conformance, reconciliation, correction/as-of controls, and join coverage. Business factor/balance, prepayment, delinquency, collateral, concentration, investigation, Power BI, API, AI, cloud, and hosted-release claims become valid only after their milestone evidence is verified.

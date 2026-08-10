@@ -1,8 +1,18 @@
 # M4 monthly security and loan data intake
 
-Status: `requested security and loan acquisition complete; M4 contract implementation is next`
+Status: `M4 contracts, inventory, conformance, joins, parity, and safety verified`
 
-This record converts the acquired M4 population into a fail-closed implementation procedure. Row-level local use is authorized; exact machine fields, joins, calculations, and reviewer/public rights still require their documented gates.
+This record documents the fail-closed M4 implementation for the acquired population. Row-level local use, exact machine fields, joins, correction handling, and restricted conformance are approved; M5 calculations and reviewer/public release remain separately gated.
+
+## Verified implementation outcome
+
+- Both machine contracts are approved on 2026-08-10.
+- All 71 monthly-security and 35 monthly-loan archives pass exact package, member, schema/layout, validity-window, and required-period checks.
+- 693,640,933 physical rows reconcile to 274,162,591 accepted/published facts and 419,478,342 explicit supplemental exclusions, with zero rejected, duplicate, or quarantined rows.
+- `FactSecurityPeriod` contains 9,240,038 restricted facts; 35 compressed `FactLoanPeriod` partitions contain 264,922,553 restricted facts.
+- All 264,922,553 real loan/security joins are matched. Golden fixtures cover unmatched, ambiguous, late, ineligible, and terminated classifications.
+- Backfill and unchanged incremental processing share normalized snapshot SHA-256 `ec3862e9f6c1f4531424a26e4d3934b12b4e690ebb14fe58e8fd343c81074528`.
+- Restricted-output inspection sampled 228 identifiers/values and found zero tracked matches or tracked restricted paths.
 
 ## Verified acquisition progress
 
@@ -21,7 +31,7 @@ The archives are retained under ignored `data/raw/` storage. Safe structural ins
 
 The four samples contain 20,447,529 physical records and zero unknown record types or record-width failures under the observed structural layouts. The supplemental files do not contain a header row; their first field selects a record-specific layout. The intake gate now validates those record-type/column-count contracts without emitting row values.
 
-The initial samples established packaging/layouts; the completed backfill below establishes the requested implementation window. It does not by itself define correction handling or certify M4 fields, joins, or measures.
+The initial samples established packaging/layouts; the completed backfill below establishes the requested implementation window. The approved machine contracts define correction handling, M4 fields, joins, and conformance measures.
 
 ### 2025 backfill
 
@@ -48,7 +58,7 @@ Safe structural inspection confirms the documented consolidation boundary:
 - The shared 98-column Core FICO/VS4 layout continues across all observed 2026 Core files.
 - The machine contract contains a separate April-through-August 2026 consolidated Supplemental File 1 layout. No raw field values or identifiers were emitted while profiling it.
 
-The acquired monthly-security scope is complete for December 2024 through August 2026 under the selected family/period rules. Corrections/restatements remain a separate policy and acquisition decision.
+The acquired monthly-security scope is complete for December 2024 through August 2026 under the selected family/period rules. M4 records correction precedence and original/latest lineage; additional correction packages remain a separately governed acquisition decision.
 
 ### Adjacent source-family roadmap
 
@@ -56,7 +66,7 @@ The portal contains additional files, but access authority alone does not make u
 
 | Source family | Decision | Reason |
 | --- | --- | --- |
-| Monthly loan-level Files 1/2 (`fu`/`au`) | Acquired: `fu` January 2025–August 2026 and `au` January 2025–March 2026 | Implement next under a distinct loan-period grain, schema, correction, and security-linkage contract. |
+| Monthly loan-level Files 1/2 (`fu`/`au`) | Acquired and conformed: `fu` January 2025–August 2026 and `au` January 2025–March 2026 | Governed by a distinct loan-period grain, schema, correction, and security-linkage contract. |
 | Security correction/restatement packages | Acquire for every covered period in which a correction exists | Required to define original-versus-latest precedence and reproducible as-of reporting before M4 transformation approval. |
 | Daily prepayment reports | Defer until monthly factor/loan measures reconcile | Separate daily grain; useful for timing and validation, but it should not define the first monthly metric contract. |
 | Daily issuance files | Defer | The governed month-end `FRE_IS` history already answers the current monthly issuance workflow; daily files add intramonth timing rather than missing M4 factor fields. |
@@ -64,7 +74,7 @@ The portal contains additional files, but access authority alone does not make u
 
 History range and retention are separate controls. The present monthly-security analytical history is the requested recent window used to establish schemas and the 2026 consolidation boundary. Seven-year retention means each acquired restricted file is kept for seven years from acquisition, with earlier deletion if authorization ends; it does not automatically create seven years of historical observations. For robust seasonality and rate-cycle prepayment analysis, extend the analytical history backward after the monthly security and loan-level parsers prove schema-safe; target at least five years and preferably seven years if the official packages and local capacity support it.
 
-The adjacent loan-level window is complete through the applicable August/March 2026 endpoints: twenty `fu` packages covering January 2025–August 2026 and fifteen `au` packages covering January 2025–March 2026, totaling about 9.1 GiB compressed. All 35 ZIPs pass archive-integrity checks and contain exactly named `.txt` members. Header-only inspection found 116 columns throughout, a December 2025 FICO/VS4 semantic transition in both families, and no additional header change at the April 2026 File 1/File 2 consolidation boundary. These files remain outside the M4 security-source contract and are not yet approved for row transformation.
+The adjacent loan-level window is complete through the applicable August/March 2026 endpoints: twenty `fu` packages covering January 2025–August 2026 and fifteen `au` packages covering January 2025–March 2026, totaling about 9.1 GiB compressed. All 35 ZIPs pass archive-integrity checks and contain exactly named `.txt` members. Header-only inspection found 116 columns throughout, a December 2025 FICO/VS4 semantic transition in both families, and no additional header change at the April 2026 File 1/File 2 consolidation boundary. These files are governed by `.project/m4-loan-source-contract.json` and approved for restricted local conformance only.
 
 ## Verified official source candidates and transition
 
@@ -93,7 +103,7 @@ Primary references, accessed 2026-08-09:
 
 ## Owner approval checklist
 
-Before `.project/m4-source-contract.json` may be changed to `approved`, record:
+The owner checklist was completed before both contracts changed to `approved`:
 
 1. Exact acquired archive and embedded-member conventions for every required source family.
 2. Public demo rights remain unapproved. Authorized restricted row-level use and the seven-year/authorization-end deletion boundary are confirmed.
@@ -114,14 +124,14 @@ Before `.project/m4-source-contract.json` may be changed to `approved`, record:
 - governed issuance, approved M4, unapproved candidate, invalid, and unrelated classifications;
 - missing required families, unrecognized schemas, invalid archives, and contract blockers.
 
-The fail-closed readiness command remains blocked until M4 approves the machine contract and every required family matches. That blocker is an implementation gate, not a missing-file request. Discovery never grants formula or release approval. Run:
+The fail-closed readiness command now requires both approved contracts and every required family/period. Discovery and conformance do not grant formula or release approval. Run:
 
 ```sh
 npm run inventory:sources
-python3 scripts/source_inventory.py --input data/raw --contract .project/m4-source-contract.json --require-ready
+npm run verify:m4
 ```
 
-The second command intentionally exits with status 2 until the M4 contract is completed and approved.
+Both commands pass for the verified local inventory and skip unchanged adjacent archives through safe checksum metadata.
 
 ## No-go rules
 

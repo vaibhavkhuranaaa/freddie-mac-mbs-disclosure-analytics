@@ -1,6 +1,6 @@
 # End-to-end product refinement plan
 
-Status: `implementation-ready; M4 is next`
+Status: `M4 complete; M5 is next`
 
 Prepared: 2026-08-10
 
@@ -27,12 +27,14 @@ Cloud, paid services, AI, deployment, and publication remain independent approva
 - Monthly-security acquisition is complete for the requested window: 71 archives across the applicable `fd`, `fq`, `ar`, and `ge` families.
 - Adjacent monthly loan-level acquisition is complete for the requested window: 35 `fu`/`au` archives, approximately 9.1 GiB compressed.
 - The source files expose enough fields for security balance/factor, collateral, credit, delinquency, modification, assistance, geography, counterparty, and mission analytics after contracts and formulas are verified.
+- M4 approves both machine contracts and reconciles 693,640,933 physical records to 274,162,591 conformed facts plus 419,478,342 explicit supplemental exclusions, with zero rejected, duplicate, or quarantined rows.
+- All 264,922,553 loan/security joins match; backfill and incremental snapshots are identical.
 
 ## Product gaps to close
 
 | Priority | Gap | Consequence | Closing milestone |
 | --- | --- | --- | --- |
-| P0 | Monthly security and loan schemas are staged but not transformed under an approved field/join/correction contract | No defensible longitudinal analytics | M4 |
+| Closed | Monthly security and loan schemas lacked approved field/join/correction contracts | Resolved by verified M4 conformance | M4 complete |
 | P0 | Industry measures lack a single versioned calculation engine and golden fixtures | BI calculations could diverge or overclaim | M5 |
 | P0 | No certified star-schema semantic model exists | Executive and detail views cannot share one truth | M6 |
 | P1 | Current UI answers issuance questions only | Stakeholders cannot evaluate runoff, delinquency, collateral, or concentration | M7–M8 |

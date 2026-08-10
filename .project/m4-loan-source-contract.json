@@ -1,0 +1,137 @@
+{
+  "version": 1,
+  "contract_id": "m4-monthly-loan-v1",
+  "status": "approved",
+  "approved_on": "2026-08-10",
+  "authorization": "Owner-confirmed authorized row-level Freddie Mac use for the restricted local analyst workflow",
+  "public_demo_rights": "Not approved; loan rows, identifiers, values, and derived loan-level products remain excluded from reviewer/public artifacts",
+  "retention": "Retain restricted raw and loan-level derived data for seven years from acquisition; delete earlier if authorization ends",
+  "native_grain": {
+    "loan": "one disclosed loan/security relationship per reporting period and source delivery"
+  },
+  "timing": {
+    "publication_date_source": "YYMMDD in the exact embedded member name",
+    "publication_period": "calendar month containing publication_date",
+    "report_period": "publication_period for the acquired monthly snapshots",
+    "release_timing": "fourth business day at 4:30 P.M. per Disclosure Guide v6.2",
+    "consolidation": "File 2 ends after 2026-03; File 1 contains the consolidated population beginning 2026-04; this is source-layout metadata, not economic activity"
+  },
+  "keys": {
+    "business_key": ["Loan Identifier", "Security Identifier", "report_period"],
+    "version_key": ["Loan Identifier", "Security Identifier", "report_period", "source_version_id"],
+    "same_version_duplicate_policy": "quarantine every repeated business key and fail the source period",
+    "cross_family_duplicate_policy": "classify as ambiguous, prevent publication to a latest view, and fail the source period"
+  },
+  "correction_precedence": {
+    "immutable_rule": "append each accepted source delivery; never overwrite an earlier accepted version",
+    "original_view": "earliest accepted source version for a business key as of the requested cutoff",
+    "latest_view": "latest accepted source version for a business key as of the requested cutoff",
+    "precedence": ["as_of_timestamp", "publication_date", "source_version_id"],
+    "indicator": "Loan Correction Indicator N=no declared change, Y=changed, A=added, D=deleted",
+    "same_precedence_tie": "quarantine as ambiguous and fail closed"
+  },
+  "release_modes": {
+    "authorized": "restricted local FactLoanPeriod detail and value-free reconciliation metadata",
+    "reviewer": "not approved; no row/detail value or derived loan-level product may be emitted",
+    "public": "not approved"
+  },
+  "retention_policy": {
+    "duration_years_from_acquisition": 7,
+    "early_delete_condition": "authorization ends",
+    "applies_to": ["raw", "staging", "conformed", "lineage"]
+  },
+  "dispositions": ["accepted", "excluded", "rejected", "duplicate", "quarantined", "published-to-conformed"],
+  "source_families": [
+    {
+      "id": "monthly-loan-level-1",
+      "required": true,
+      "archive_pattern": "^fu\\d{6}\\.zip$",
+      "member_pattern": "^fu\\d{6}\\.txt$",
+      "has_header": true,
+      "record_type_column": null,
+      "period_source": "member",
+      "period_pattern": "^fu(?P<year>\\d{2})(?P<month>\\d{2})\\d{2}\\.txt$",
+      "schema_versions": [
+        {
+          "version": "monthly-loan-level-1-legacy-through-2025-11",
+          "header_sha256": "460b9dcf109815801bd586e72d4ac24903a54671f9496c8af228af5cd2a01554",
+          "column_count": 116,
+          "record_layouts": null,
+          "period_min": "2025-01",
+          "period_max": "2025-11"
+        },
+        {
+          "version": "monthly-loan-level-1-fico-vs4-from-2025-12",
+          "header_sha256": "3325806c2aac895d132309ed90b20d595c50dbc705b5b4f8ace703d642210cc6",
+          "column_count": 116,
+          "record_layouts": null,
+          "period_min": "2025-12",
+          "period_max": "2026-08"
+        }
+      ]
+    },
+    {
+      "id": "monthly-loan-level-2",
+      "required": true,
+      "archive_pattern": "^au\\d{6}\\.zip$",
+      "member_pattern": "^au\\d{6}\\.txt$",
+      "has_header": true,
+      "record_type_column": null,
+      "period_source": "member",
+      "period_pattern": "^au(?P<year>\\d{2})(?P<month>\\d{2})\\d{2}\\.txt$",
+      "schema_versions": [
+        {
+          "version": "monthly-loan-level-2-legacy-through-2025-11",
+          "header_sha256": "460b9dcf109815801bd586e72d4ac24903a54671f9496c8af228af5cd2a01554",
+          "column_count": 116,
+          "record_layouts": null,
+          "period_min": "2025-01",
+          "period_max": "2025-11"
+        },
+        {
+          "version": "monthly-loan-level-2-fico-vs4-from-2025-12",
+          "header_sha256": "3325806c2aac895d132309ed90b20d595c50dbc705b5b4f8ace703d642210cc6",
+          "column_count": 116,
+          "record_layouts": null,
+          "period_min": "2025-12",
+          "period_max": "2026-03"
+        }
+      ]
+    }
+  ],
+  "join_contract": {
+    "grain": "one loan/security relationship per report period and accepted source version",
+    "effective_period": "publication month from the exact embedded member date",
+    "business_keys": ["Loan Identifier", "Security Identifier", "report_period"],
+    "correction_behavior": "original and latest views apply correction_precedence without overwriting immutable versions",
+    "unmatched_policy": "assign exactly one of matched, unmatched, ambiguous, late, ineligible, or terminated and reconcile every accepted loan row"
+  },
+  "field_allowlist": [
+    {"target": "loan_id", "source_names": ["Loan Identifier"], "type": "text", "nullable": false, "null_tokens": [], "sensitivity": "restricted", "authorized_use": "business key and authorized drill-through", "reviewer_rule": "excluded"},
+    {"target": "loan_correction_indicator", "source_names": ["Loan Correction Indicator"], "type": "enum", "nullable": false, "null_tokens": [], "sensitivity": "restricted", "authorized_use": "correction, addition, and deletion lineage", "reviewer_rule": "count-only after separate approval"},
+    {"target": "prefix", "source_names": ["Prefix"], "type": "text", "nullable": false, "null_tokens": [], "sensitivity": "restricted", "authorized_use": "conformance and join evidence", "reviewer_rule": "excluded"},
+    {"target": "security_id", "source_names": ["Security Identifier"], "type": "text", "nullable": false, "null_tokens": [], "sensitivity": "restricted", "authorized_use": "security join key", "reviewer_rule": "excluded"},
+    {"target": "mortgage_loan_amount", "source_names": ["Mortgage Loan Amount"], "type": "decimal", "nullable": true, "null_tokens": [""], "sensitivity": "restricted", "authorized_use": "conformed source value", "reviewer_rule": "aggregate-only after separate approval"},
+    {"target": "issuance_loan_upb", "source_names": ["Issuance Investor Loan UPB"], "type": "decimal", "nullable": true, "null_tokens": [""], "sensitivity": "restricted", "authorized_use": "conformed source value", "reviewer_rule": "aggregate-only after separate approval"},
+    {"target": "current_loan_upb", "source_names": ["Current Investor Loan UPB"], "type": "decimal", "nullable": true, "null_tokens": [""], "sensitivity": "restricted", "authorized_use": "conformed source value; total decline is not prepayment", "reviewer_rule": "aggregate-only after separate approval"},
+    {"target": "remaining_months_to_maturity", "source_names": ["Remaining Months to Maturity"], "type": "integer", "nullable": true, "null_tokens": [""], "sensitivity": "restricted", "authorized_use": "conformed source value", "reviewer_rule": "aggregate-only after separate approval"},
+    {"target": "loan_age", "source_names": ["Loan Age"], "type": "integer", "nullable": true, "null_tokens": [""], "sensitivity": "restricted", "authorized_use": "conformed source value", "reviewer_rule": "aggregate-only after separate approval"},
+    {"target": "legacy_credit_score", "source_names": ["Borrower Credit Score"], "type": "integer", "nullable": true, "null_tokens": [""], "sensitivity": "restricted", "authorized_use": "legacy score-system segment", "reviewer_rule": "excluded"},
+    {"target": "classic_fico", "source_names": ["Classic FICO"], "type": "integer", "nullable": true, "null_tokens": [""], "sensitivity": "restricted", "authorized_use": "Classic FICO segment only", "reviewer_rule": "excluded"},
+    {"target": "vs4", "source_names": ["VS4"], "type": "integer", "nullable": true, "null_tokens": [""], "sensitivity": "restricted", "authorized_use": "VS4 segment only", "reviewer_rule": "excluded"},
+    {"target": "updated_legacy_credit_score", "source_names": ["Updated Credit Score"], "type": "integer", "nullable": true, "null_tokens": [""], "sensitivity": "restricted", "authorized_use": "legacy score-system segment", "reviewer_rule": "excluded"},
+    {"target": "updated_classic_fico", "source_names": ["Updated Classic FICO"], "type": "integer", "nullable": true, "null_tokens": [""], "sensitivity": "restricted", "authorized_use": "Classic FICO segment only", "reviewer_rule": "excluded"},
+    {"target": "updated_vs4", "source_names": ["Updated VS4"], "type": "integer", "nullable": true, "null_tokens": [""], "sensitivity": "restricted", "authorized_use": "VS4 segment only", "reviewer_rule": "excluded"},
+    {"target": "days_delinquent", "source_names": ["Days Delinquent"], "type": "integer", "nullable": true, "null_tokens": [""], "sensitivity": "restricted", "authorized_use": "conformed source value only; no M4 delinquency formula", "reviewer_rule": "excluded"},
+    {"target": "modification_program", "source_names": ["Modification Program"], "type": "text", "nullable": true, "null_tokens": [""], "sensitivity": "restricted", "authorized_use": "conformed source value", "reviewer_rule": "excluded"},
+    {"target": "current_deferred_upb", "source_names": ["Current Deferred UPB"], "type": "decimal", "nullable": true, "null_tokens": [""], "sensitivity": "restricted", "authorized_use": "conformed source value", "reviewer_rule": "aggregate-only after separate approval"},
+    {"target": "property_state", "source_names": ["Property State"], "type": "text", "nullable": true, "null_tokens": [""], "sensitivity": "restricted", "authorized_use": "conformed source value", "reviewer_rule": "aggregate-only after separate approval"},
+    {"target": "seller_name", "source_names": ["Seller Name"], "type": "text", "nullable": true, "null_tokens": [""], "sensitivity": "restricted", "authorized_use": "authorized concentration analysis only", "reviewer_rule": "excluded"},
+    {"target": "servicer_name", "source_names": ["Servicer Name"], "type": "text", "nullable": true, "null_tokens": [""], "sensitivity": "restricted", "authorized_use": "authorized concentration analysis only", "reviewer_rule": "excluded"}
+  ],
+  "intended_measures": [
+    {"name": "source_record_reconciliation", "scope": "M4 conformance counts only"},
+    {"name": "loan_version_and_correction_counts", "scope": "M4 lineage counts only"},
+    {"name": "security_loan_join_reconciliation", "scope": "M4 reason counts only"}
+  ]
+}

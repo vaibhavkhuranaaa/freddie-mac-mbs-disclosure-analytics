@@ -4,13 +4,16 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import csv
+from concurrent.futures import ProcessPoolExecutor
 import hashlib
 import json
 import re
 import sys
 import zipfile
 from datetime import datetime
+from itertools import repeat
 from pathlib import Path
 from typing import Any
 
@@ -75,6 +78,23 @@ def load_contract(path: Path) -> dict[str, Any]:
                 "approved contract must define a field allowlist and intended measures"
             )
         validate_join_contract(contract["join_contract"])
+        governance_fields = {
+            "contract_id",
+            "native_grain",
+            "timing",
+            "keys",
+            "correction_precedence",
+            "release_modes",
+            "retention_policy",
+            "dispositions",
+        }
+        missing_governance = sorted(governance_fields - set(contract))
+        if missing_governance:
+            raise InventoryError(
+                "approved contract missing governance keys: "
+                + ", ".join(missing_governance)
+            )
+        validate_field_allowlist(contract["field_allowlist"])
 
     family_ids = [
         family.get("id")
@@ -86,6 +106,70 @@ def load_contract(path: Path) -> dict[str, Any]:
     for family in contract["source_families"]:
         validate_family(family)
     return contract
+
+
+def load_contract_bundle(paths: list[Path]) -> dict[str, Any]:
+    """Load several approved contracts as one inventory boundary."""
+    if not paths:
+        raise InventoryError("at least one contract is required")
+    contracts = [load_contract(path) for path in paths]
+    bundle = copy.deepcopy(contracts[0])
+    bundle["contract_ids"] = [
+        contract.get("contract_id", path.name)
+        for contract, path in zip(contracts, paths)
+    ]
+    bundle["source_families"] = [
+        family for contract in contracts for family in contract["source_families"]
+    ]
+    bundle["field_allowlist"] = [
+        field for contract in contracts for field in contract["field_allowlist"]
+    ]
+    bundle["intended_measures"] = [
+        measure for contract in contracts for measure in contract["intended_measures"]
+    ]
+    bundle["status"] = (
+        APPROVED_STATUS
+        if all(contract["status"] == APPROVED_STATUS for contract in contracts)
+        else PENDING_STATUS
+    )
+    family_ids = [family["id"] for family in bundle["source_families"]]
+    if len(family_ids) != len(set(family_ids)):
+        raise InventoryError("source family ids must be unique across contracts")
+    return bundle
+
+
+def validate_field_allowlist(fields: Any) -> None:
+    if not isinstance(fields, list) or not fields:
+        raise InventoryError("field_allowlist must be a non-empty list")
+    required = {
+        "target",
+        "source_names",
+        "type",
+        "nullable",
+        "null_tokens",
+        "sensitivity",
+        "authorized_use",
+        "reviewer_rule",
+    }
+    allowed_types = {"text", "integer", "decimal", "date", "enum"}
+    targets: set[str] = set()
+    for field in fields:
+        if not isinstance(field, dict) or not required.issubset(field):
+            raise InventoryError("field_allowlist contains an invalid field contract")
+        if (
+            not field["target"]
+            or field["target"] in targets
+            or not isinstance(field["source_names"], list)
+            or not field["source_names"]
+            or field["type"] not in allowed_types
+            or not isinstance(field["nullable"], bool)
+            or not isinstance(field["null_tokens"], list)
+            or field["sensitivity"] != "restricted"
+            or not field["authorized_use"]
+            or not field["reviewer_rule"]
+        ):
+            raise InventoryError("field_allowlist contains an invalid field contract")
+        targets.add(field["target"])
 
 
 def validate_join_contract(join_contract: Any) -> None:
@@ -241,32 +325,35 @@ def inspect_text_member(
         record_layout_counts: dict[str, int] = {}
         observed_record_layouts: dict[str, int] = {}
 
-        def inspect_line(line: str) -> None:
+        def inspect_line(raw_line: bytes) -> None:
             nonlocal row_count, invalid_column_count, unknown_record_type_count
             row_count += 1
-            fields = line.split("|")
+            stripped = raw_line.rstrip(b"\r\n")
+            column_count = stripped.count(b"|") + 1
             if has_header:
-                if len(fields) != len(first_fields):
+                if column_count != len(first_fields):
                     invalid_column_count += 1
                 return
-            if record_type_column is None or record_type_column >= len(fields):
+            if record_type_column is None or record_type_column >= column_count:
                 unknown_record_type_count += 1
                 return
-            record_type = fields[record_type_column]
+            record_type = stripped.split(b"|", record_type_column + 1)[
+                record_type_column
+            ].decode("ascii", errors="replace")
             expected_counts = (allowed_record_layouts or {}).get(record_type)
             if expected_counts is None:
                 unknown_record_type_count += 1
                 return
             record_layout_counts[record_type] = record_layout_counts.get(record_type, 0) + 1
-            observed_record_layouts[record_type] = len(fields)
-            if len(fields) not in expected_counts:
+            observed_record_layouts[record_type] = column_count
+            if column_count not in expected_counts:
                 invalid_column_count += 1
 
         if not has_header and first_line:
-            inspect_line(first_line)
+            inspect_line(first_line.encode("utf-8"))
         for raw_line in binary:
             if raw_line.strip():
-                inspect_line(raw_line.decode("utf-8").rstrip("\r\n"))
+                inspect_line(raw_line)
     fingerprint = (
         hashlib.sha256("|".join(first_fields).encode("utf-8")).hexdigest()
         if has_header
@@ -453,13 +540,89 @@ def match_family(item: dict[str, Any], family: dict[str, Any]) -> bool:
     return True
 
 
-def build_inventory(input_dir: Path, contract: dict[str, Any]) -> dict[str, Any]:
+def contract_signature(contract: dict[str, Any]) -> str:
+    payload = {
+        "version": contract["version"],
+        "status": contract["status"],
+        "source_families": contract["source_families"],
+    }
+    return hashlib.sha256(
+        json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+
+
+def load_inventory_cache(path: Path | None) -> dict[str, Any]:
+    if path is None or not path.is_file():
+        return {"entries": {}}
+    try:
+        cache = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {"entries": {}}
+    return cache if isinstance(cache.get("entries"), dict) else {"entries": {}}
+
+
+def save_inventory_cache(path: Path | None, cache: dict[str, Any]) -> None:
+    if path is None:
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(cache, sort_keys=True), encoding="utf-8")
+
+
+def expected_periods(family: dict[str, Any]) -> set[str]:
+    starts = [schema["period_min"] for schema in family["schema_versions"] if schema["period_min"]]
+    ends = [schema["period_max"] for schema in family["schema_versions"] if schema["period_max"]]
+    if not starts or not ends:
+        return set()
+    year, month = map(int, min(starts).split("-"))
+    end_year, end_month = map(int, max(ends).split("-"))
+    periods = set()
+    while (year, month) <= (end_year, end_month):
+        periods.add(f"{year:04d}-{month:02d}")
+        month += 1
+        if month == 13:
+            year, month = year + 1, 1
+    return periods
+
+
+def build_inventory(
+    input_dir: Path,
+    contract: dict[str, Any],
+    cache_path: Path | None = None,
+) -> dict[str, Any]:
     if not input_dir.is_dir():
         raise InventoryError(f"input directory not found: {input_dir}")
     files = []
-    for path in sorted(input_dir.iterdir()):
-        if not path.is_file() or path.name == ".gitkeep":
+    cache = load_inventory_cache(cache_path)
+    signature = contract_signature(contract)
+    current_entries: dict[str, Any] = {}
+    paths = [
+        path
+        for path in sorted(input_dir.iterdir())
+        if path.is_file() and path.name != ".gitkeep"
+    ]
+    uncached = []
+    for path in paths:
+        if path.suffix.lower() != ".zip":
             continue
+        stat = path.stat()
+        cached = cache["entries"].get(path.name)
+        if not (
+            cached
+            and cached.get("size_bytes") == stat.st_size
+            and cached.get("mtime_ns") == stat.st_mtime_ns
+            and cached.get("contract_signature") == signature
+        ):
+            uncached.append(path)
+    if len(uncached) > 4:
+        with ProcessPoolExecutor(max_workers=4) as executor:
+            inspected = executor.map(inspect_zip, uncached, repeat(contract))
+            preinspected = {
+                path.name: item for path, item in zip(uncached, inspected)
+            }
+    else:
+        preinspected = {path.name: inspect_zip(path, contract) for path in uncached}
+
+    for path in paths:
         if path.suffix.lower() != ".zip":
             files.append(
                 {
@@ -474,7 +637,18 @@ def build_inventory(input_dir: Path, contract: dict[str, Any]) -> dict[str, Any]
                 }
             )
             continue
-        item = inspect_zip(path, contract)
+        stat = path.stat()
+        cache_key = path.name
+        cached = cache["entries"].get(cache_key)
+        if (
+            cached
+            and cached.get("size_bytes") == stat.st_size
+            and cached.get("mtime_ns") == stat.st_mtime_ns
+            and cached.get("contract_signature") == signature
+        ):
+            item = cached["item"]
+        else:
+            item = preinspected[path.name]
         issuance_named = bool(pipeline.OFFICIAL_ZIP_PATTERN.fullmatch(item["name"]))
         issuance_recognized = recognize_issuance(item)
         if issuance_named and not issuance_recognized:
@@ -489,6 +663,14 @@ def build_inventory(input_dir: Path, contract: dict[str, Any]) -> dict[str, Any]
             if not matched and item["issues"]:
                 item["status"] = "invalid"
         files.append(item)
+        current_entries[cache_key] = {
+            "size_bytes": stat.st_size,
+            "mtime_ns": stat.st_mtime_ns,
+            "contract_signature": signature,
+            "item": item,
+        }
+
+    save_inventory_cache(cache_path, {"entries": current_entries})
 
     counts = {
         "governed_issuance": sum(item["kind"] == "governed-issuance" for item in files),
@@ -500,16 +682,34 @@ def build_inventory(input_dir: Path, contract: dict[str, Any]) -> dict[str, Any]
     matched_families = {
         item["source_family"] for item in files if item["kind"] == "approved-m4"
     }
-    missing_families = [
-        family["id"]
-        for family in contract["source_families"]
-        if family["required"] and family["id"] not in matched_families
-    ]
+    missing_families = []
+    missing_periods: dict[str, list[str]] = {}
+    for family in contract["source_families"]:
+        if not family["required"]:
+            continue
+        if family["id"] not in matched_families:
+            missing_families.append(family["id"])
+        observed = {
+            item.get("report_period")
+            for item in files
+            if item.get("source_family") == family["id"] and item["kind"] == "approved-m4"
+        }
+        missing = sorted(expected_periods(family) - observed)
+        if missing:
+            missing_periods[family["id"]] = missing
     blockers = []
     if contract["status"] != APPROVED_STATUS:
         blockers.append("M4 source contract is not approved")
     if missing_families:
         blockers.append(f"missing required source families: {', '.join(missing_families)}")
+    if missing_periods:
+        blockers.append(
+            "missing required source periods: "
+            + "; ".join(
+                f"{family}={','.join(periods)}"
+                for family, periods in sorted(missing_periods.items())
+            )
+        )
     if counts["invalid"]:
         blockers.append(
             f"{counts['invalid']} source package(s) failed inspection or contract matching"
@@ -523,6 +723,7 @@ def build_inventory(input_dir: Path, contract: dict[str, Any]) -> dict[str, Any]
         "m4_readiness": {
             "status": readiness,
             "missing_required_families": missing_families,
+            "missing_required_periods": missing_periods,
             "blockers": blockers,
         },
         "files": files,
@@ -551,7 +752,16 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", type=Path, default=Path("data/raw"))
     parser.add_argument(
-        "--contract", type=Path, default=Path(".project/m4-source-contract.json")
+        "--contract",
+        type=Path,
+        action="append",
+        help="machine contract; repeat for security and loan contracts",
+    )
+    parser.add_argument(
+        "--cache",
+        type=Path,
+        default=None,
+        help="ignored safe metadata cache used to skip unchanged archives",
     )
     parser.add_argument("--json", action="store_true", help="emit the complete safe inventory")
     parser.add_argument(
@@ -561,7 +771,16 @@ def main() -> int:
     )
     args = parser.parse_args()
     try:
-        inventory = build_inventory(args.input, load_contract(args.contract))
+        contract_paths = args.contract or [Path(".project/m4-source-contract.json")]
+        contract = (
+            load_contract(contract_paths[0])
+            if len(contract_paths) == 1
+            else load_contract_bundle(contract_paths)
+        )
+        cache_path = args.cache
+        if cache_path is None and args.input == Path("data/raw"):
+            cache_path = Path("local/m4-inventory-cache.json")
+        inventory = build_inventory(args.input, contract, cache_path)
     except InventoryError as error:
         print(f"Source inventory failed: {error}", file=sys.stderr)
         return 1

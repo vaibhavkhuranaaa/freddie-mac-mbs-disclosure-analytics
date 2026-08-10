@@ -1,6 +1,6 @@
 # Data dictionary
 
-Status: current issuance schema plus implementation contract for M4–M6. Exact source-to-column mappings remain machine-versioned in source contracts.
+Status: current issuance schema plus verified M4 conformed facts. Exact mappings remain machine-versioned in approved source contracts.
 
 ## Classification
 
@@ -37,13 +37,25 @@ Identity fields record file/family, report period, archive/member checksum, acqu
 
 Records source, row/record reference, severity, rule code, and a value-free explanation. Informational exclusions remain visible; errors block publication.
 
-## M4 target facts
+### M4 restricted control and facts
+
+| Object | Storage/grain | Implemented fields | Boundary |
+| --- | --- | --- | --- |
+| `source_manifest`, `row_disposition`, `source_issue` | one source/version and value-free disposition/issue summaries | source checksum/schema/period, accepted/excluded/rejected/duplicate/quarantine/published counts, partition checksum | restricted local; aggregate evidence only in Git |
+| `FactSecurityPeriodOriginal`, `FactSecurityPeriodLatest` | one security/factor period under original/latest precedence | restricted keys, status/correction, UPB/factor components, loan count, separate legacy/Classic FICO/VS4 fields, involuntary removal components | authorized only |
+| `FactLoanPeriod` compressed partitions | one loan/security/report period/source version | restricted keys, correction, UPB components, term/age, separate score systems, delinquency/modification/deferral, geography, seller/servicer, join reason, record/source hash | authorized only |
+| `join_reconciliation` | source family/report period/reason | matched, unmatched, ambiguous, late, ineligible, terminated counts | aggregate evidence; reviewer release still unapproved |
+| `restatement_lineage` | original-to-replacement source version | hashed business key, as-of precedence, changed-record flag | authorized only |
+
+Supplemental files remain at record-type-specific native grains. M4 validates and explicitly excludes their 419,478,342 records from `FactSecurityPeriod`/`FactLoanPeriod`; M5 may add a separate supplemental fact without flattening unlike grains.
+
+## M4 implemented and downstream target facts
 
 | Fact | Grain | Core measures/attributes | Classification |
 | --- | --- | --- | --- |
 | `FactIssuance` | one accepted security at issuance month | issuance UPB, prefix/product, correction, source lineage | restricted detail |
-| `FactSecurityPeriod` | one security per reporting period and correction view | factor, current UPB, loan count, weighted rates/term/age/credit, removal count/UPB, mission/green/social indicators | restricted detail |
-| `FactLoanPeriod` | one loan per reporting period and correction view | current UPB, rates, maturity/age, credit/collateral, delinquency, modification, deferral, assistance, geography, seller/servicer | restricted detail |
+| `FactSecurityPeriod` | one security per reporting period and source version; original/latest views | M4 conformance fields now; wider approved analytical fields may enter M5 only through contract/version changes | restricted detail |
+| `FactLoanPeriod` | one loan/security per reporting period and source version | M4 approved fields, correction/source lineage, and join reason | restricted detail |
 | `FactSupplementalDistribution` | provider-defined record type and period | bucket/distribution counts, balances, and source keys | restricted detail |
 | `FactSourceQuality` | file/family/period/load | dispositions, schema, freshness, coverage, join results | safe metadata/aggregate |
 | `FactRestatement` | original record/version to latest record/version | affected fields, count, UPB, reason, as-of times | restricted detail |

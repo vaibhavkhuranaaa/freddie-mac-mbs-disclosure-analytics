@@ -1,19 +1,22 @@
 {
   "name": "freddie-mac-mbs-disclosure-analytics-demo",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "type": "module",
   "private": true,
   "description": "Freddie Mac MBS issuance analytics case study.",
   "scripts": {
     "load:sample": "python3 scripts/pipeline.py --input data/sample --database local/sample-mbs.sqlite --output local/sample-dashboard.json",
     "load:raw": "python3 scripts/pipeline.py --input data/raw",
-    "inventory:sources": "python3 scripts/source_inventory.py --input data/raw --contract .project/m4-source-contract.json",
+    "inventory:sources": "python3 scripts/source_inventory.py --input data/raw --contract .project/m4-source-contract.json --contract .project/m4-loan-source-contract.json --require-ready",
+    "load:m4": "python3 scripts/m4_conformance.py --input data/raw --database local/m4-conformed.sqlite",
+    "verify:m4": "python3 scripts/m4_conformance.py --input data/raw --database local/m4-conformed.sqlite --incremental",
+    "verify:m4-safety": "python3 scripts/verify_m4_safety.py",
     "test:python": "python3 -m unittest discover -s tests -v",
     "test:analytics": "node tests/test_analytics.mjs",
     "test": "npm run test:python && npm run test:analytics",
     "validate:dashboard": "node scripts/validate_dashboard.mjs",
     "smoke:static": "python3 scripts/smoke_static.py",
-    "check": "npm run test && npm run validate:dashboard && npm run smoke:static && python3 scripts/project_kit.py check",
+    "check": "npm run test && npm run verify:m4-safety && npm run validate:dashboard && npm run smoke:static && python3 scripts/project_kit.py check",
     "serve": "python3 -m http.server 4173 --directory app"
   }
 }

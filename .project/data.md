@@ -1,6 +1,6 @@
 # Data contract
 
-Status: `authorized row-level local use and retention approved; M4 transformation contract is next`
+Status: `authorized row-level local use; M4 security and loan contracts approved and implemented`
 
 ## Rights and release boundary
 
@@ -9,7 +9,7 @@ Status: `authorized row-level local use and retention approved; M4 transformatio
 - The reviewer-facing application receives monthly aggregates and safe quality/provenance metadata only.
 - Security identifiers, CUSIPs, seller/servicer attributes, descriptions, and security-level rows are restricted to the authorized local workflow.
 - The requested `fd`, `ar`, `fq`, and `ge` monthly-security history is acquired under restricted raw storage: all 48 packages for 2025, plus 22 packages through the applicable August/March 2026 family endpoints and one December 2024 Core File 1 sample.
-- The requested `fu` and `au` monthly loan-level history is also acquired. The owner authorizes local row-level use; M4 must machine-version exact fields, schemas, joins, corrections, and release modes before transformation output is treated as governed.
+- The requested `fu` and `au` monthly loan-level history is also acquired. The owner authorizes local row-level use; the approved M4 contracts machine-version exact fields, schemas, joins, corrections, and release modes.
 
 ## Current source family
 
@@ -91,10 +91,12 @@ The requested monthly-security backfill is complete with 71 archives: one Decemb
 
 ## Observed loan-level candidates
 
-Restricted raw storage contains twenty Monthly Loan-Level File 1 (`fu`) packages from January 2025 through August 2026 and fifteen Monthly Loan-Level File 2 (`au`) packages from January 2025 through its March 2026 retirement. The 35 archives total about 9.1 GiB compressed, pass ZIP-integrity and exact-member-name checks, and remain outside approved transformation scope. Both families expose 116 headered columns; December 2025 replaces legacy credit-score/filler positions with Classic FICO and VS4 fields without changing the column count. The same FICO/VS4 header continues through the observed April 2026 consolidation and August endpoint.
+Restricted raw storage contains twenty Monthly Loan-Level File 1 (`fu`) packages from January 2025 through August 2026 and fifteen Monthly Loan-Level File 2 (`au`) packages from January 2025 through its March 2026 retirement. The 35 archives total about 9.1 GiB compressed, pass ZIP-integrity and exact-member-name checks, and are approved for restricted local M4 conformance. Both families expose 116 headered columns; December 2025 replaces legacy credit-score/filler positions with Classic FICO and VS4 fields without changing the column count. The same FICO/VS4 header continues through the observed April 2026 consolidation and August endpoint.
 
-## M4 implementation gate
+## M4 implemented contract
 
-M4 begins by recording provenance, rights/release boundary, native grain, timing, correction behavior, keys, field allowlist, sensitivity, retention, and authorized/reviewer rules for every security and loan family. `.project/m4-source-contract.json` is the current monthly-security machine boundary; M4 adds the corresponding loan contract and approves both before governed transformation output is released. `.project/m4-data-intake.md` records the verified acquisition and schema evidence.
+`.project/m4-source-contract.json` and `.project/m4-loan-source-contract.json` now approve provenance, native grains, timing, corrections, keys, fields, types/nulls, sensitivity, retention, and release rules for all six acquired source families. Exact inventory and conformance pass for all 106 archives.
 
-`scripts/source_inventory.py` may inspect archive checksums, sizes, member names, encryption flags, physical row counts, ordered-header fingerprints, and headerless record-type/column-count distributions. It must not emit disclosure row values. A discovered file remains an unapproved candidate unless it matches an approved family, member convention, schema/layout version, validity period, and required-family contract.
+M4 treats supplemental records as provider-native distributions outside `FactSecurityPeriod`/`FactLoanPeriod`: all 419,478,342 are structurally accepted by inventory and explicitly dispositioned as M5-deferred exclusions from these two facts. Core and loan rows produce 9,240,038 security-period and 264,922,553 loan-period facts. Restricted values remain under ignored `local/`; only aggregate reconciliation evidence enters project records.
+
+`scripts/source_inventory.py` inspects checksums, sizes, member names, encryption flags, physical row counts, ordered-header fingerprints, and headerless record layouts without emitting disclosure row values. Its ignored cache skips unchanged adjacent files. `scripts/m4_conformance.py` streams approved rows once into restricted facts and value-free control records.

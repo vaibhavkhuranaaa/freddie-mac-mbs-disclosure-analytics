@@ -107,11 +107,26 @@ evidence:
     verified_on: 2026-08-10
   - id: E-027
     claim: "The repository defines one implementation-ready M0-M12 BI product plan covering a certified Power BI semantic model, nine stakeholder pages, disclosure-supported metric families, correction/as-of behavior, authorized/reviewer boundaries, evaluation gates, and the exact M4 continuation prompt."
-    source: docs/BI_PRODUCT_SPEC.md; .project/refinement-plan.md; .project/milestones.yml; DESIGN.md; docs/NEXT_CHAT_PROMPT.md
+    source: docs/BI_PRODUCT_SPEC.md; .project/refinement-plan.md; .project/milestones.yml; DESIGN.md
     status: verified
     verified_on: 2026-08-10
   - id: E-028
     claim: "The implementation-ready BI planning revision passes 20 Python tests over the real source inventory, dashboard analytics tests, released-payload validation for 19 months and 59,904 observations, static artifact smoke verification, Graphify synchronization, and project-record checks."
     source: npm run check; graphify-out/GRAPH_REPORT.md; .project/graph-source.sha256
+    status: verified
+    verified_on: 2026-08-10
+  - id: E-029
+    claim: "Approved monthly-security and monthly-loan machine contracts govern exact package/member patterns, schema windows, native grains, fields/types/nulls, keys, correction precedence, original/latest rules, sensitivity, retention, and authorized/reviewer boundaries for all six acquired families."
+    source: .project/m4-source-contract.json; .project/m4-loan-source-contract.json; scripts/source_inventory.py; tests/test_source_inventory.py
+    status: verified
+    verified_on: 2026-08-10
+  - id: E-030
+    claim: "All 106 M4 archives pass exact inventory and reconcile 693,640,933 physical records to 274,162,591 accepted/published facts plus 419,478,342 explicit supplemental exclusions, with zero rejected, duplicate, or quarantined rows; 264,922,553 loan joins are matched."
+    source: local/m4-conformed.sqlite; local/m4-conformed; scripts/m4_conformance.py
+    status: verified-local-restricted
+    verified_on: 2026-08-10
+  - id: E-031
+    claim: "Golden fixtures prove schema transitions, April consolidation treatment, corrections, duplicates, missing periods, malformed layouts, all six join reasons, original/latest as-of behavior, parity, and idempotence; real backfill and incremental snapshots share SHA-256 ec3862e9f6c1f4531424a26e4d3934b12b4e690ebb14fe58e8fd343c81074528, and sampled restricted values do not appear in tracked artifacts."
+    source: tests/fixtures/m4/golden_cases.json; tests/test_m4_conformance.py; scripts/verify_m4_safety.py
     status: verified
     verified_on: 2026-08-10

@@ -18,12 +18,21 @@ A governed MBS disclosure analytics product in progress. The verified baseline p
 
 These files are ignored by Git and are not public assets. Public/demo redistribution is separately gated.
 
+## Verified M4 conformance
+
+- Approved machine contracts govern 71 monthly-security and 35 loan-level archives across exact legacy, FICO/VS4, retirement, and April 2026 consolidation windows.
+- 693,640,933 physical records reconcile to 274,162,591 accepted/published conformed rows and 419,478,342 explicit supplemental native-grain exclusions, with zero rejected, duplicate, or quarantined rows.
+- Restricted outputs contain 9,240,038 security-period and 264,922,553 loan-period facts. All loan joins are matched in the acquired population; unmatched, ambiguous, late, ineligible, and terminated behaviors remain golden-tested.
+- Backfill and unchanged incremental runs produce snapshot SHA-256 `ec3862e9f6c1f4531424a26e4d3934b12b4e690ebb14fe58e8fd343c81074528`.
+
 ## Run locally
 
 ```sh
 npm run check
 npm run inventory:sources
 npm run load:raw
+npm run load:m4
+npm run verify:m4
 npm run check
 npm run serve
 ```
@@ -36,7 +45,7 @@ Open [http://127.0.0.1:4173](http://127.0.0.1:4173).
 
 Implemented through M3: issuance UPB/count, corrections, official term-family composition, exact schemas, provenance, reconciliation, data-derived findings, resilient UI states, and aggregate-only local publication.
 
-M4 is the next implementation milestone: approve and implement the security/loan source contract, corrections, conformed grains, joins, and backfill/incremental parity. M5–M9 add the metric engine, certified Power BI semantic model, nontechnical dashboard, investigation workflow, and governed API. M10–M12 remain separately gated AI, private-cloud, and reviewer-publication work.
+Implemented through M4: issuance workflow plus approved security/loan contracts, fail-closed native-grain conformance, correction/as-of lineage, reason-coded joins, and backfill/incremental parity. M5 is next; M5–M9 add the metric engine, certified Power BI semantic model, nontechnical dashboard, investigation workflow, and governed API. M10–M12 remain separately gated AI, private-cloud, and reviewer-publication work.
 
 The [BI product specification](docs/BI_PRODUCT_SPEC.md) defines the pages, industry metric catalog, semantic model, visuals, user experience, governance, and history recommendation. The [milestone plan](.project/milestones.yml) is the execution contract.
 

@@ -1,6 +1,6 @@
 # Evaluation contract
 
-Status: M0–M3 verified; M4 implementation gates ready
+Status: M0–M4 verified; M5 formula gates next
 
 ## Verified baseline
 
@@ -18,6 +18,16 @@ Status: M0–M3 verified; M4 implementation gates ready
 
 ## M4 source and conformance gates
 
+| Gate | Verified result |
+| --- | --- |
+| Exact source inventory | 106/106 approved M4 archives; 71 security + 35 loan; 0 invalid/missing |
+| Row reconciliation | 693,640,933 = 274,162,591 accepted/published + 419,478,342 excluded + 0 rejected + 0 duplicate |
+| Conformed facts | 9,240,038 security-period + 264,922,553 loan-period |
+| Join reconciliation | 264,922,553 matched; 0 unmatched/ambiguous/late/ineligible/terminated in real population |
+| Correction/as-of | 73,280 provider-corrected security rows; 0 same-period replacement versions in acquired set; golden original/latest correction fixtures pass |
+| Backfill/incremental parity | identical SHA-256 `ec3862e9f6c1f4531424a26e4d3934b12b4e690ebb14fe58e8fd343c81074528` |
+| Restricted-output safety | 228 sampled restricted tokens; 0 tracked matches; 0 tracked restricted paths |
+
 - All 71 monthly-security and 35 loan-level archives must pass exact package, member, schema/layout, validity-period, row, and reconciliation rules.
 - Every physical record receives one documented disposition; accepted records reconcile to conformed facts.
 - Eligible joins reconcile to matched, unmatched, ambiguous, late, ineligible, and terminated reasons by family/period.
@@ -25,6 +35,8 @@ Status: M0–M3 verified; M4 implementation gates ready
 - Original-publication and latest-known correction views reproduce golden correction fixtures.
 - No restricted row value appears in Git, public artifacts, logs, command summaries, or test failure snapshots.
 - Tests include each schema transition, the April 2026 consolidation, malformed/unknown layouts, duplicate keys, missing periods, corrections, and join failures.
+
+All M4 gates above pass. Supplemental native-grain distributions remain explicit M5-deferred exclusions from the two M4 fact outputs; no M5 business formula is released.
 
 ## M5 metric gates
 
