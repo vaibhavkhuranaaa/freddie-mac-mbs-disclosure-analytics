@@ -24,10 +24,15 @@ A status-`C` row with issuance UPB, current UPB, and factor all blank is a docum
 - Issuance-file correction count
 - Source and period coverage
 - Input, accepted, excluded, rejected, duplicate, quarantined, and published counts
+- Monthly issuance UPB and security-count mix by approved official UMBS term family, with all unsupported prefixes explicit
 
 ## Interpretation
 
 The dashboard describes observed issuance activity. A peak, trough, schema change, exclusion change, or composition shift is a prompt for source/comparability and operational investigation—not a causal conclusion or investment signal.
+
+## Mix method
+
+The aggregate layer uses Freddie Mac's Prefix Library Summary for CL/ZL (30-year), CT/ZT (20-year), CI/ZI (15-year), and CN/ZN (10-year) term families. All other codes are grouped as `Other / Unmapped prefix`. Monthly group counts, UPB, and UPB shares reconcile exactly to the monthly issuance totals.
 
 ## Scope boundary
 

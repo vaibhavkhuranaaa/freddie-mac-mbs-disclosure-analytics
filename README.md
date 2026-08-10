@@ -9,6 +9,7 @@ A governed data-engineering and analytics case study. The implemented release pr
 - Zero rejected rows and zero duplicate business keys in the verified build.
 - Two exact source schemas, with the FICO/VS4 transition enforced from December 2025.
 - A 19-row aggregate payload carrying period, build, pipeline, schema, and quality metadata.
+- A 95-row monthly mix payload; 99.29% of observed issuance UPB maps to an official UMBS term family and all other prefixes remain explicit.
 
 ## Run the reviewer workflow
 
@@ -36,7 +37,7 @@ The 700 excluded rows are all status-`C` securities whose issuance UPB, current 
 
 ## Current scope
 
-Implemented: issuance UPB, issued-security count, source correction count, exact schema control, provenance, quality reconciliation, and aggregate-only local dashboard publication.
+Implemented: issuance UPB, issued-security count, source correction count, exact schema control, provenance, quality reconciliation, official term-family mix, data-derived findings, resilient UI states, and aggregate-only local dashboard publication.
 
 Planned under approval-gated milestones: issuance composition, monthly factor and supplemental sources, balance/runoff/prepayment measures, authenticated analyst workflow, governed semantic API, evaluated cited assistant, cloud pilot, and public portfolio release.
 

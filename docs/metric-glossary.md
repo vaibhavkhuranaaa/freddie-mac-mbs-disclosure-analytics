@@ -59,3 +59,13 @@
 - Baseline/result: 19 of 19 source files pass in build `7c0f195305e1...`.
 - Supported decision: publish or stop and investigate.
 - Limitation: proves implemented rules and reconciliation, not every possible source-provider error.
+
+## Issuance mix share
+
+- Definition: a term-family group's issuance UPB divided by total accepted issuance UPB for the month.
+- Method: map CL/ZL, CT/ZT, CI/ZI, and CN/ZN using the Freddie Mac Prefix Library Summary; aggregate every other prefix as `Other / Unmapped prefix`.
+- Business meaning: identifies which term family contributes to a monthly issuance change.
+- Desired direction: contextual; a mix shift is an investigation signal, not good/bad performance.
+- Baseline/result: 99.29% of observed-period issuance UPB is mapped; 0.71% remains explicit and unmapped.
+- Supported decision: whether the latest total movement is broad or concentrated in a term family.
+- Limitation: term-family grouping does not make different structures economically identical and does not replace security-level review.

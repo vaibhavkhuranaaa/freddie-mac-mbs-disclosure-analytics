@@ -21,6 +21,7 @@ function isNonNegativeInteger(value) {
 assert(payload && typeof payload === "object" && !Array.isArray(payload), "Dashboard payload must be an object.");
 assert(Array.isArray(payload.months) && payload.months.length >= 2, "Dashboard payload needs at least two monthly rows.");
 assert(payload.metadata && typeof payload.metadata === "object" && !Array.isArray(payload.metadata), "Dashboard payload needs metadata.");
+assert(Array.isArray(payload.mix) && payload.mix.length > 0, "Dashboard payload needs issuance-mix rows.");
 
 const months = new Set();
 let previousMonth = "";
@@ -67,5 +68,32 @@ assert(quality.input_count === quality.accepted_count + quality.excluded_count +
 assert(quality.quarantined_count === quality.rejected_count + quality.duplicate_count, "Quarantine quality counts do not reconcile.");
 assert(quality.accepted_count === observationCount, "Accepted count must equal the published observation count.");
 assert(quality.published_count === quality.accepted_count, "Published count must equal accepted count.");
+
+const monthlyMix = new Map();
+for (const row of payload.mix) {
+  assert(row && typeof row === "object" && !Array.isArray(row), "Each mix row must be an object.");
+  assert(months.has(row.month), `Mix row has unknown month: ${row.month}.`);
+  assert(typeof row.product_group === "string" && row.product_group.length > 0, "Every mix row needs a product group.");
+  assert(Number.isInteger(row.security_count) && row.security_count > 0, "Mix security_count must be positive.");
+  assert(isFiniteNumber(row.issuance_upb) && row.issuance_upb > 0, "Mix issuance_upb must be positive.");
+  assert(isFiniteNumber(row.issuance_share) && row.issuance_share > 0 && row.issuance_share <= 1, "Mix issuance_share must be in (0,1].");
+  const total = monthlyMix.get(row.month) ?? { security_count: 0, issuance_upb: 0, issuance_share: 0 };
+  total.security_count += row.security_count;
+  total.issuance_upb += row.issuance_upb;
+  total.issuance_share += row.issuance_share;
+  monthlyMix.set(row.month, total);
+}
+for (const month of payload.months) {
+  const mix = monthlyMix.get(month.month);
+  assert(mix && mix.security_count === month.security_count, `Mix security count does not reconcile for ${month.month}.`);
+  assert(Math.abs(mix.issuance_upb - month.issuance_upb) < 0.01, `Mix issuance UPB does not reconcile for ${month.month}.`);
+  assert(Math.abs(mix.issuance_share - 1) < 1e-9, `Mix issuance share does not reconcile for ${month.month}.`);
+}
+const mixMetadata = metadata.mix;
+assert(mixMetadata && typeof mixMetadata === "object", "metadata.mix is required.");
+assert(typeof mixMetadata.taxonomy_version === "string" && mixMetadata.taxonomy_version.length > 0, "Mix taxonomy version is required.");
+assert(typeof mixMetadata.taxonomy_source === "string" && mixMetadata.taxonomy_source.startsWith("https://"), "Mix taxonomy source must be an HTTPS URL.");
+assert(mixMetadata.mapped_observation_count + mixMetadata.unmapped_observation_count === observationCount, "Mix observation coverage does not reconcile.");
+assert(isFiniteNumber(mixMetadata.mapped_issuance_share) && mixMetadata.mapped_issuance_share >= 0 && mixMetadata.mapped_issuance_share <= 1, "Mapped issuance share is invalid.");
 
 console.log(`Dashboard payload validation: pass (${payload.months.length} monthly rows, ${observationCount.toLocaleString("en-US")} observations, build ${metadata.build_id.slice(0, 12)}).`);

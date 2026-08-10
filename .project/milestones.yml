@@ -35,7 +35,7 @@ milestones:
       - CI runs the same full check and static-preview smoke path used locally.
   - id: M3
     title: Complete the issuance decision workflow
-    status: next
+    status: in-progress
     acceptance:
       - Findings and investigation prompts are derived from loaded data.
       - An approved Prefix-to-product taxonomy powers an issuance-mix view with explicit unknown handling.

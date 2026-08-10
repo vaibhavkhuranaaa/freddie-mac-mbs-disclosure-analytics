@@ -153,15 +153,682 @@
       "correction_count": 0
     }
   ],
+  "mix": [
+    {
+      "month": "2024-12",
+      "product_group": "30-year UMBS / Supers family",
+      "security_count": 2620,
+      "issuance_upb": 69989129034.0,
+      "issuance_share": 0.893382274335071
+    },
+    {
+      "month": "2024-12",
+      "product_group": "15-year UMBS / Supers family",
+      "security_count": 171,
+      "issuance_upb": 7232676902.0,
+      "issuance_share": 0.09232212815651047
+    },
+    {
+      "month": "2024-12",
+      "product_group": "20-year UMBS / Supers family",
+      "security_count": 35,
+      "issuance_upb": 749792786.0,
+      "issuance_share": 0.009570794688862355
+    },
+    {
+      "month": "2024-12",
+      "product_group": "10-year UMBS / Supers family",
+      "security_count": 10,
+      "issuance_upb": 189012693.0,
+      "issuance_share": 0.0024126688227325394
+    },
+    {
+      "month": "2024-12",
+      "product_group": "Other / Unmapped prefix",
+      "security_count": 19,
+      "issuance_upb": 181136619.0,
+      "issuance_share": 0.002312133996823602
+    },
+    {
+      "month": "2025-01",
+      "product_group": "30-year UMBS / Supers family",
+      "security_count": 3084,
+      "issuance_upb": 131293047576.0,
+      "issuance_share": 0.968799887485601
+    },
+    {
+      "month": "2025-01",
+      "product_group": "15-year UMBS / Supers family",
+      "security_count": 194,
+      "issuance_upb": 3442498255.0,
+      "issuance_share": 0.02540189281677565
+    },
+    {
+      "month": "2025-01",
+      "product_group": "20-year UMBS / Supers family",
+      "security_count": 35,
+      "issuance_upb": 507026264.0,
+      "issuance_share": 0.00374130235061461
+    },
+    {
+      "month": "2025-01",
+      "product_group": "10-year UMBS / Supers family",
+      "security_count": 11,
+      "issuance_upb": 157879781.0,
+      "issuance_share": 0.0011649810625388429
+    },
+    {
+      "month": "2025-01",
+      "product_group": "Other / Unmapped prefix",
+      "security_count": 13,
+      "issuance_upb": 120876390.0,
+      "issuance_share": 0.0008919362844698876
+    },
+    {
+      "month": "2025-02",
+      "product_group": "30-year UMBS / Supers family",
+      "security_count": 2655,
+      "issuance_upb": 39612345476.0,
+      "issuance_share": 0.919934136697609
+    },
+    {
+      "month": "2025-02",
+      "product_group": "15-year UMBS / Supers family",
+      "security_count": 187,
+      "issuance_upb": 2866561279.0,
+      "issuance_share": 0.0665713565758274
+    },
+    {
+      "month": "2025-02",
+      "product_group": "20-year UMBS / Supers family",
+      "security_count": 26,
+      "issuance_upb": 333841940.0,
+      "issuance_share": 0.007752951590645544
+    },
+    {
+      "month": "2025-02",
+      "product_group": "10-year UMBS / Supers family",
+      "security_count": 11,
+      "issuance_upb": 196201430.0,
+      "issuance_share": 0.004556468216082827
+    },
+    {
+      "month": "2025-02",
+      "product_group": "Other / Unmapped prefix",
+      "security_count": 6,
+      "issuance_upb": 51029819.0,
+      "issuance_share": 0.0011850869198351897
+    },
+    {
+      "month": "2025-03",
+      "product_group": "30-year UMBS / Supers family",
+      "security_count": 2881,
+      "issuance_upb": 45550854632.0,
+      "issuance_share": 0.9076566244002618
+    },
+    {
+      "month": "2025-03",
+      "product_group": "15-year UMBS / Supers family",
+      "security_count": 172,
+      "issuance_upb": 4142042033.0,
+      "issuance_share": 0.08253526569742227
+    },
+    {
+      "month": "2025-03",
+      "product_group": "20-year UMBS / Supers family",
+      "security_count": 13,
+      "issuance_upb": 257035226.0,
+      "issuance_share": 0.0051217420061142535
+    },
+    {
+      "month": "2025-03",
+      "product_group": "10-year UMBS / Supers family",
+      "security_count": 7,
+      "issuance_upb": 156619662.0,
+      "issuance_share": 0.003120838782808767
+    },
+    {
+      "month": "2025-03",
+      "product_group": "Other / Unmapped prefix",
+      "security_count": 11,
+      "issuance_upb": 78566263.0,
+      "issuance_share": 0.0015655291133928858
+    },
+    {
+      "month": "2025-04",
+      "product_group": "30-year UMBS / Supers family",
+      "security_count": 2889,
+      "issuance_upb": 44911439034.0,
+      "issuance_share": 0.9023958499419115
+    },
+    {
+      "month": "2025-04",
+      "product_group": "15-year UMBS / Supers family",
+      "security_count": 152,
+      "issuance_upb": 3885371274.0,
+      "issuance_share": 0.0780679263135347
+    },
+    {
+      "month": "2025-04",
+      "product_group": "20-year UMBS / Supers family",
+      "security_count": 25,
+      "issuance_upb": 648937055.0,
+      "issuance_share": 0.013038952166778748
+    },
+    {
+      "month": "2025-04",
+      "product_group": "Other / Unmapped prefix",
+      "security_count": 12,
+      "issuance_upb": 197134522.0,
+      "issuance_share": 0.003960981397153831
+    },
+    {
+      "month": "2025-04",
+      "product_group": "10-year UMBS / Supers family",
+      "security_count": 8,
+      "issuance_upb": 126228907.0,
+      "issuance_share": 0.0025362901806212364
+    },
+    {
+      "month": "2025-05",
+      "product_group": "30-year UMBS / Supers family",
+      "security_count": 2843,
+      "issuance_upb": 42641786157.0,
+      "issuance_share": 0.9279512854200566
+    },
+    {
+      "month": "2025-05",
+      "product_group": "15-year UMBS / Supers family",
+      "security_count": 134,
+      "issuance_upb": 2494404251.0,
+      "issuance_share": 0.05428209837529821
+    },
+    {
+      "month": "2025-05",
+      "product_group": "20-year UMBS / Supers family",
+      "security_count": 25,
+      "issuance_upb": 570897334.0,
+      "issuance_share": 0.01242360985953254
+    },
+    {
+      "month": "2025-05",
+      "product_group": "Other / Unmapped prefix",
+      "security_count": 19,
+      "issuance_upb": 162047890.0,
+      "issuance_share": 0.003526412971338984
+    },
+    {
+      "month": "2025-05",
+      "product_group": "10-year UMBS / Supers family",
+      "security_count": 5,
+      "issuance_upb": 83477212.0,
+      "issuance_share": 0.00181659337377373
+    },
+    {
+      "month": "2025-06",
+      "product_group": "30-year UMBS / Supers family",
+      "security_count": 2825,
+      "issuance_upb": 41904490863.0,
+      "issuance_share": 0.9088831034259541
+    },
+    {
+      "month": "2025-06",
+      "product_group": "15-year UMBS / Supers family",
+      "security_count": 190,
+      "issuance_upb": 3021405114.0,
+      "issuance_share": 0.06553245249291573
+    },
+    {
+      "month": "2025-06",
+      "product_group": "20-year UMBS / Supers family",
+      "security_count": 50,
+      "issuance_upb": 1008240467.0,
+      "issuance_share": 0.02186812691848534
+    },
+    {
+      "month": "2025-06",
+      "product_group": "10-year UMBS / Supers family",
+      "security_count": 8,
+      "issuance_upb": 136725272.0,
+      "issuance_share": 0.0029654885901940595
+    },
+    {
+      "month": "2025-06",
+      "product_group": "Other / Unmapped prefix",
+      "security_count": 5,
+      "issuance_upb": 34617311.0,
+      "issuance_share": 0.0007508285724507413
+    },
+    {
+      "month": "2025-07",
+      "product_group": "30-year UMBS / Supers family",
+      "security_count": 2678,
+      "issuance_upb": 36917373336.0,
+      "issuance_share": 0.9262797556237301
+    },
+    {
+      "month": "2025-07",
+      "product_group": "15-year UMBS / Supers family",
+      "security_count": 156,
+      "issuance_upb": 2364366401.0,
+      "issuance_share": 0.05932341697743689
+    },
+    {
+      "month": "2025-07",
+      "product_group": "20-year UMBS / Supers family",
+      "security_count": 25,
+      "issuance_upb": 324323895.0,
+      "issuance_share": 0.008137487341511016
+    },
+    {
+      "month": "2025-07",
+      "product_group": "Other / Unmapped prefix",
+      "security_count": 11,
+      "issuance_upb": 141841885.0,
+      "issuance_share": 0.0035589007207858098
+    },
+    {
+      "month": "2025-07",
+      "product_group": "10-year UMBS / Supers family",
+      "security_count": 9,
+      "issuance_upb": 107627449.0,
+      "issuance_share": 0.0027004393365361577
+    },
+    {
+      "month": "2025-08",
+      "product_group": "30-year UMBS / Supers family",
+      "security_count": 2943,
+      "issuance_upb": 44676240186.0,
+      "issuance_share": 0.9025486136249129
+    },
+    {
+      "month": "2025-08",
+      "product_group": "15-year UMBS / Supers family",
+      "security_count": 236,
+      "issuance_upb": 3397688184.0,
+      "issuance_share": 0.0686400365660114
+    },
+    {
+      "month": "2025-08",
+      "product_group": "20-year UMBS / Supers family",
+      "security_count": 50,
+      "issuance_upb": 1089780765.0,
+      "issuance_share": 0.02201573172923507
+    },
+    {
+      "month": "2025-08",
+      "product_group": "Other / Unmapped prefix",
+      "security_count": 9,
+      "issuance_upb": 170317386.0,
+      "issuance_share": 0.0034407488179520004
+    },
+    {
+      "month": "2025-08",
+      "product_group": "10-year UMBS / Supers family",
+      "security_count": 8,
+      "issuance_upb": 166066340.0,
+      "issuance_share": 0.0033548692618885954
+    },
+    {
+      "month": "2025-09",
+      "product_group": "30-year UMBS / Supers family",
+      "security_count": 3156,
+      "issuance_upb": 53438581383.0,
+      "issuance_share": 0.9288997000862003
+    },
+    {
+      "month": "2025-09",
+      "product_group": "15-year UMBS / Supers family",
+      "security_count": 179,
+      "issuance_upb": 2818844174.0,
+      "issuance_share": 0.04899874659942435
+    },
+    {
+      "month": "2025-09",
+      "product_group": "20-year UMBS / Supers family",
+      "security_count": 29,
+      "issuance_upb": 980110954.0,
+      "issuance_share": 0.017036843936718463
+    },
+    {
+      "month": "2025-09",
+      "product_group": "10-year UMBS / Supers family",
+      "security_count": 8,
+      "issuance_upb": 148428151.0,
+      "issuance_share": 0.0025800622205908764
+    },
+    {
+      "month": "2025-09",
+      "product_group": "Other / Unmapped prefix",
+      "security_count": 12,
+      "issuance_upb": 142939027.0,
+      "issuance_share": 0.0024846471570660424
+    },
+    {
+      "month": "2025-10",
+      "product_group": "30-year UMBS / Supers family",
+      "security_count": 3040,
+      "issuance_upb": 47754312551.0,
+      "issuance_share": 0.8921122568480088
+    },
+    {
+      "month": "2025-10",
+      "product_group": "15-year UMBS / Supers family",
+      "security_count": 221,
+      "issuance_upb": 4203275371.0,
+      "issuance_share": 0.07852261454652516
+    },
+    {
+      "month": "2025-10",
+      "product_group": "20-year UMBS / Supers family",
+      "security_count": 27,
+      "issuance_upb": 1087083378.0,
+      "issuance_share": 0.02030812200874681
+    },
+    {
+      "month": "2025-10",
+      "product_group": "10-year UMBS / Supers family",
+      "security_count": 20,
+      "issuance_upb": 364549825.0,
+      "issuance_share": 0.006810261728026622
+    },
+    {
+      "month": "2025-10",
+      "product_group": "Other / Unmapped prefix",
+      "security_count": 12,
+      "issuance_upb": 120267103.0,
+      "issuance_share": 0.002246744868692601
+    },
+    {
+      "month": "2025-11",
+      "product_group": "30-year UMBS / Supers family",
+      "security_count": 3053,
+      "issuance_upb": 49564877680.0,
+      "issuance_share": 0.8991726958847611
+    },
+    {
+      "month": "2025-11",
+      "product_group": "15-year UMBS / Supers family",
+      "security_count": 190,
+      "issuance_upb": 3296309257.0,
+      "issuance_share": 0.05979942692933493
+    },
+    {
+      "month": "2025-11",
+      "product_group": "20-year UMBS / Supers family",
+      "security_count": 30,
+      "issuance_upb": 1722834536.0,
+      "issuance_share": 0.031254506150503056
+    },
+    {
+      "month": "2025-11",
+      "product_group": "10-year UMBS / Supers family",
+      "security_count": 13,
+      "issuance_upb": 292335601.0,
+      "issuance_share": 0.0053033559802434255
+    },
+    {
+      "month": "2025-11",
+      "product_group": "Other / Unmapped prefix",
+      "security_count": 12,
+      "issuance_upb": 246399552.0,
+      "issuance_share": 0.004470015055157449
+    },
+    {
+      "month": "2025-12",
+      "product_group": "30-year UMBS / Supers family",
+      "security_count": 3226,
+      "issuance_upb": 49206150302.0,
+      "issuance_share": 0.8873251206649533
+    },
+    {
+      "month": "2025-12",
+      "product_group": "15-year UMBS / Supers family",
+      "security_count": 206,
+      "issuance_upb": 3260902693.0,
+      "issuance_share": 0.05880323613581471
+    },
+    {
+      "month": "2025-12",
+      "product_group": "20-year UMBS / Supers family",
+      "security_count": 79,
+      "issuance_upb": 2593898925.0,
+      "issuance_share": 0.046775284440911995
+    },
+    {
+      "month": "2025-12",
+      "product_group": "Other / Unmapped prefix",
+      "security_count": 8,
+      "issuance_upb": 210553425.0,
+      "issuance_share": 0.0037968697428652624
+    },
+    {
+      "month": "2025-12",
+      "product_group": "10-year UMBS / Supers family",
+      "security_count": 14,
+      "issuance_upb": 182971437.0,
+      "issuance_share": 0.0032994890154547595
+    },
+    {
+      "month": "2026-01",
+      "product_group": "30-year UMBS / Supers family",
+      "security_count": 2805,
+      "issuance_upb": 45617927722.0,
+      "issuance_share": 0.9107290853010558
+    },
+    {
+      "month": "2026-01",
+      "product_group": "15-year UMBS / Supers family",
+      "security_count": 166,
+      "issuance_upb": 2862778359.0,
+      "issuance_share": 0.057153308940299685
+    },
+    {
+      "month": "2026-01",
+      "product_group": "20-year UMBS / Supers family",
+      "security_count": 23,
+      "issuance_upb": 1263354154.0,
+      "issuance_share": 0.025221956159328696
+    },
+    {
+      "month": "2026-01",
+      "product_group": "10-year UMBS / Supers family",
+      "security_count": 5,
+      "issuance_upb": 206201991.0,
+      "issuance_share": 0.004116674299523687
+    },
+    {
+      "month": "2026-01",
+      "product_group": "Other / Unmapped prefix",
+      "security_count": 8,
+      "issuance_upb": 139197371.0,
+      "issuance_share": 0.002778975299792153
+    },
+    {
+      "month": "2026-02",
+      "product_group": "30-year UMBS / Supers family",
+      "security_count": 2427,
+      "issuance_upb": 42179397081.0,
+      "issuance_share": 0.904843473585098
+    },
+    {
+      "month": "2026-02",
+      "product_group": "15-year UMBS / Supers family",
+      "security_count": 188,
+      "issuance_upb": 2768149027.0,
+      "issuance_share": 0.05938305794608352
+    },
+    {
+      "month": "2026-02",
+      "product_group": "20-year UMBS / Supers family",
+      "security_count": 26,
+      "issuance_upb": 1470186673.0,
+      "issuance_share": 0.03153882957267486
+    },
+    {
+      "month": "2026-02",
+      "product_group": "10-year UMBS / Supers family",
+      "security_count": 5,
+      "issuance_upb": 108265584.0,
+      "issuance_share": 0.0023225416643142937
+    },
+    {
+      "month": "2026-02",
+      "product_group": "Other / Unmapped prefix",
+      "security_count": 7,
+      "issuance_upb": 89132663.0,
+      "issuance_share": 0.0019120972318293233
+    },
+    {
+      "month": "2026-03",
+      "product_group": "30-year UMBS / Supers family",
+      "security_count": 2762,
+      "issuance_upb": 53159421386.0,
+      "issuance_share": 0.9069246742400755
+    },
+    {
+      "month": "2026-03",
+      "product_group": "15-year UMBS / Supers family",
+      "security_count": 207,
+      "issuance_upb": 3630586945.0,
+      "issuance_share": 0.061939516957600846
+    },
+    {
+      "month": "2026-03",
+      "product_group": "20-year UMBS / Supers family",
+      "security_count": 33,
+      "issuance_upb": 1262587275.0,
+      "issuance_share": 0.021540331388569332
+    },
+    {
+      "month": "2026-03",
+      "product_group": "Other / Unmapped prefix",
+      "security_count": 8,
+      "issuance_upb": 292418070.0,
+      "issuance_share": 0.004988789493229975
+    },
+    {
+      "month": "2026-03",
+      "product_group": "10-year UMBS / Supers family",
+      "security_count": 9,
+      "issuance_upb": 270021173.0,
+      "issuance_share": 0.004606687920524314
+    },
+    {
+      "month": "2026-04",
+      "product_group": "30-year UMBS / Supers family",
+      "security_count": 2874,
+      "issuance_upb": 60307583758.0,
+      "issuance_share": 0.8928069932165559
+    },
+    {
+      "month": "2026-04",
+      "product_group": "15-year UMBS / Supers family",
+      "security_count": 223,
+      "issuance_upb": 3411654130.0,
+      "issuance_share": 0.050506892763649974
+    },
+    {
+      "month": "2026-04",
+      "product_group": "Other / Unmapped prefix",
+      "security_count": 90,
+      "issuance_upb": 2095578825.0,
+      "issuance_share": 0.03102341883409225
+    },
+    {
+      "month": "2026-04",
+      "product_group": "20-year UMBS / Supers family",
+      "security_count": 46,
+      "issuance_upb": 1592100803.0,
+      "issuance_share": 0.02356981729740641
+    },
+    {
+      "month": "2026-04",
+      "product_group": "10-year UMBS / Supers family",
+      "security_count": 11,
+      "issuance_upb": 141370318.0,
+      "issuance_share": 0.0020928778882955217
+    },
+    {
+      "month": "2026-05",
+      "product_group": "30-year UMBS / Supers family",
+      "security_count": 3171,
+      "issuance_upb": 61115278484.0,
+      "issuance_share": 0.9330625655704707
+    },
+    {
+      "month": "2026-05",
+      "product_group": "15-year UMBS / Supers family",
+      "security_count": 178,
+      "issuance_upb": 1812707742.0,
+      "issuance_share": 0.027675072066026436
+    },
+    {
+      "month": "2026-05",
+      "product_group": "Other / Unmapped prefix",
+      "security_count": 99,
+      "issuance_upb": 1562272915.0,
+      "issuance_share": 0.023851619600699092
+    },
+    {
+      "month": "2026-05",
+      "product_group": "20-year UMBS / Supers family",
+      "security_count": 38,
+      "issuance_upb": 812018936.0,
+      "issuance_share": 0.012397300487051215
+    },
+    {
+      "month": "2026-05",
+      "product_group": "10-year UMBS / Supers family",
+      "security_count": 15,
+      "issuance_upb": 197379437.0,
+      "issuance_share": 0.0030134422757525383
+    },
+    {
+      "month": "2026-06",
+      "product_group": "30-year UMBS / Supers family",
+      "security_count": 3094,
+      "issuance_upb": 51645451521.0,
+      "issuance_share": 0.8920481640509362
+    },
+    {
+      "month": "2026-06",
+      "product_group": "15-year UMBS / Supers family",
+      "security_count": 230,
+      "issuance_upb": 3484456883.0,
+      "issuance_share": 0.06018542337520089
+    },
+    {
+      "month": "2026-06",
+      "product_group": "Other / Unmapped prefix",
+      "security_count": 97,
+      "issuance_upb": 1865483764.0,
+      "issuance_share": 0.03222164426360714
+    },
+    {
+      "month": "2026-06",
+      "product_group": "20-year UMBS / Supers family",
+      "security_count": 33,
+      "issuance_upb": 731020620.0,
+      "issuance_share": 0.012626583421179286
+    },
+    {
+      "month": "2026-06",
+      "product_group": "10-year UMBS / Supers family",
+      "security_count": 15,
+      "issuance_upb": 168949371.0,
+      "issuance_share": 0.00291818488907641
+    }
+  ],
   "metadata": {
     "observation_count": 59904,
     "source_file_count": 19,
     "period_start": "2024-12",
     "period_end": "2026-06",
-    "generated_at": "2026-08-10T01:50:34Z",
-    "pipeline_version": "0.2.0",
-    "pipeline_revision": "b0a4cf876448",
-    "build_id": "7c0f195305e1f5d576f763e02fa6ad9406dab8df6ab3cc4a1a0276a2c0a9e035",
+    "generated_at": "2026-08-10T01:57:51Z",
+    "pipeline_version": "0.3.0",
+    "pipeline_revision": "8f47aad0732b",
+    "build_id": "5c6977cfad48f13eeb892d19da4e1340ea7864f8842f4185d9321cc3108b0c93",
     "schema_versions": [
       "fre-is-fico-v2",
       "fre-is-legacy-v1"
@@ -175,6 +842,15 @@
       "duplicate_count": 0,
       "quarantined_count": 0,
       "published_count": 59904
+    },
+    "mix": {
+      "taxonomy_version": "official-umbs-term-v1",
+      "taxonomy_source": "https://capitalmarkets.freddiemac.com/mbs/docs/prefix_library_explainer.pdf",
+      "mapped_observation_count": 59446,
+      "unmapped_observation_count": 458,
+      "mapped_issuance_upb": 1098287750056.0,
+      "unmapped_issuance_upb": 7901810800.0,
+      "mapped_issuance_share": 0.9928567299135553
     }
   }
 }

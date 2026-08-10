@@ -3,115 +3,84 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Freddie Mac MBS issuance analytics case study." />
-    <title>Freddie Mac MBS Issuance | Case Study</title>
+    <meta name="description" content="Governed Freddie Mac MBS issuance monitoring with reconciled source quality and aggregate-only evidence." />
+    <title>Freddie Mac MBS Disclosure Intelligence</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <a class="skip-link" href="#main">Skip to analysis</a>
+    <a class="skip-link" href="#main">Skip to issuance analysis</a>
     <header class="site-header">
       <div>
-        <p class="product-label">Mortgage-backed securities analytics</p>
-        <h1>Freddie Mac MBS Issuance</h1>
+        <p class="product-label">Disclosure intelligence · issuance release</p>
+        <h1>Freddie Mac MBS issuance</h1>
       </div>
-      <div class="header-meta" aria-label="Environment status">
-        <span>Dec 2024 – Jun 2026</span>
-        <span>Security-level source files</span>
+      <div class="header-meta" aria-label="Release scope">
+        <span>Aggregate-only reviewer mode</span>
+        <span>Dec 2024–Jun 2026</span>
       </div>
     </header>
 
     <main id="main">
-      <section class="story-intro" aria-labelledby="question-title">
-        <div>
-          <p class="section-label">Business question</p>
-          <h2 id="question-title">Where did issuance accelerate, cool, and concentrate over the observed period?</h2>
-          <p>Monthly issuance is a useful operational signal: it shows the scale and cadence of new securitization activity before performance data is layered in.</p>
-        </div>
-        <p class="source-note">Built from Freddie Mac month-end issuance security-level files. The dashboard publishes monthly aggregates only.</p>
+      <section id="app-status" class="status-panel" data-kind="loading" aria-live="polite">
+        <div><strong>Loading governed issuance data</strong><span>Checking the released aggregate and quality gate.</span></div>
+        <button id="retry" type="button" hidden>Retry loading</button>
       </section>
 
-      <section class="control-bar" aria-label="Analysis controls">
-        <div>
-          <label for="metric">Trend metric</label>
-          <select id="metric">
-            <option value="issuance_upb">Issuance UPB</option>
-            <option value="security_count">Issued securities</option>
-            <option value="average_factor">Average security factor</option>
-          </select>
-        </div>
-        <p id="coverage-note">Loading observed issuance history.</p>
-      </section>
-
-      <section class="metric-grid" aria-label="Current period summary">
-        <article>
-          <p>Latest month issued</p>
-          <strong id="issuance-value">-</strong>
-          <span id="issuance-change">-</span>
-        </article>
-        <article>
-          <p>Latest issuance UPB</p>
-          <strong id="upb-value">-</strong>
-          <span id="upb-change">-</span>
-        </article>
-        <article>
-          <p>Observed-period total</p>
-          <strong id="total-value">-</strong>
-          <span id="total-change">-</span>
-        </article>
-        <article>
-          <p>Highest observed month</p>
-          <strong id="peak-value">-</strong>
-          <span id="peak-change">-</span>
-        </article>
-      </section>
-
-      <section class="analysis-grid" aria-label="Trend and findings">
-        <article class="chart-panel">
-          <div class="panel-heading">
-            <div>
-              <p class="section-label">Monthly trend</p>
-              <h2 id="chart-title">Issuance UPB</h2>
-            </div>
-            <p id="chart-summary"></p>
+      <div id="dashboard-content" class="dashboard-content" hidden>
+        <section class="story-intro" aria-labelledby="question-title">
+          <div>
+            <p class="section-label">Analyst decision</p>
+            <h2 id="question-title">Where did issuance change, which term families explain it, and what needs investigation?</h2>
+            <p>This release separates source health from market-activity signals. Every visible total traces to accepted records and documented exclusions.</p>
           </div>
-          <div id="chart" class="chart" role="img" aria-label="Monthly trend chart"></div>
-        </article>
-        <aside class="controls-panel">
-          <p class="section-label">What the data says</p>
-          <h2>Three takeaways</h2>
-          <div id="findings" class="findings"></div>
-        </aside>
-      </section>
+          <p class="source-note">Official month-end issuance files. Monthly aggregates only; no security-level rows are sent to the browser.</p>
+        </section>
 
-      <section class="method-section" aria-labelledby="method-title">
-        <div class="section-intro">
-          <p class="section-label">How to use this project</p>
-          <h2 id="method-title">A reproducible monthly monitoring workflow</h2>
-        </div>
-        <div class="method-grid">
-          <article><strong>1. Refresh</strong><p>Place newly downloaded month-end issuance ZIP files in <code>data/raw/</code>, then run <code>npm run load:raw</code>.</p></article>
-          <article><strong>2. Review</strong><p>Use the trend to identify changes in issuance volume, security count, and average security factor.</p></article>
-          <article><strong>3. Extend</strong><p>Add monthly security-factor files for balance runoff and prepayment analysis without changing the public aggregate layer.</p></article>
-        </div>
-      </section>
+        <section class="quality-ledger" aria-labelledby="quality-title">
+          <div><p class="section-label">Release health</p><h2 id="quality-title">Quality gate passed</h2></div>
+          <div><strong id="quality-summary"></strong><span id="quality-detail"></span></div>
+          <div class="build-notes"><span id="coverage-note"></span><span id="generated-note"></span></div>
+        </section>
 
-      <section class="table-section" aria-labelledby="table-title">
-        <div class="section-intro">
-          <p class="section-label">Monthly evidence</p>
-          <h2 id="table-title">Observed issuance history</h2>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Month</th><th>Issued securities</th><th>Issuance UPB</th><th>Average factor</th><th>Corrections</th></tr></thead>
-            <tbody id="table-body"></tbody>
-          </table>
-        </div>
-      </section>
+        <section class="control-bar" aria-label="Trend controls">
+          <div><label for="metric">Trend metric</label><select id="metric"><option value="issuance_upb">Issuance UPB</option><option value="security_count">Issued securities</option></select></div>
+          <p>Observed movement is descriptive, not a valuation or trading signal.</p>
+        </section>
+
+        <dl class="metric-ledger" aria-label="Current issuance summary">
+          <div><dt>Latest securities</dt><dd id="latest-count">—</dd><small id="latest-count-note"></small></div>
+          <div><dt>Latest issuance UPB</dt><dd id="latest-upb">—</dd><small id="latest-upb-note"></small></div>
+          <div><dt>Observed-period UPB</dt><dd id="period-total">—</dd><small id="period-total-note"></small></div>
+          <div><dt>Highest observed month</dt><dd id="peak-upb">—</dd><small id="peak-upb-note"></small></div>
+        </dl>
+
+        <section class="analysis-grid" aria-label="Trend and investigation findings">
+          <article class="chart-panel">
+            <div class="panel-heading"><div><p class="section-label">Monthly trend</p><h2 id="chart-title">Issuance UPB</h2></div></div>
+            <div id="chart" class="chart" role="img"></div>
+            <p id="chart-description" class="chart-description"></p>
+          </article>
+          <aside class="findings-panel"><p class="section-label">Evidence-led review</p><h2>What changed and what to check</h2><div id="findings" class="findings"></div></aside>
+        </section>
+
+        <section class="mix-section" aria-labelledby="mix-title">
+          <div class="section-intro"><p class="section-label">Latest-month composition</p><h2 id="mix-title">Issuance by official term-family mapping</h2><p id="mix-coverage"></p></div>
+          <ol id="mix-list" class="mix-list"></ol>
+          <p class="method-note">CL/ZL, CT/ZT, CI/ZI, and CN/ZN follow Freddie Mac's <a id="mix-source" target="_blank" rel="noreferrer">Prefix Library summary</a>. Every other observed prefix remains “Other / Unmapped.”</p>
+        </section>
+
+        <section class="method-section" aria-labelledby="method-title">
+          <div class="section-intro"><p class="section-label">Investigation workflow</p><h2 id="method-title">Move from release health to a bounded follow-up</h2></div>
+          <ol class="workflow-list"><li><strong>Confirm</strong><span>Check reconciliation, schemas, exclusions, and freshness.</span></li><li><strong>Compare</strong><span>Review UPB, count, and term-family mix across adjacent months.</span></li><li><strong>Investigate</strong><span>Document a source/comparability or activity hypothesis without claiming causality.</span></li></ol>
+        </section>
+
+        <section class="table-section" aria-labelledby="table-title">
+          <div class="section-intro"><p class="section-label">Monthly evidence</p><h2 id="table-title">Observed issuance history</h2></div>
+          <div class="table-wrap"><table><thead><tr><th>Month</th><th>Issued securities</th><th>Issuance UPB</th><th>Corrections</th></tr></thead><tbody id="table-body"></tbody></table></div>
+        </section>
+      </div>
     </main>
-    <footer>
-      <span>Case study: monthly issuance monitoring using Freddie Mac disclosure files.</span>
-      <span>Not a valuation, trading, or lending-decision tool.</span>
-    </footer>
+    <footer><span>Governed local case study using authorized Freddie Mac disclosures.</span><span>Not a valuation, trading, hedging, or lending-decision tool.</span></footer>
     <script type="module" src="app.js"></script>
   </body>
 </html>

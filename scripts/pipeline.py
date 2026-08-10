@@ -18,7 +18,20 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
 
-PIPELINE_VERSION = "0.2.0"
+PIPELINE_VERSION = "0.3.0"
+PREFIX_TAXONOMY_VERSION = "official-umbs-term-v1"
+PREFIX_TAXONOMY_SOURCE = "https://capitalmarkets.freddiemac.com/mbs/docs/prefix_library_explainer.pdf"
+PREFIX_TAXONOMY = {
+    "CL": "30-year UMBS / Supers family",
+    "ZL": "30-year UMBS / Supers family",
+    "CT": "20-year UMBS / Supers family",
+    "ZT": "20-year UMBS / Supers family",
+    "CI": "15-year UMBS / Supers family",
+    "ZI": "15-year UMBS / Supers family",
+    "CN": "10-year UMBS / Supers family",
+    "ZN": "10-year UMBS / Supers family",
+}
+UNMAPPED_PRODUCT_GROUP = "Other / Unmapped prefix"
 OFFICIAL_ZIP_PATTERN = re.compile(r"^FRE_IS_(20\d{2})(0[1-9]|1[0-2])\.zip$")
 MONTH_PATTERN = re.compile(r"^20\d{2}-(0[1-9]|1[0-2])$")
 SEMVER_PATTERN = re.compile(r"^\d+\.\d+\.\d+$")
@@ -500,6 +513,44 @@ def build_id(manifest: Iterable[sqlite3.Row]) -> str:
     return hashlib.sha256(encoded).hexdigest()
 
 
+def build_mix(rows: Iterable[sqlite3.Row], months: list[dict]) -> tuple[list[dict], dict]:
+    monthly_totals = {row["month"]: row["issuance_upb"] for row in months}
+    grouped: dict[tuple[str, str], dict] = {}
+    mapped_observations = 0
+    mapped_upb = 0.0
+    total_observations = 0
+    total_upb = 0.0
+    for row in rows:
+        product_group = PREFIX_TAXONOMY.get(row["security_type"], UNMAPPED_PRODUCT_GROUP)
+        key = (row["month"], product_group)
+        target = grouped.setdefault(
+            key,
+            {"month": row["month"], "product_group": product_group, "security_count": 0, "issuance_upb": 0.0},
+        )
+        target["security_count"] += row["security_count"]
+        target["issuance_upb"] += row["issuance_upb"]
+        total_observations += row["security_count"]
+        total_upb += row["issuance_upb"]
+        if product_group != UNMAPPED_PRODUCT_GROUP:
+            mapped_observations += row["security_count"]
+            mapped_upb += row["issuance_upb"]
+    mix = []
+    for row in grouped.values():
+        row["issuance_share"] = row["issuance_upb"] / monthly_totals[row["month"]]
+        mix.append(row)
+    mix.sort(key=lambda row: (row["month"], -row["issuance_upb"], row["product_group"]))
+    metadata = {
+        "taxonomy_version": PREFIX_TAXONOMY_VERSION,
+        "taxonomy_source": PREFIX_TAXONOMY_SOURCE,
+        "mapped_observation_count": mapped_observations,
+        "unmapped_observation_count": total_observations - mapped_observations,
+        "mapped_issuance_upb": mapped_upb,
+        "unmapped_issuance_upb": total_upb - mapped_upb,
+        "mapped_issuance_share": mapped_upb / total_upb if total_upb else 0,
+    }
+    return mix, metadata
+
+
 def publish(database: Path, output: Path) -> None:
     with sqlite3.connect(database) as connection:
         connection.row_factory = sqlite3.Row
@@ -545,6 +596,19 @@ def publish(database: Path, output: Path) -> None:
                 """
             )
         ]
+        mix_source = list(
+            connection.execute(
+                """
+                SELECT report_month AS month,
+                       security_type,
+                       COUNT(*) AS security_count,
+                       SUM(issuance_upb) AS issuance_upb
+                FROM monthly_security
+                GROUP BY report_month, security_type
+                ORDER BY report_month, security_type
+                """
+            )
+        )
         observation_count = connection.execute("SELECT COUNT(*) FROM monthly_security").fetchone()[0]
         if observation_count != totals["accepted_count"]:
             raise QualityGateError("accepted source rows do not equal stored observations")
@@ -552,6 +616,7 @@ def publish(database: Path, output: Path) -> None:
         totals["published_count"] = totals["accepted_count"]
     if not months:
         raise QualityGateError("no records are available to publish")
+    mix, mix_metadata = build_mix(mix_source, months)
     metadata = {
         "observation_count": observation_count,
         "source_file_count": len(manifest),
@@ -572,11 +637,15 @@ def publish(database: Path, output: Path) -> None:
             "quarantined_count": totals["quarantined_count"],
             "published_count": totals["published_count"],
         },
+        "mix": mix_metadata,
     }
     if not SEMVER_PATTERN.fullmatch(metadata["pipeline_version"]):
         raise QualityGateError("pipeline version is not semantic-version formatted")
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(json.dumps({"months": months, "metadata": metadata}, indent=2) + "\n", encoding="utf-8")
+    output.write_text(
+        json.dumps({"months": months, "mix": mix, "metadata": metadata}, indent=2) + "\n",
+        encoding="utf-8",
+    )
 
 
 def main() -> None:

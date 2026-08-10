@@ -94,6 +94,9 @@ class PipelineTests(unittest.TestCase):
             payload = json.loads(output.read_text())
             self.assertEqual(payload["metadata"]["observation_count"], 18)
             self.assertEqual(payload["metadata"]["quality"]["published_count"], 18)
+            self.assertEqual(
+                payload["metadata"]["mix"]["unmapped_observation_count"], 18
+            )
             self.assertEqual(payload["metadata"]["period_start"], "2026-01")
             self.assertEqual(payload["metadata"]["period_end"], "2026-06")
             self.assertEqual(len(payload["months"]), 6)
@@ -127,6 +130,8 @@ class PipelineTests(unittest.TestCase):
             self.assertEqual(payload["metadata"]["quality"]["input_count"], 3)
             self.assertEqual(payload["months"][0]["issuance_upb"], 250)
             self.assertAlmostEqual(payload["months"][0]["average_factor"], 0.85)
+            november_mix = [row for row in payload["mix"] if row["month"] == "2025-11"]
+            self.assertEqual(sum(row["security_count"] for row in november_mix), 2)
 
     def test_official_schema_period_mismatch_blocks_publication(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -283,6 +288,7 @@ class PipelineTests(unittest.TestCase):
                             {"month": "2026-01", "security_count": 1},
                             {"month": "2026-02", "security_count": 1},
                         ],
+                        "mix": [{}],
                         "metadata": {"observation_count": 2, "source_file_count": 1},
                     }
                 ),

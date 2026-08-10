@@ -38,7 +38,7 @@ Status: `approved authorized issuance baseline; new source families require sepa
 Only these official fields are used by the implemented issuance pipeline:
 
 - `Security Identifier` — local business key; never published.
-- `Prefix` — current security-type label; aggregate taxonomy use awaits M3 approval.
+- `Prefix` — mapped in the aggregate layer using the approved official UMBS term taxonomy below.
 - `Issuance Investor Security UPB` — issuance balance measure.
 - `Current Investor Security UPB` — retained for source reconciliation; not interpreted as subsequent runoff in issuance files.
 - `Security Factor` — retained for validation; issuance-date factor is not presented as performance analytics.
@@ -46,6 +46,20 @@ Only these official fields are used by the implemented issuance pipeline:
 - `Security Status Indicator` — used only to classify the documented status-`C` blank-balance exclusion.
 
 All other source columns are ignored by the current transformation and remain restricted.
+
+## Approved issuance-mix taxonomy
+
+Source: Freddie Mac Prefix Library Summary — `https://capitalmarkets.freddiemac.com/mbs/docs/prefix_library_explainer.pdf`.
+
+| Aggregate group | Prefixes |
+| --- | --- |
+| 30-year UMBS / Supers family | CL, ZL |
+| 20-year UMBS / Supers family | CT, ZT |
+| 15-year UMBS / Supers family | CI, ZI |
+| 10-year UMBS / Supers family | CN, ZN |
+| Other / Unmapped prefix | Every other observed code |
+
+The taxonomy groups official term-related prefixes for composition monitoring; it does not assert that UMBS, Supers, and reverse-REMIC securities are economically identical. In the verified M3 payload, 59,446 observations and 99.29% of issuance UPB are mapped; 458 observations and 0.71% remain explicit and unmapped.
 
 ## Quality rules
 

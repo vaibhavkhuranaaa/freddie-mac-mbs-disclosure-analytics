@@ -26,6 +26,9 @@ Where did issuance accelerate, cool, and change composition over the observed pe
 - Blocks publication when a schema, row, duplicate, or reconciliation rule fails.
 - Stores accepted security observations, SHA-256 source manifests, and value-free quality events in local SQLite.
 - Publishes aggregate-only monthly dashboard data with period, generation, pipeline, build, schema, and quality metadata.
+- Publishes a tested issuance-mix view using official CL/ZL, CT/ZT, CI/ZI, and CN/ZN term-family mappings with an explicit unmapped group.
+- Generates latest change, observed range, mix finding, and investigation prompts from the active payload rather than fixed months.
+- Provides resilient loading/error/retry states, year-aware chart labels and summaries, keyboard focus, forced-color support, and responsive evidence views.
 - Runs automated official-file, failure-path, idempotence, payload, non-destructive, and static-preview checks.
 
 ## Verified baseline
@@ -39,7 +42,7 @@ Where did issuance accelerate, cool, and change composition over the observed pe
 ## Current limitations
 
 - The implemented source set is issuance-only. Issuance-date factor and current UPB are not measures of subsequent runoff.
-- Issuance mix is planned for M3 after the Prefix taxonomy is approved and tested.
+- Mix is term-family monitoring only; 458 observations outside the approved UMBS mapping remain `Other / Unmapped prefix`.
 - Balance movement, paydown, CPR/prepayment, timeliness, and supplemental monitoring require separately approved monthly factor and supplemental files.
 - Authenticated analyst mode, AI, cloud infrastructure, deployment, and public publication are not implemented or authorized.
 - The product is descriptive operational analytics; it does not make borrower decisions or provide investment, valuation, hedging, or trading recommendations.

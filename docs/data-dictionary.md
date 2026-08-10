@@ -49,3 +49,8 @@ Stores source file, row number, severity, rule code, and a value-free explanatio
 | `metadata.build_id` | Deterministic source/pipeline fingerprint | SHA-256 |
 | `metadata.schema_versions` | Reviewed schemas used | List of text values |
 | `metadata.quality` | Reconciled release counts and pass status | Object |
+| `mix[].product_group` | Approved official term-family group or explicit unmapped group | Text |
+| `mix[].security_count` | Accepted securities in month/group | Count |
+| `mix[].issuance_upb` | Issuance UPB in month/group | US dollars |
+| `mix[].issuance_share` | Group issuance UPB / monthly issuance UPB | Ratio `(0,1]` |
+| `metadata.mix` | Taxonomy version/source plus mapped and unmapped coverage | Object |

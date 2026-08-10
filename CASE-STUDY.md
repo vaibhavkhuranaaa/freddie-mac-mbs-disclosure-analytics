@@ -23,7 +23,7 @@ The authorized local workflow validates official Freddie Mac issuance ZIP names,
 
 ## Analyst use
 
-The current product supports release validation and descriptive issuance monitoring. An analyst can verify that dashboard totals trace to accepted records and that no row disappeared silently. The next milestone turns that trusted foundation into a data-derived issuance and composition investigation workflow.
+The product supports release validation and descriptive issuance/composition monitoring. An analyst can verify that totals trace to accepted records, compare monthly UPB and security count, inspect official UMBS term-family mix, and follow a data-derived investigation prompt without treating movement as causal.
 
 ## Limitations
 

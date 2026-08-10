@@ -30,6 +30,15 @@ Status: `M2 approved and verified locally; later-milestone targets remain propos
 - Every chart has an equivalent plain-language summary and accessible evidence table.
 - Findings remain correct when peak, trough, latest period, and year boundary change.
 
+Current M3 implementation evidence:
+
+- Monthly mix security counts, UPB, and shares reconcile to every monthly total in the payload validator.
+- Pure analytics tests cover payload rejection, zero-denominator handling, cross-year month labels, latest mix ordering, and derived findings.
+- Loading and error states use an `aria-live` status region and a named retry action; the default HTML renders a loading explanation before JavaScript completes.
+- Trend labels include month and year, the chart has a generated accessible description, and the evidence table remains available.
+- Impeccable's mechanical detector returned no findings for the changed HTML, CSS, and JavaScript.
+- Local HTTP smoke returned 200 for the application and served a passing 19-month/95-mix-row payload.
+
 ## M4–M6 analytical and product targets
 
 - Cross-source joins quantify matched, unmatched, duplicate, corrected, and late records by period.
