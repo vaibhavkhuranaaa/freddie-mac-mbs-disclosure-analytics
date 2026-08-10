@@ -2,9 +2,11 @@ version: 4
 data_use: authorized-freddie-mac-user-confirmed-2026-08-01
 architecture: approved-local-real-data-prototype-2026-08-01
 refinement_plan: approved-for-milestone-implementation-by-owner-2026-08-09
-current_milestone: M4-completed-locally-M5-next-unblocked
+current_milestone: M5-supported-engine-verified-acceptance-blocked
 monthly_security_contract: approved-2026-08-10
 monthly_loan_contract: approved-2026-08-10
+m5_field_contract_extension: pending-owner-approval-see-m5-approval-request
+m5_methodology_gates: pending-domain-review-see-m5-approval-request
 data_retention: approved-seven-years-delete-earlier-if-authorization-ends-2026-08-09
 ai_services: not-approved
 cloud: not-approved

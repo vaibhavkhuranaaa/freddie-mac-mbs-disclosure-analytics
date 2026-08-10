@@ -1,6 +1,6 @@
 # Evaluation contract
 
-Status: M0–M4 verified; M5 formula gates next
+Status: M0–M4 verified; M5 supported contracts verified and acceptance blocked by external gates
 
 ## Verified baseline
 
@@ -47,6 +47,21 @@ All M4 gates above pass. Supplemental native-grain distributions remain explicit
 - Corrections, issuance, removals, terminations, missing periods, low balances, schema transitions, and score-model transitions are covered.
 - SMM/CPR, runoff, roll/cure, and HHI remain unreleased until a domain reviewer approves their formula fixtures.
 - Voluntary, scheduled, curtailment, involuntary, and correction principal movements are never silently combined.
+
+### Verified supported-contract result
+
+| Gate | Verified result |
+| --- | --- |
+| Contract coverage | 54 complete resolved contracts: 23 supported, 17 methodology-gated, 11 contract-extension-required, 3 external |
+| Supported implementation | 23/23 supported contracts emit released components; no gated/external contract is released |
+| Real loan reconciliation | 35/35 partitions; 264,922,553/264,922,553 rows |
+| Real security reconciliation | 9,240,038 latest rows and 9,240,038 original rows |
+| Additive/weighted parity | 564 segment and weighted numerator/denominator checks pass |
+| Idempotence | full and unchanged incremental checksum `7f83b73d126631fe16bfa13e205dec1d4bd2ec3c22c4efa21d21252543d5d6d3` |
+| Bounded memory | measured peak RSS 29,196,288 bytes while scanning the full loan population |
+| Release safety | 256,355 supported components released locally; 180 candidates explicitly unreleased; restricted-output inspection passes |
+
+M5 milestone acceptance is not complete. Cohort/vintage and eleven other measures need approved field-contract extensions; seventeen formulas need recorded domain approval. `.project/m5-approval-request.json` is pending and does not self-approve either gate.
 
 ## M6 semantic-model gates
 

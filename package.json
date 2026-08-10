@@ -11,6 +11,8 @@
     "load:m4": "python3 scripts/m4_conformance.py --input data/raw --database local/m4-conformed.sqlite",
     "verify:m4": "python3 scripts/m4_conformance.py --input data/raw --database local/m4-conformed.sqlite --incremental",
     "verify:m4-safety": "python3 scripts/verify_m4_safety.py",
+    "load:m5": "python3 scripts/m5_metric_engine.py",
+    "verify:m5": "python3 scripts/m5_metric_engine.py --incremental && python3 scripts/verify_m5_metrics.py",
     "test:python": "python3 -m unittest discover -s tests -v",
     "test:analytics": "node tests/test_analytics.mjs",
     "test": "npm run test:python && npm run test:analytics",

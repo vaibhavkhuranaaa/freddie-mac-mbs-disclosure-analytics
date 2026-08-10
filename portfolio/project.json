@@ -1,11 +1,11 @@
 {
-  "version": 4,
+  "version": 5,
   "slug": "freddie-mac-mbs-disclosure-analytics",
   "title": "Freddie Mac MBS Disclosure Intelligence",
   "status": "analyst-product",
-  "summary": "Verified governed issuance analytics plus approved, reconciled native-grain security and loan conformance for 106 restricted archives.",
-  "scope": "Implemented through M4: issuance workflow, exact source contracts, 693,640,933-row reconciliation, restricted security/loan facts, correction/as-of controls, reason-coded joins, and backfill/incremental parity. M5-M9: metric engine, certified Power BI model, nontechnical dashboard, investigation workflow, and semantic API. AI, private cloud, reviewer redistribution, and publication remain separately gated.",
+  "summary": "Verified governed issuance analytics, 106-archive native-grain conformance, and a bounded-memory local metric engine implementing all 23 currently supported contracts.",
+  "scope": "M0-M4 complete. M5 supported engine verified across 264,922,553 loan rows and 9,240,038 security rows; acceptance remains blocked by 17 domain formula approvals and 11 field-contract extensions. M6-M9 have not started. AI, private cloud, reviewer redistribution, and publication remain separately gated.",
   "productSpec": "docs/BI_PRODUCT_SPEC.md",
   "milestones": ".project/milestones.yml",
-  "evidence": ["E-001", "E-002", "E-003", "E-007", "E-008", "E-009", "E-010", "E-011", "E-012", "E-013", "E-014", "E-015", "E-016", "E-017", "E-018", "E-023", "E-024", "E-026", "E-027", "E-028", "E-029", "E-030", "E-031"]
+  "evidence": ["E-001", "E-002", "E-003", "E-007", "E-008", "E-009", "E-010", "E-011", "E-012", "E-013", "E-014", "E-015", "E-016", "E-017", "E-018", "E-023", "E-024", "E-026", "E-027", "E-028", "E-029", "E-030", "E-031", "E-032", "E-033", "E-034"]
 }

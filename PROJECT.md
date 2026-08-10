@@ -3,7 +3,7 @@
 ## Charter
 
 - **Industry:** mortgage-backed securities disclosure analytics
-- **Current verified release:** governed month-end Freddie Mac issuance monitoring plus restricted M4 conformed security/loan inputs
+- **Current verified release:** governed month-end Freddie Mac issuance monitoring plus restricted M4 facts and the supported M5 local metric engine
 - **Target product:** authorized row-level Power BI decision product for issuance, balance/factor, prepayment, credit, collateral, concentration, correction, quality, and investigation workflows
 - **Primary stakeholder:** MBS disclosure operations or market-data analyst; executive summaries support nontechnical leadership
 - **Authorized data use:** the owner is authorized to use the acquired Freddie Mac source files at row level for this project
@@ -31,6 +31,8 @@ Help a stakeholder decide whether a disclosure release is trustworthy, what chan
 - Issuance UPB/count, corrections, approved term-family composition, active-data findings, investigation prompts, evidence, and limitations.
 - Loading/error/retry, year-aware descriptions, keyboard focus, forced colors, responsive layout, automated tests, and static smoke verification.
 - Value-free inventory of the acquired monthly-security and loan-level source population.
+- Versioned 54-measure M5 catalog: 23 supported and implemented, 17 methodology-gated, 11 field-contract extensions, and 3 external families.
+- Streaming M5 components across all 264,922,553 loan-period and 9,240,038 security-period facts with 29.2 MB measured peak RSS, 564 parity checks, and idempotent checksum evidence.
 
 ## Target decision product
 
@@ -49,7 +51,7 @@ Price, yield, OAS, spreads, duration, convexity, WAL, market return, MSR, macro 
 
 ## Current implementation boundary
 
-M0–M4 are complete. M5 is the first unblocked milestone: implement only approved disclosure-supported business formulas from the conformed facts, with separate formula gates for factor-derived runoff/paydown, SMM/CPR, delinquency transitions, and concentration. M4 conformance does not authorize an unverified formula or public claim.
+M0–M4 are complete. M5 has implemented every currently supported contract and is blocked at its external acceptance gates: methodology approval for 17 formulas and approved field extensions for 11 measures. No gated formula is released, and M6 has not begun.
 
 AI services, cloud infrastructure, paid resources, deployment, and publication are not approved. The product is descriptive operational analytics and does not make borrower, investment, valuation, trading, hedging, or causal recommendations.
 

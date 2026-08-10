@@ -130,3 +130,18 @@ evidence:
     source: tests/fixtures/m4/golden_cases.json; tests/test_m4_conformance.py; scripts/verify_m4_safety.py
     status: verified
     verified_on: 2026-08-10
+  - id: E-032
+    claim: "The M5 machine catalog resolves 54 complete formula-version m5.1.0 contracts: 23 supported, 17 methodology-gated, 11 contract-extension-required, and 3 external; release modes keep every non-supported contract unreleased."
+    source: .project/m5-metric-catalog.json; tests/test_m5_metric_engine.py
+    status: verified
+    verified_on: 2026-08-10
+  - id: E-033
+    claim: "The streaming M5 engine implements all 23 supported contracts over all 35 loan partitions and both security correction views, producing 256,355 released components and 180 explicitly unreleased candidates with measured peak RSS of 29,196,288 bytes."
+    source: local/m5-metrics.sqlite; scripts/m5_metric_engine.py
+    status: verified-local-restricted
+    verified_on: 2026-08-10
+  - id: E-034
+    claim: "All 264,922,553 loan rows and 9,240,038 security rows reconcile; 564 segment/weighted parity checks pass; full and unchanged incremental outputs share SHA-256 7f83b73d126631fe16bfa13e205dec1d4bd2ec3c22c4efa21d21252543d5d6d3; no gated metric is released."
+    source: scripts/verify_m5_metrics.py; tests/fixtures/m5/golden_cases.json; local/m5-metrics.sqlite
+    status: verified
+    verified_on: 2026-08-10

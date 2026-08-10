@@ -41,6 +41,8 @@ All measures follow `docs/BI_PRODUCT_SPEC.md` and `docs/metric-glossary.md`. Eac
 - SMM/CPR remain unavailable until unscheduled principal, scheduled principal, involuntary removal, corrections, and denominator timing are approved and tested.
 - External market, valuation, macroeconomic, liquidation, and recovery metrics remain absent without separate sources.
 
+The implemented M5 engine resolves `.project/m5-metric-catalog.json`, streams each compressed loan partition independently, stores exact additive/weighted components, then consolidates them across source families. It reuses unchanged partition components only when partition checksum, catalog checksum, expected rows, and engine version match. Security calculations run separately for original-publication and latest-known views. Candidate HHI and delinquency-threshold components carry `released=0`; no bridge, runoff, SMM/CPR, roll/cure, or external metric is released.
+
 ## BI and interpretation method
 
 The Power BI model uses native-grain facts, conformed dimensions, explicit measures, single-direction relationships, controlled field parameters, and certified filter behavior. No report-local calculation may create a new business measure.
@@ -53,6 +55,9 @@ Dashboard findings describe observed changes and concentration. They do not asse
 npm run check
 npm run inventory:sources
 npm run load:raw
+npm run load:m4
+npm run load:m5
+npm run verify:m5
 npm run check
 ```
 

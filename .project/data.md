@@ -1,6 +1,6 @@
 # Data contract
 
-Status: `authorized row-level local use; M4 security and loan contracts approved and implemented`
+Status: `authorized row-level local use; M4 contracts implemented; M5 supported-field metrics implemented locally`
 
 ## Rights and release boundary
 
@@ -100,3 +100,9 @@ Restricted raw storage contains twenty Monthly Loan-Level File 1 (`fu`) packages
 M4 treats supplemental records as provider-native distributions outside `FactSecurityPeriod`/`FactLoanPeriod`: all 419,478,342 are structurally accepted by inventory and explicitly dispositioned as M5-deferred exclusions from these two facts. Core and loan rows produce 9,240,038 security-period and 264,922,553 loan-period facts. Restricted values remain under ignored `local/`; only aggregate reconciliation evidence enters project records.
 
 `scripts/source_inventory.py` inspects checksums, sizes, member names, encryption flags, physical row counts, ordered-header fingerprints, and headerless record layouts without emitting disclosure row values. Its ignored cache skips unchanged adjacent files. `scripts/m4_conformance.py` streams approved rows once into restricted facts and value-free control records.
+
+## M5 derived metric boundary
+
+`.project/m5-metric-catalog.json` resolves 54 complete metric contracts. `scripts/m5_metric_engine.py` reads only approved M4 conformed columns plus the existing governed issuance allowlist. Restricted output stays at `local/m5-metrics.sqlite` and contains additive numerators/denominators, segment components, original/latest security views, candidate gate results, and value-free run evidence.
+
+The engine does not read supplemental row values or any unallowlisted core/loan value. Proposed M4 v2 field additions and exact approval questions are recorded in `.project/m5-approval-request.json`; that file grants no processing authority. Delinquent-loan-purchase fields remain unlocated in approved core/loan headers. Reviewer/public release remains unapproved.

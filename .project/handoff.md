@@ -2,20 +2,24 @@
 
 ## Outcome
 
-M4 is complete. Approved security and loan contracts govern all 106 acquired archives. Real backfill reconciles 693,640,933 physical records to 274,162,591 accepted/published facts and 419,478,342 explicit supplemental exclusions, with zero rejected, duplicate, or quarantined rows. All 264,922,553 loan/security joins match. Backfill and unchanged incremental snapshots share SHA-256 `ec3862e9f6c1f4531424a26e4d3934b12b4e690ebb14fe58e8fd343c81074528`.
+M5 safe supported work is complete. The machine catalog contains 54 formula-version `m5.1.0` contracts: 23 supported/implemented, 17 methodology-gated, 11 field-contract extensions, and 3 external. No gated, extended, or external contract is released.
 
-Restricted control/security facts and 35 compressed loan partitions remain ignored under `local/`. Reviewer/public redistribution remains unapproved.
+The restricted local engine processed all 35 compressed loan partitions and 264,922,553 rows plus both 9,240,038-row security correction views. It emits 256,355 released components and 180 explicitly unreleased candidates. The independent verifier passes 564 segment and weighted-component parity checks. Measured peak RSS is 29,196,288 bytes. Full and unchanged incremental outputs share SHA-256 `7f83b73d126631fe16bfa13e205dec1d4bd2ec3c22c4efa21d21252543d5d6d3`.
 
-## M5 implementation order
+M5 acceptance is blocked by genuinely external owner/domain input. M6 has not started.
 
-1. Read project records and query refreshed Graphify.
-2. Define complete metric contracts before implementing each M5 formula.
-3. Reuse conformed M4 facts; do not reopen raw archives unless a source-contract defect requires it.
-4. Keep Classic FICO, VS4, and legacy score systems separate.
-5. Keep runoff/paydown, SMM/CPR, roll/cure, and HHI unreleased until their explicit formula fixtures and domain gates pass.
-6. Reconcile every metric numerator/denominator across security, loan, cohort, segment, and portfolio grains.
+## Current blockers
 
-Do not implement M5 formulas inside M4 except the reconciliation measures required to prove conformance. Do not treat Classic FICO and VS4 as one score, April consolidation as an economic event, total balance decline as prepayment, or source discovery as public-release permission.
+1. Approve, reject, or revise the exact proposed fields in `.project/m5-approval-request.json`. Until approval and exact guide code/null/range fixtures are recorded in versioned M4 contracts, the engine must not read those row values.
+2. Approve methodology gates by technical name and formula version. Ending-balance bridge, runoff/paydown, SMM/CPR, cohort speed, burnout, principal categories, PSA, involuntary-removal share, delinquency threshold/transition metrics, modification rate, composite quality/comparability, and HHI remain unreleased.
+3. Identify a provider-supported source/field for delinquent-loan purchases if that metric remains required.
+4. Cohort/vintage real-population reconciliation remains blocked until exact issue/origination fields are approved. Golden blocker fixtures already pass.
+
+Do not mark M5 complete or begin M6 until applicable approval entries change in `.project/approvals.yml` and every newly approved field/formula passes golden and real reconciliation.
+
+## First unblocked action after approval
+
+Amend only the approved M4 field contracts, add exact source-guide code/null/range rules and non-sensitive fixtures, then extend M4 partitions narrowly enough to expose those fields. Re-run M4 parity and safety before adding any newly supported M5 component. If only methodology gates are approved, implement/release only those named gates whose existing fields and fixtures are already sufficient.
 
 ## Recovery commands
 
@@ -23,11 +27,16 @@ Do not implement M5 formulas inside M4 except the reconciliation measures requir
 npm run check
 npm run inventory:sources
 npm run verify:m4
+npm run verify:m5
 ```
 
-All three commands are expected to pass without rereading unchanged raw archives beyond safe inventory metadata checks.
+Expected M5 result:
 
-## External blockers
+- 54 catalog contracts; 23 released supported contracts.
+- 35 loan partitions; 264,922,553 loan rows; 9,240,038 security rows.
+- 564 parity checks.
+- Checksum `7f83b73d126631fe16bfa13e205dec1d4bd2ec3c22c4efa21d21252543d5d6d3`.
 
-- GitHub cannot be updated until `gh auth login -h github.com` succeeds and a target repository/remote is selected.
-- Cloud, AI, paid resources, deployment, and publication require the approvals recorded in `.project/approvals.yml`.
+Restricted data remains ignored under `data/raw/` and `local/`. Reviewer/public redistribution, cloud, AI, paid services, deployment, and publication remain unapproved. The repository has no configured remote; GitHub authentication was invalid at last verification.
+
+Use `docs/NEXT_CHAT_PROMPT.md` only after recording owner/domain decisions.

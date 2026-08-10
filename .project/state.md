@@ -1,8 +1,8 @@
 # Current state
 
-- Lifecycle: implementation-ready BI product roadmap; M0–M4 completed
+- Lifecycle: M0–M4 completed; M5 supported engine verified and blocked by external approvals
 - Product contract: `docs/BI_PRODUCT_SPEC.md`; executable roadmap: M0–M12 in `.project/milestones.yml`
-- Next milestone: M5 — build the industry metric engine under formula gates
+- Current milestone: M5 — 23 supported contracts complete; acceptance blocked by 17 methodology gates and 11 field extensions
 - Data authorization: row-level local use approved for the owner; reviewer/public redistribution not approved
 - Retention: seven years from acquisition, delete earlier if authorization ends
 - Governed issuance: 19 files, 2024-12 through 2026-06; 60,604 physical rows; 59,904 accepted/published; 700 documented exclusions; 0 rejected; 0 duplicate keys
@@ -12,6 +12,10 @@
 - M4 machine state: both contracts approved; 106/106 archives pass exact inventory controls; 693,640,933 rows reconcile to 274,162,591 accepted/published and 419,478,342 explicit supplemental exclusions, with zero rejected, duplicate, or quarantined rows
 - M4 conformed state: 9,240,038 security-period facts and 264,922,553 loan-period facts; all 264,922,553 loan joins matched; 35 loan partitions and control/security SQLite remain restricted and ignored
 - M4 parity: backfill and unchanged incremental runs share snapshot SHA-256 `ec3862e9f6c1f4531424a26e4d3934b12b4e690ebb14fe58e8fd343c81074528`; original/latest and correction behavior pass golden fixtures
+- M5 catalog: 54 contracts at formula version `m5.1.0` — 23 supported, 17 methodology-gated, 11 contract-extension-required, 3 external
+- M5 engine: 35/35 loan partitions and 264,922,553 rows; 9,240,038 original and latest security rows; 256,355 released components; 180 unreleased candidates
+- M5 verification: 564 segment/weighted parity checks; 29,196,288-byte peak RSS; full/incremental checksum `7f83b73d126631fe16bfa13e205dec1d4bd2ec3c22c4efa21d21252543d5d6d3`
+- M5 blockers: pending `.project/m5-approval-request.json`; no gated, extended, or external measure released; cohort/vintage real-population parity remains blocked by unapproved fields
 - Target product: certified Power BI model and nine-page trust-to-investigation workflow with full authorized detail and separate reviewer boundary
 - Verification: real inventory, conformance, incremental parity, restricted-output safety, Python/dashboard tests, released-payload validation, static smoke, Graphify synchronization, and project-record checks pass for M4
 - Source control: branch `product/bi-dashboard-roadmap`; local Git only; no remote; GitHub authentication currently invalid

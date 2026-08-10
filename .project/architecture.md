@@ -2,8 +2,8 @@
 
 ## Approved status
 
-- **Current architecture:** governed local issuance product plus restricted M4 conformed security/loan facts
-- **Next architecture:** versioned metric engine and certified Power BI semantic model over M4 facts
+- **Current architecture:** governed local issuance product plus restricted M4 facts and supported M5 metric components
+- **Next architecture:** complete M5 approval gates, then build the certified Power BI semantic model over M4/M5
 - **Data access:** authorized row-level Freddie Mac source use; restricted files stay outside Git and reviewer artifacts
 - **Retention:** seven years from acquisition, deleted earlier if authorization ends
 - **Current cost:** $0 operating baseline
@@ -35,6 +35,18 @@ The verified build processes 60,604 physical rows from 19 files and publishes 59
 ```
 
 The M4 build reconciles 693,640,933 physical rows to 274,162,591 accepted/published facts and 419,478,342 explicit supplemental exclusions. Zero rows are rejected, duplicated, or quarantined. All loan joins match in the acquired population. Backfill and unchanged incremental runs produce the same normalized snapshot checksum.
+
+## Verified M5 supported engine
+
+```text
+M4 SQLite security facts + compressed loan partitions + governed issuance facts
+  -> resolved 54-contract metric catalog
+  -> partition-local streaming additive/weighted components
+  -> cross-partition security/loan/segment/portfolio reconciliation
+  -> restricted local SQLite metric store
+```
+
+All 23 currently supported contracts are implemented. The engine scans 264,922,553 loan rows and both 9,240,038-row security correction views with 29,196,288 bytes measured peak RSS. It emits 256,355 released components and 180 explicitly unreleased candidates. Full and unchanged incremental runs share checksum `7f83b73d126631fe16bfa13e205dec1d4bd2ec3c22c4efa21d21252543d5d6d3`; 564 segment and weighted-component parity checks pass.
 
 ## Target logical architecture
 
@@ -113,4 +125,4 @@ Provider, tenant, region, residency, tiers, cost ceiling, identity, backup, reco
 
 ## Claim boundary
 
-Current claims include issuance plus M4 source contracts, native-grain conformance, reconciliation, correction/as-of controls, and join coverage. Business factor/balance, prepayment, delinquency, collateral, concentration, investigation, Power BI, API, AI, cloud, and hosted-release claims become valid only after their milestone evidence is verified.
+Current claims include issuance, M4 conformance, and the 23 supported M5 contracts for release trust, issuance/balance, factor, age/maturity, score-model-separated credit, delinquency distributions, modification/deferral components, geography, and counterparty composition. Methodology-gated speed, transition, bridge, composite-quality, modification-rate, and HHI measures remain unreleased. Field-extension, external, Power BI, investigation, API, AI, cloud, and hosted-release claims remain absent.

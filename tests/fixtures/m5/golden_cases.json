@@ -1,0 +1,65 @@
+{
+  "classification": "non-sensitive synthetic golden evidence; never reviewer data",
+  "catalog": {
+    "metrics": 54,
+    "support_counts": {
+      "supported": 23,
+      "methodology-gated": 17,
+      "contract-extension-required": 11,
+      "external": 3
+    }
+  },
+  "balance_bridge": {
+    "beginning": 100000,
+    "additions": 5000,
+    "adjustments": -1000,
+    "scheduled": 1000,
+    "curtailment": 500,
+    "voluntary": 2500,
+    "involuntary": 1000,
+    "terminations": 0,
+    "ending": 99000,
+    "expected_residual": 0
+  },
+  "formula_gates": [
+    {"id": "smm-valid", "unscheduled_principal": 1000, "surviving_balance": 100000, "expected": 0.01},
+    {"id": "smm-zero-denominator", "unscheduled_principal": 1000, "surviving_balance": 0, "expected": null},
+    {"id": "smm-invalid-negative", "unscheduled_principal": -1, "surviving_balance": 100000, "expected": null}
+  ],
+  "hhi": [
+    {"id": "equal-four", "components": [25, 25, 25, 25], "expected": 0.25},
+    {"id": "single", "components": [100], "expected": 1.0},
+    {"id": "zero-population", "components": [0, 0], "expected": null}
+  ],
+  "delinquency_bands": [
+    {"days": null, "expected": "Missing"},
+    {"days": 0, "expected": "Current"},
+    {"days": 29, "expected": "1-29"},
+    {"days": 30, "expected": "30-59"},
+    {"days": 60, "expected": "60-89"},
+    {"days": 90, "expected": "90+"}
+  ],
+  "score_transition": [
+    {"period": "2025-11", "allowed_nonmissing": ["legacy_credit_score"]},
+    {"period": "2025-12", "allowed_nonmissing": ["classic_fico", "vs4"]}
+  ],
+  "coverage_cases": [
+    "original-latest-correction",
+    "new-issuance",
+    "missing-period",
+    "termination",
+    "involuntary-removal",
+    "low-balance",
+    "zero-denominator",
+    "schema-transition",
+    "score-model-transition",
+    "comparison-ineligible",
+    "formula-gate-failure",
+    "security-grain",
+    "loan-grain",
+    "cohort-grain-blocked-by-field-contract",
+    "vintage-grain-blocked-by-field-contract",
+    "segment-grain",
+    "portfolio-grain"
+  ]
+}

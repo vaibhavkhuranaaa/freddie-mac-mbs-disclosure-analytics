@@ -25,6 +25,14 @@ These files are ignored by Git and are not public assets. Public/demo redistribu
 - Restricted outputs contain 9,240,038 security-period and 264,922,553 loan-period facts. All loan joins are matched in the acquired population; unmatched, ambiguous, late, ineligible, and terminated behaviors remain golden-tested.
 - Backfill and unchanged incremental runs produce snapshot SHA-256 `ec3862e9f6c1f4531424a26e4d3934b12b4e690ebb14fe58e8fd343c81074528`.
 
+## Verified M5 supported metric engine
+
+- Machine-readable catalog contains 54 contracts: 23 supported/implemented, 17 methodology-gated, 11 field-contract extensions, and 3 external families.
+- Restricted local SQLite output contains 256,355 released additive/weighted components and 180 explicitly unreleased candidates.
+- All 35 loan partitions and 264,922,553 rows reconcile; both original/latest security views cover 9,240,038 rows.
+- 564 segment and weighted-component parity checks pass with measured peak RSS of 29,196,288 bytes.
+- Full and unchanged incremental outputs share checksum `7f83b73d126631fe16bfa13e205dec1d4bd2ec3c22c4efa21d21252543d5d6d3`.
+
 ## Run locally
 
 ```sh
@@ -33,6 +41,8 @@ npm run inventory:sources
 npm run load:raw
 npm run load:m4
 npm run verify:m4
+npm run load:m5
+npm run verify:m5
 npm run check
 npm run serve
 ```
@@ -45,7 +55,7 @@ Open [http://127.0.0.1:4173](http://127.0.0.1:4173).
 
 Implemented through M3: issuance UPB/count, corrections, official term-family composition, exact schemas, provenance, reconciliation, data-derived findings, resilient UI states, and aggregate-only local publication.
 
-Implemented through M4: issuance workflow plus approved security/loan contracts, fail-closed native-grain conformance, correction/as-of lineage, reason-coded joins, and backfill/incremental parity. M5 is next; M5–M9 add the metric engine, certified Power BI semantic model, nontechnical dashboard, investigation workflow, and governed API. M10–M12 remain separately gated AI, private-cloud, and reviewer-publication work.
+Implemented M5 boundary: every currently supported local metric contract, additive numerator/denominator components, correction views, score-model separation, real-inventory reconciliation, and bounded-memory streaming. M5 acceptance remains blocked by recorded field-contract and domain-methodology approvals; M6 has not started. M6–M9 add the certified Power BI model, nontechnical dashboard, investigation workflow, and governed API. M10–M12 remain separately gated AI, private-cloud, and reviewer-publication work.
 
 The [BI product specification](docs/BI_PRODUCT_SPEC.md) defines the pages, industry metric catalog, semantic model, visuals, user experience, governance, and history recommendation. The [milestone plan](.project/milestones.yml) is the execution contract.
 

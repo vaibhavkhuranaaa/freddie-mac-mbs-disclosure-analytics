@@ -1,6 +1,6 @@
 # Data dictionary
 
-Status: current issuance schema plus verified M4 conformed facts. Exact mappings remain machine-versioned in approved source contracts.
+Status: current issuance schema, verified M4 conformed facts, and restricted M5 metric components. Exact mappings remain machine-versioned in approved source/metric contracts.
 
 ## Classification
 
@@ -48,6 +48,17 @@ Records source, row/record reference, severity, rule code, and a value-free expl
 | `restatement_lineage` | original-to-replacement source version | hashed business key, as-of precedence, changed-record flag | authorized only |
 
 Supplemental files remain at record-type-specific native grains. M4 validates and explicitly excludes their 419,478,342 records from `FactSecurityPeriod`/`FactLoanPeriod`; M5 may add a separate supplemental fact without flattening unlike grains.
+
+### M5 restricted metric store
+
+| Object | Grain / purpose | Boundary |
+| --- | --- | --- |
+| `input_partition` | one compressed loan partition with checksum, expected/scanned rows, active/all UPB components, peak RSS, and catalog hash | restricted local; safe counts/checksums may enter evidence |
+| `partition_component` | one additive or weighted component per source partition, period, contract, dimension, and member | restricted local; seller/servicer members never enter tracked artifacts |
+| `metric_component` | consolidated security, loan, segment, and portfolio numerator/denominator with explicit released flag | restricted local; reviewer/public release not approved |
+| `run_metadata` | value-free catalog, count, memory, and normalized-snapshot evidence | safe metadata after verification |
+
+`numerator` and `denominator` are decimal-integer text so weighted products cannot overflow SQLite 64-bit integers. `value` is derived; reconciliation uses exact components. Balance snapshots remain period-grained and are never rolled up as additive flows.
 
 ## M4 implemented and downstream target facts
 

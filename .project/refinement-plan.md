@@ -1,6 +1,6 @@
 # End-to-end product refinement plan
 
-Status: `M4 complete; M5 is next`
+Status: `M4 complete; M5 supported engine verified and blocked at external approval gates`
 
 Prepared: 2026-08-10
 
@@ -29,13 +29,15 @@ Cloud, paid services, AI, deployment, and publication remain independent approva
 - The source files expose enough fields for security balance/factor, collateral, credit, delinquency, modification, assistance, geography, counterparty, and mission analytics after contracts and formulas are verified.
 - M4 approves both machine contracts and reconciles 693,640,933 physical records to 274,162,591 conformed facts plus 419,478,342 explicit supplemental exclusions, with zero rejected, duplicate, or quarantined rows.
 - All 264,922,553 loan/security joins match; backfill and incremental snapshots are identical.
+- The M5 catalog resolves 54 complete contracts; all 23 supported contracts are implemented, while 17 methodology gates, 11 field extensions, and 3 external families remain unreleased.
+- Real M5 processing reconciles all loan/security inputs, passes 564 component-parity checks with 29.2 MB peak RSS, and produces identical full/incremental checksum `7f83b73d126631fe16bfa13e205dec1d4bd2ec3c22c4efa21d21252543d5d6d3`.
 
 ## Product gaps to close
 
 | Priority | Gap | Consequence | Closing milestone |
 | --- | --- | --- | --- |
 | Closed | Monthly security and loan schemas lacked approved field/join/correction contracts | Resolved by verified M4 conformance | M4 complete |
-| P0 | Industry measures lack a single versioned calculation engine and golden fixtures | BI calculations could diverge or overclaim | M5 |
+| Blocked externally | Supported industry measures now share one versioned engine and golden fixtures; gated/extension measures await approvals | M6 cannot start until M5 acceptance closes | M5 |
 | P0 | No certified star-schema semantic model exists | Executive and detail views cannot share one truth | M6 |
 | P1 | Current UI answers issuance questions only | Stakeholders cannot evaluate runoff, delinquency, collateral, or concentration | M7–M8 |
 | P1 | No governed investigation record or semantic API exists | Findings are not assignable or reusable outside the report | M8–M9 |

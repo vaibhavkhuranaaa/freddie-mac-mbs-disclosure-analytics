@@ -1,198 +1,204 @@
-# Graph Report - freddie-mac-mbs-disclosure-analytics  (2026-08-10)
+# Graph Report - .  (2026-08-10)
 
 ## Corpus Check
-- 41 files · ~36,487 words
-- Verdict: corpus is large enough that graph structure adds value.
+- Corpus is ~47,806 words - fits in a single context window. You may not need a graph.
 
 ## Summary
-- 373 nodes · 651 edges · 37 communities (24 shown, 13 thin omitted)
-- Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 9 edges (avg confidence: 0.6)
+- 391 nodes · 777 edges · 31 communities (26 shown, 5 thin omitted)
+- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 33 edges (avg confidence: 0.84)
 - Token cost: 0 input · 0 output
 
-## Graph Freshness
-- Built from commit: `ff72912d`
-- Run `git rev-parse HEAD` and compare to check if the graph is stale.
-- Run `graphify update .` after code changes (no API cost).
-
 ## Community Hubs (Navigation)
-- project_kit.py
-- app.js
-- scripts
-- pipeline.py
-- Handoff
-- validate_dashboard.mjs
-- PipelineTests
-- Issuance Monitoring Scope
-- Issuance Monitoring Business Question
-- Recruiter-Facing Issuance Dashboard
-- Issuance Monitoring Methodology
-- m4_conformance.py
-- Verified Project Evidence
-- Delivery sequence
-- source_inventory.py
-- Freddie Mac MBS Disclosure Intelligence — BI product specification
-- SourceInventoryTests
-- Data contract
-- Evaluation contract
-- Metric glossary
-- Freddie Mac MBS Disclosure Intelligence
-- Deployment decision record
-- Data dictionary
-- M4 monthly security and loan data intake
-- M2 Source Quality and Provenance
-- Project delivery rules
-- main
-- CLAUDE.md
-- User-facing design rules
-- Freddie Mac MBS Issuance Monitoring Overview
-- category.md
-- industry.md
-- copilot-instructions.md
-- publication.md
-- state.md
-- test_m4_conformance.py
-- verify_m4_safety.py
+- Issuance Pipeline
+- M5 Metric Engine
+- M4 Conformance
+- Source Inventory
+- Package Scripts
+- Project Delivery
+- Dashboard Analytics
+- Issuance Tests
+- Metric Methodology
+- Inventory Tests
+- Project Governance
+- M4 Tests
+- Dashboard Interface
+- Deployment and BI
+- M5 Tests
+- Product Modes
+- Product Specification
+- Data Model
+- M5 Verification
+- Dashboard Validation
+- Case Study
+- M5 Documentation
+- Data Safety
+- Milestone Handoff
+- Static Smoke Test
+- Semantic Model Roadmap
+- Approvals and Publication
+- Data Rights
+- Evaluation Gates
+- CI Quality
+- Evidence Registry
 
 ## God Nodes (most connected - your core abstractions)
-1. `scripts` - 14 edges
-2. `iter_loan_rows()` - 14 edges
-3. `build()` - 13 edges
-4. `build_inventory()` - 13 edges
-5. `PipelineTests` - 13 edges
-6. `ConformanceError` - 11 edges
-7. `SourceResult` - 11 edges
-8. `PipelineError` - 11 edges
-9. `SourceBatch` - 11 edges
-10. `Data contract` - 11 edges
+1. `scripts` - 16 edges
+2. `build()` - 15 edges
+3. `BI Product Specification` - 15 edges
+4. `iter_loan_rows()` - 14 edges
+5. `build()` - 13 edges
+6. `build_inventory()` - 13 edges
+7. `PipelineTests` - 13 edges
+8. `ConformanceError` - 11 edges
+9. `SourceResult` - 11 edges
+10. `PipelineError` - 11 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `Evidence-Backed Investigation Decision` --semantically_similar_to--> `Definition of a Usable BI Product`  [INFERRED] [semantically similar]
+  CASE-STUDY.md → docs/BI_PRODUCT_SPEC.md
+- `Trust Change Driver Comparability Action Hierarchy` --semantically_similar_to--> `Trust-to-Investigation Workflow`  [INFERRED] [semantically similar]
+  DESIGN.md → docs/BI_PRODUCT_SPEC.md
+- `M5 Contract Status` --semantically_similar_to--> `Supported M5 Metric Engine`  [INFERRED] [semantically similar]
+  docs/metric-glossary.md → PROJECT.md
+- `Verified M5 Supported Metric Engine` --semantically_similar_to--> `Supported M5 Metric Engine`  [INFERRED] [semantically similar]
+  README.md → PROJECT.md
 - `build()` --indirect_call--> `connection()`  [INFERRED]
   scripts/m4_conformance.py → tests/test_m4_conformance.py
-- `load()` --indirect_call--> `connection()`  [INFERRED]
-  scripts/pipeline.py → tests/test_m4_conformance.py
-- `renderChart()` --indirect_call--> `money()`  [INFERRED]
-  app/app.js → app/analytics.js
-- `render()` --calls--> `monthLabel()`  [EXTRACTED]
-  app/app.js → app/analytics.js
-- `renderChart()` --calls--> `monthLabel()`  [EXTRACTED]
-  app/app.js → app/analytics.js
 
 ## Import Cycles
 - None detected.
 
-## Communities (37 total, 13 thin omitted)
+## Hyperedges (group relationships)
+- **M5 Acceptance Approval Gate** — _project_approvals_m5_external_approval_gates, _project_evaluation_m5_metric_gates, _project_handoff_m5_acceptance_blockers, _project_milestones_m5_industry_metric_engine, _project_state_m5_blocked_state [INFERRED 0.95]
+- **Trust-to-Investigation Product Flow** — design_trust_change_driver_comparability_action, docs_bi_product_spec_trust_to_investigation_workflow, app_index_investigation_workflow_ui, case_study_evidence_backed_investigation [INFERRED 0.95]
+- **Governed Analyst and Reviewer Release Boundary** — project_authorized_analyst_mode, project_reviewer_mode, docs_bi_product_spec_reviewer_aggregate_boundary, docs_data_dictionary_release_classification, docs_rules_industry_restricted_data_boundary [INFERRED 0.95]
+- **Certified Metric Governance** — docs_bi_product_spec_metric_contract_standard, docs_methodology_metric_governance_method, docs_metric_glossary_metric_glossary, docs_rules_category_certified_semantic_model [INFERRED 0.95]
 
-### Community 0 - "project_kit.py"
-Cohesion: 0.26
-Nodes (20): Namespace, bootstrap(), category_slug(), Charter, check(), copy_adapter(), field(), graph_sync() (+12 more)
+## Communities (31 total, 5 thin omitted)
 
-### Community 1 - "app.js"
-Cohesion: 0.27
-Nodes (16): deriveFindings(), latestMix(), money(), monthLabel(), percentChange(), validatePayload(), appendFinding(), dashboard (+8 more)
-
-### Community 2 - "scripts"
-Cohesion: 0.10
-Nodes (19): description, name, private, scripts, check, inventory:sources, load:m4, load:raw (+11 more)
-
-### Community 3 - "pipeline.py"
+### Community 0 - "Issuance Pipeline"
 Cohesion: 0.13
-Nodes (34): Exception, Row, build_id(), build_mix(), deduplicate(), ExcludedRow, identify_official_schema(), insert_batch() (+26 more)
+Nodes (34): Exception, build_id(), build_mix(), deduplicate(), ExcludedRow, identify_official_schema(), insert_batch(), load() (+26 more)
 
-### Community 4 - "Handoff"
-Cohesion: 0.33
-Nodes (5): External blockers, Handoff, M5 implementation order, Outcome, Recovery commands
+### Community 1 - "M5 Metric Engine"
+Cohesion: 0.14
+Nodes (33): add_top_n_components(), adjacent_month(), build(), build_candidate_metrics(), build_issuance_metrics(), build_security_metrics(), build_trust_metrics(), catalog_sha256() (+25 more)
 
-### Community 5 - "validate_dashboard.mjs"
-Cohesion: 0.29
-Nodes (3): monthlyMix, months, payload
-
-### Community 6 - "PipelineTests"
-Cohesion: 0.26
-Nodes (4): official_row(), PipelineTests, schema_for(), write_official_zip()
-
-### Community 11 - "m4_conformance.py"
+### Community 2 - "M4 Conformance"
 Cohesion: 0.18
 Nodes (34): build(), cell(), classify_join(), ConformanceError, create_manifest(), field_positions(), finalize_manifest(), insert_batches() (+26 more)
 
-### Community 13 - "Delivery sequence"
-Cohesion: 0.11
-Nodes (18): BI product principles, Critical design decisions for M4/M5, Current evidence, Delivery sequence, End-to-end product refinement plan, M10 — optional cited assistant, M11 — private cloud release candidate, M12 — reviewer publication (+10 more)
-
-### Community 14 - "source_inventory.py"
+### Community 3 - "Source Inventory"
 Cohesion: 0.21
 Nodes (26): build_inventory(), contract_signature(), expected_periods(), extract_report_period(), inspect_text_member(), inspect_zip(), InventoryError, load_contract() (+18 more)
 
-### Community 15 - "Freddie Mac MBS Disclosure Intelligence — BI product specification"
-Cohesion: 0.10
-Nodes (20): Authoritative references, Credit, collateral, mission, and concentration, Credit, delinquency, and loss mitigation, Decision workflow and information architecture, Definition of usable, Dimensions, Facts, Freddie Mac MBS Disclosure Intelligence — BI product specification (+12 more)
+### Community 4 - "Package Scripts"
+Cohesion: 0.09
+Nodes (21): description, name, private, scripts, check, inventory:sources, load:m4, load:m5 (+13 more)
 
-### Community 16 - "SourceInventoryTests"
+### Community 5 - "Project Delivery"
+Cohesion: 0.26
+Nodes (20): Namespace, bootstrap(), category_slug(), Charter, check(), copy_adapter(), field(), graph_sync() (+12 more)
+
+### Community 6 - "Dashboard Analytics"
+Cohesion: 0.27
+Nodes (16): deriveFindings(), latestMix(), money(), monthLabel(), percentChange(), validatePayload(), appendFinding(), dashboard (+8 more)
+
+### Community 7 - "Issuance Tests"
+Cohesion: 0.26
+Nodes (4): official_row(), PipelineTests, schema_for(), write_official_zip()
+
+### Community 8 - "Metric Methodology"
+Cohesion: 0.14
+Nodes (15): Aggregate-Only Reproducibility Boundary, Bounded-Memory M5 Component Engine, Fail-Closed Issuance Pipeline, M4 Source Contract Method, Methodology, Metric Governance Method, Classic FICO and VS4 Separation, External-Only Metric Family (+7 more)
+
+### Community 9 - "Inventory Tests"
 Cohesion: 0.28
 Nodes (5): approved_contract(), header_sha256(), pending_contract(), SourceInventoryTests, write_zip()
 
-### Community 17 - "Data contract"
-Cohesion: 0.17
-Nodes (11): Approved issuance-mix taxonomy, Current field allowlist, Current source family, Data contract, Grain and business key, M4 implemented contract, Observed loan-level candidates, Observed M4 candidates (+3 more)
+### Community 10 - "Project Governance"
+Cohesion: 0.14
+Nodes (14): Project Instructions, M5 External Approval Gates, Architecture Decision, Verified M4 Conformance, Verified M5 Supported Engine, M4 Implemented Contract, M5 Derived Metric Boundary, M5 Acceptance Blockers (+6 more)
 
-### Community 18 - "Evaluation contract"
-Cohesion: 0.18
-Nodes (10): Cloud/release gates, Evaluation contract, M10 optional AI gates, M4 source and conformance gates, M5 metric gates, M6 semantic-model gates, M7–M8 stakeholder and UX gates, M8–M9 governance/API gates (+2 more)
-
-### Community 19 - "Metric glossary"
-Cohesion: 0.20
-Nodes (9): Change and comparison rules, Composition and concentration metrics, Credit and servicing metrics, Current verified results, External-only metric family, Issuance and balance metrics, Metric glossary, Prepayment metrics (+1 more)
-
-### Community 20 - "Freddie Mac MBS Disclosure Intelligence"
-Cohesion: 0.29
-Nodes (6): Boundaries, Decision value, Freddie Mac MBS Disclosure Intelligence, Problem, Product expansion, Verified result
-
-### Community 21 - "Deployment decision record"
-Cohesion: 0.40
-Nodes (4): Current state, Deployment decision record, Deployment gates, Local workflow
-
-### Community 22 - "Data dictionary"
-Cohesion: 0.17
-Nodes (11): Classification, Conformed dimensions, Data dictionary, Implemented restricted tables, M4 implemented and downstream target facts, M4 restricted control and facts, `monthly_security`, Public aggregate payload currently implemented (+3 more)
-
-### Community 23 - "M4 monthly security and loan data intake"
-Cohesion: 0.18
-Nodes (10): 2025 backfill, 2026 backfill and consolidation, Adjacent source-family roadmap, M4 monthly security and loan data intake, Machine-enforced contract, No-go rules, Owner approval checklist, Verified acquisition progress (+2 more)
-
-### Community 25 - "Project delivery rules"
-Cohesion: 0.50
-Nodes (3): Project delivery rules, Read first, Rules
-
-### Community 26 - "main"
-Cohesion: 0.83
-Nodes (3): main(), Path, verify_payload()
-
-### Community 28 - "User-facing design rules"
-Cohesion: 0.22
-Nodes (8): Accessibility and polish, Audience and outcome, Governance, Information hierarchy, Interaction, Language and interpretation, User-facing design rules, Visual selection
-
-### Community 35 - "test_m4_conformance.py"
+### Community 11 - "M4 Tests"
 Cohesion: 0.25
 Nodes (6): add_manifest(), add_security(), connection(), fixture_contract(), M4ConformanceTests, write_zip()
 
-### Community 37 - "verify_m4_safety.py"
+### Community 12 - "Dashboard Interface"
+Cohesion: 0.20
+Nodes (12): Investigation Workflow UI, Issuance Dashboard Shell, Issuance Trend UI, Monthly Evidence UI, Release Health UI, Term-Family Mix UI, Accessible Evidence Drill-Through, Certified Semantic Model Only (+4 more)
+
+### Community 13 - "Deployment and BI"
+Cohesion: 0.20
+Nodes (11): Deployment Approval Gates, Deployment Decision Record, GitHub Actions Verification Path, Local Static Dashboard Workflow, Power BI Local Import Model, Power BI Star Schema, Conformed Dimensions, Business Intelligence Delivery Rules (+3 more)
+
+### Community 14 - "M5 Tests"
+Cohesion: 0.29
+Nodes (4): add_m4_manifest(), loan_row(), M5MetricEngineTests, write_partition()
+
+### Community 15 - "Product Modes"
+Cohesion: 0.25
+Nodes (9): First Unblocked Milestone Rule, Project Delivery Adapter, Isolated Analyst and Reviewer Modes, Explicit Reviewer Aggregate Boundary, Public Aggregate Payload, Authorized Analyst Mode, Descriptive Operational Analytics Boundary, Freddie Mac MBS Disclosure Intelligence Project Charter (+1 more)
+
+### Community 16 - "Product Specification"
+Cohesion: 0.22
+Nodes (9): BI Product Specification, Freddie Mac Daily Prepayment Report, Freddie Mac Single-Family Disclosure Guide v6.2, Metric Contract Standard, As Reported and Latest Known Views, Microsoft Power BI Accessibility Guidance, Microsoft Power BI Star-Schema Guidance, Original and Latest Security-Period Facts (+1 more)
+
+### Community 17 - "Data Model"
+Cohesion: 0.22
+Nodes (9): Data Dictionary, Fact Loan Period, M5 Restricted Metric Store, Monthly Security Table, Native-Grain Supplemental Separation, Quality Issue Table, Release Data Classification, Source Manifest (+1 more)
+
+### Community 18 - "M5 Verification"
+Cohesion: 0.33
+Nodes (8): main(), Connection, Path, ValueError, M5 metric evidence failed., scalar(), VerificationError, verify()
+
+### Community 19 - "Dashboard Validation"
+Cohesion: 0.29
+Nodes (3): monthlyMix, months, payload
+
+### Community 20 - "Case Study"
+Cohesion: 0.33
+Nodes (6): Evidence-Backed Investigation Decision, Freddie Mac MBS Disclosure Intelligence Case Study, Issuance-Only Reviewer Release Boundary, Trust Before Analysis, Verified Issuance Product, Definition of a Usable BI Product
+
+### Community 21 - "M5 Documentation"
+Cohesion: 0.33
+Nodes (6): M5 Contract Status, Supported M5 Metric Engine, Freddie Mac MBS Disclosure Intelligence README, Local Verification Path, Verified M4 Conformance, Verified M5 Supported Metric Engine
+
+### Community 22 - "Data Safety"
 Cohesion: 0.60
 Nodes (4): main(), Path, sampled_restricted_tokens(), tracked_files()
 
+### Community 23 - "Milestone Handoff"
+Cohesion: 0.50
+Nodes (4): Approval-Gated M5 Continuation, M5 Evidence Snapshot, M6 Start Gate, Next-Chat Kickoff Prompt
+
+### Community 24 - "Static Smoke Test"
+Cohesion: 0.83
+Nodes (3): main(), Path, verify_payload()
+
+### Community 25 - "Semantic Model Roadmap"
+Cohesion: 0.67
+Nodes (3): Power BI Semantic Model, M5 Industry Metric Engine, M6 Governed Power BI Semantic Model
+
 ## Knowledge Gaps
-- **138 isolated node(s):** `statusPanel`, `dashboard`, `retryButton`, `name`, `version` (+133 more)
+- **61 isolated node(s):** `statusPanel`, `dashboard`, `retryButton`, `name`, `version` (+56 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **13 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **5 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
+- **Why does `BI Product Specification` connect `Product Specification` to `Metric Methodology`, `Dashboard Interface`, `Deployment and BI`, `Product Modes`, `Case Study`, `M5 Documentation`?**
+  _High betweenness centrality (0.029) - this node is a cross-community bridge._
 - **What connects `statusPanel`, `dashboard`, `retryButton` to the rest of the system?**
-  _138 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `scripts` be split into smaller, more focused modules?**
-  _Cohesion score 0.1 - nodes in this community are weakly interconnected._
-- **Should `pipeline.py` be split into smaller, more focused modules?**
+  _61 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `Issuance Pipeline` be split into smaller, more focused modules?**
   _Cohesion score 0.13090418353576247 - nodes in this community are weakly interconnected._
-- **Should `Delivery sequence` be split into smaller, more focused modules?**
-  _Cohesion score 0.10526315789473684 - nodes in this community are weakly interconnected._
-- **Should `Freddie Mac MBS Disclosure Intelligence — BI product specification` be split into smaller, more focused modules?**
-  _Cohesion score 0.09523809523809523 - nodes in this community are weakly interconnected._
+- **Should `M5 Metric Engine` be split into smaller, more focused modules?**
+  _Cohesion score 0.13630229419703105 - nodes in this community are weakly interconnected._
+- **Should `Package Scripts` be split into smaller, more focused modules?**
+  _Cohesion score 0.09090909090909091 - nodes in this community are weakly interconnected._
+- **Should `Metric Methodology` be split into smaller, more focused modules?**
+  _Cohesion score 0.14285714285714285 - nodes in this community are weakly interconnected._
+- **Should `Project Governance` be split into smaller, more focused modules?**
+  _Cohesion score 0.14285714285714285 - nodes in this community are weakly interconnected._

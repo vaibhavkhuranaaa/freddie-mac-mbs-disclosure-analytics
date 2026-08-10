@@ -6,7 +6,9 @@ flowchart LR
   F[71 monthly security archives] --> G[Approved M4 contracts and cached validation]
   H[35 monthly loan archives] --> G
   G --> I[Restricted SQLite security facts and compressed loan partitions]
-  I --> J[M5 versioned metric engine]
+  I --> J[M5 supported metric engine]
+  J --> S[Pending field and methodology approvals]
+  S --> J
   J --> K[M6 certified Power BI semantic model]
   K --> L[M7-M8 authorized BI decision product]
   J --> M[Explicit reviewer allowlist]

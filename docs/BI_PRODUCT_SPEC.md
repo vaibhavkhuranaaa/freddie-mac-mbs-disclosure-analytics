@@ -2,6 +2,8 @@
 
 Status: implementation-ready product contract
 
+Implementation note: the restricted M5 engine currently implements all 23 contracts supported by approved fields. Seventeen methodology-gated, eleven field-extension, and three external contracts remain unreleased; M6 has not begun.
+
 Prepared: 2026-08-10
 
 Audience: disclosure operations, MBS analytics leadership, data governance, and portfolio reviewers
