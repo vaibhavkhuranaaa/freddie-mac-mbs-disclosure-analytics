@@ -41,11 +41,14 @@ Current M3 implementation evidence:
 
 ## M4–M6 analytical and product targets
 
+- The M4 intake readiness gate must remain blocked while the source contract is pending, emit no disclosure row values, recognize the 19 governed issuance archives, and reject missing required families or unapproved schema fingerprints.
 - Cross-source joins quantify matched, unmatched, duplicate, corrected, and late records by period.
 - Every measure records definition, formula, timing, denominator, unit, desired direction, evidence, supported decision, and limitation.
 - Security, cohort, portfolio, API, and dashboard totals reconcile exactly on golden fixtures.
 - Public and authorized analyst access boundaries pass negative authorization tests.
 - A 10x-data performance test establishes scale triggers before a managed analytical database is introduced.
+
+Current readiness evidence: six source-inventory tests cover the pending-contract blocker, row-value non-disclosure, exact approved archive/member/schema matching, unapproved-schema failure, required governance fields, and the command's fail-closed exit status. The actual restricted inventory reports 19 governed issuance archives, zero approved M4 archives, and blocked readiness.
 
 ## M7 AI targets
 

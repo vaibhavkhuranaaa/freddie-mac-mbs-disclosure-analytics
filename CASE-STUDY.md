@@ -1,6 +1,6 @@
 # Freddie Mac MBS Disclosure Intelligence
 
-Status: draft — issuance trust foundation implemented; later analytical and release milestones pending
+Status: draft — issuance decision workflow implemented; later analytical and release milestones pending
 
 ## Problem
 
@@ -21,6 +21,7 @@ The authorized local workflow validates official Freddie Mac issuance ZIP names,
 - Aggregate-only dashboard payload with build, schema, period, and quality metadata.
 - Verified source revision `b0a4cf876448` and deterministic build `7c0f195305e1...`.
 - Issuance decision workflow revision `c72602c3febd` and mix-enabled build `5c6977cfad48...`.
+- A fail-closed M4 intake gate recognizes the 19 governed issuance archives, emits no disclosure row values, and reports zero approved factor/supplemental archives while the contract is pending.
 
 ## Analyst use
 
@@ -28,4 +29,4 @@ The product supports release validation and descriptive issuance/composition mon
 
 ## Limitations
 
-The implemented data is issuance-only. It does not yet support longitudinal balance runoff, paydown, prepayment, disclosure timeliness, valuation, trading, hedging, or borrower decisions. Monthly factor and supplemental sources require separate acquisition and approval. The application is local and has not been deployed or published.
+The implemented data is issuance-only. It does not yet support longitudinal balance runoff, paydown, prepayment, disclosure timeliness, valuation, trading, hedging, or borrower decisions. Monthly factor and supplemental integration is prepared but still requires separate acquisition and approval. The application is local and has not been deployed or published.

@@ -83,4 +83,6 @@ The taxonomy groups official term-related prefixes for composition monitoring; i
 
 ## New-source gate
 
-Before M4 begins, every factor or supplemental source must record provenance, license/demo rights, grain, timing, correction behavior, keys, field allowlist, sensitivity, retention, and public aggregation rules.
+Before M4 integration begins, every factor or supplemental source must record provenance, license/demo rights, grain, timing, correction behavior, keys, field allowlist, sensitivity, retention, and public aggregation rules. `.project/m4-source-contract.json` is the machine-readable approval boundary, and `.project/m4-data-intake.md` records the verified official candidates and owner checklist. The current contract is pending and defines no approved M4 source family.
+
+`scripts/source_inventory.py` may inspect archive checksums, sizes, member names, encryption flags, physical row counts, column counts, and ordered-header fingerprints. It must not emit disclosure row values. A discovered file remains an unapproved candidate unless it matches an approved family, member convention, schema fingerprint, schema validity period, and required-family contract.

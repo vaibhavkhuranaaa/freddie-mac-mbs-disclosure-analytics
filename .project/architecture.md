@@ -40,6 +40,10 @@ The verified build processes 60,604 physical rows from 19 files. It publishes 59
 | Static HTML/CSS/JS | Fast, low-cost reviewer mode with no server data exposure | Analyst drill-down and saved investigations require an authenticated API |
 | Aggregate JSON | Deterministic public/reviewer boundary | Larger segment payloads or governed queries require a versioned semantic API |
 
+## M4 intake boundary
+
+The local source inventory now sits before any new-source parser. It hashes archives, inspects member metadata and ordered headers, and counts physical rows without emitting disclosure row values. Filename/member discovery is not authorization: a candidate becomes an approved M4 source only when `.project/m4-source-contract.json` records rights, retention, exact patterns, schema fingerprints and validity periods, fields, measures, and join behavior. Missing approval, a missing required family, an unknown schema, or an invalid package keeps readiness blocked.
+
 ## Approved logical target
 
 ```text
@@ -70,4 +74,4 @@ The platform, region, services, tiers, cost ceiling, identity, retention, backup
 
 ## Public claims
 
-Current claims are limited to authorized local issuance ingestion, exact schema/period validation, reconciled quality/provenance, monthly aggregates, automated verification, and the static local dashboard. Issuance mix, factor/runoff/prepayment, authenticated APIs, AI, cloud, and hosted release remain planned until their milestone evidence exists.
+Current claims are limited to authorized local issuance ingestion, exact schema/period validation, reconciled quality/provenance, monthly aggregates and issuance mix, automated verification, the static local dashboard, and the fail-closed M4 intake gate. Factor/runoff/prepayment, authenticated APIs, AI, cloud, and hosted release remain planned until their milestone evidence exists.

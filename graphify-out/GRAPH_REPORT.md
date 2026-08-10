@@ -1,16 +1,16 @@
 # Graph Report - freddie-mac-mbs-disclosure-analytics  (2026-08-09)
 
 ## Corpus Check
-- 34 files · ~21,690 words
+- 38 files · ~24,786 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 240 nodes · 360 edges · 29 communities (16 shown, 13 thin omitted)
-- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 11 edges (avg confidence: 0.68)
+- 279 nodes · 437 edges · 33 communities (20 shown, 13 thin omitted)
+- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 7 edges (avg confidence: 0.61)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `c72602c3`
+- Built from commit: `29db1f0c`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -28,13 +28,17 @@
 - Issuance Monitoring Methodology
 - Next Chat Continuation Prompt
 - Verified Project Evidence
+- End-to-end product refinement plan
+- source_inventory.py
 - 6. Milestone-by-milestone delivery plan
+- test_source_inventory.py
 - Data contract
 - Evaluation contract
 - Metric glossary
 - Freddie Mac MBS Disclosure Intelligence
 - Deployment decision record
 - Restricted local tables
+- M4 factor and supplemental data intake
 - Project delivery rules
 - main
 - CLAUDE.md
@@ -48,14 +52,14 @@
 ## God Nodes (most connected - your core abstractions)
 1. `PipelineTests` - 13 edges
 2. `6. Milestone-by-milestone delivery plan` - 12 edges
-3. `PipelineError` - 11 edges
-4. `SourceBatch` - 11 edges
-5. `scripts` - 10 edges
-6. `bootstrap()` - 10 edges
-7. `End-to-end product refinement plan` - 10 edges
-8. `render()` - 9 edges
-9. `parse_official_zip()` - 9 edges
-10. `load()` - 9 edges
+3. `scripts` - 11 edges
+4. `PipelineError` - 11 edges
+5. `SourceBatch` - 11 edges
+6. `End-to-end product refinement plan` - 10 edges
+7. `render()` - 9 edges
+8. `parse_official_zip()` - 9 edges
+9. `load()` - 9 edges
+10. `bootstrap()` - 9 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Hiring Manager Review and Remediation Plan` --semantically_similar_to--> `M2 Source Quality and Provenance`  [INFERRED] [semantically similar]
@@ -72,11 +76,11 @@
 ## Import Cycles
 - None detected.
 
-## Communities (29 total, 13 thin omitted)
+## Communities (33 total, 13 thin omitted)
 
 ### Community 0 - "project_kit.py"
-Cohesion: 0.27
-Nodes (20): Namespace, bootstrap(), category_slug(), Charter, check(), copy_adapter(), field(), graph_sync() (+12 more)
+Cohesion: 0.28
+Nodes (19): Namespace, bootstrap(), category_slug(), Charter, check(), copy_adapter(), field(), graph_sync() (+11 more)
 
 ### Community 1 - "app.js"
 Cohesion: 0.27
@@ -84,11 +88,11 @@ Nodes (16): deriveFindings(), latestMix(), money(), monthLabel(), percentChange(
 
 ### Community 2 - "scripts"
 Cohesion: 0.12
-Nodes (15): description, name, private, scripts, check, load:raw, load:sample, serve (+7 more)
+Nodes (16): description, name, private, scripts, check, inventory:sources, load:raw, load:sample (+8 more)
 
 ### Community 3 - "pipeline.py"
-Cohesion: 0.14
-Nodes (33): Connection, Exception, Row, build_id(), build_mix(), deduplicate(), ExcludedRow, identify_official_schema() (+25 more)
+Cohesion: 0.13
+Nodes (34): Connection, Exception, Row, build_id(), build_mix(), deduplicate(), ExcludedRow, identify_official_schema() (+26 more)
 
 ### Community 4 - "Handoff"
 Cohesion: 0.22
@@ -102,9 +106,21 @@ Nodes (3): monthlyMix, months, payload
 Cohesion: 0.26
 Nodes (4): official_row(), PipelineTests, schema_for(), write_official_zip()
 
-### Community 13 - "6. Milestone-by-milestone delivery plan"
-Cohesion: 0.06
-Nodes (33): 1. Product goal, 2. Current-state evaluation, 3. Target product capabilities, 4. Recommended target architecture, 5. AI architecture and safety contract, 6. Milestone-by-milestone delivery plan, 7. Cross-milestone evaluation gates, 8. Key risks and treatments (+25 more)
+### Community 13 - "End-to-end product refinement plan"
+Cohesion: 0.09
+Nodes (21): 1. Product goal, 2. Current-state evaluation, 3. Target product capabilities, 4. Recommended target architecture, 5. AI architecture and safety contract, 7. Cross-milestone evaluation gates, 8. Key risks and treatments, 9. Approval decision (+13 more)
+
+### Community 14 - "source_inventory.py"
+Cohesion: 0.26
+Nodes (19): Any, build_inventory(), extract_report_period(), inspect_text_member(), inspect_zip(), InventoryError, load_contract(), main() (+11 more)
+
+### Community 15 - "6. Milestone-by-milestone delivery plan"
+Cohesion: 0.17
+Nodes (12): 6. Milestone-by-milestone delivery plan, M0 — Verified real-data baseline, M10 — Public reviewer release and portfolio publication, M1 — Non-destructive verification, M2 — Trust foundation: repository, data contract, quality, and provenance, M3 — Complete the issuance decision workflow, M4 — Integrate monthly factor and approved supplemental sources, M5 — Implement factor, balance, runoff, and prepayment analytics (+4 more)
+
+### Community 16 - "test_source_inventory.py"
+Cohesion: 0.30
+Nodes (5): approved_contract(), header_sha256(), pending_contract(), SourceInventoryTests, write_zip()
 
 ### Community 17 - "Data contract"
 Cohesion: 0.20
@@ -130,6 +146,10 @@ Nodes (6): Current state, Deployment decision record, Deployment-ready work, Hos
 Cohesion: 0.29
 Nodes (6): Data dictionary, `monthly_security`, Public aggregate payload, `quality_issue`, Restricted local tables, `source_manifest`
 
+### Community 23 - "M4 factor and supplemental data intake"
+Cohesion: 0.33
+Nodes (5): M4 factor and supplemental data intake, Machine-enforced contract, No-go rules, Owner approval checklist, Verified official source candidates and transition
+
 ### Community 25 - "Project delivery rules"
 Cohesion: 0.50
 Nodes (3): Project delivery rules, Read first, Rules
@@ -139,20 +159,20 @@ Cohesion: 0.83
 Nodes (3): main(), Path, verify_payload()
 
 ## Knowledge Gaps
-- **103 isolated node(s):** `statusPanel`, `dashboard`, `retryButton`, `name`, `version` (+98 more)
+- **108 isolated node(s):** `statusPanel`, `dashboard`, `retryButton`, `name`, `version` (+103 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **13 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `PipelineError` connect `pipeline.py` to `project_kit.py`?**
-  _High betweenness centrality (0.042) - this node is a cross-community bridge._
+- **Why does `End-to-end product refinement plan` connect `End-to-end product refinement plan` to `6. Milestone-by-milestone delivery plan`?**
+  _High betweenness centrality (0.011) - this node is a cross-community bridge._
 - **What connects `statusPanel`, `dashboard`, `retryButton` to the rest of the system?**
-  _103 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _108 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `scripts` be split into smaller, more focused modules?**
-  _Cohesion score 0.125 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.11764705882352941 - nodes in this community are weakly interconnected._
 - **Should `pipeline.py` be split into smaller, more focused modules?**
-  _Cohesion score 0.13655761024182078 - nodes in this community are weakly interconnected._
-- **Should `6. Milestone-by-milestone delivery plan` be split into smaller, more focused modules?**
-  _Cohesion score 0.058823529411764705 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.13090418353576247 - nodes in this community are weakly interconnected._
+- **Should `End-to-end product refinement plan` be split into smaller, more focused modules?**
+  _Cohesion score 0.09090909090909091 - nodes in this community are weakly interconnected._

@@ -46,6 +46,7 @@ milestones:
   - id: M4
     title: Integrate monthly factor and approved supplemental sources
     status: blocked-pending-data-acquisition-and-contract-approval
+    readiness_evidence: [E-018]
     acceptance:
       - Authorized factor and supplemental sources have approved field allowlists, timing, keys, and demo rights.
       - Immutable manifests, schema versions, quarantine, and reconciliation cover each new source family.

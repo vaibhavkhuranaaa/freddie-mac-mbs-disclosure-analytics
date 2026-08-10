@@ -85,3 +85,8 @@ evidence:
     source: tests/test_pipeline.py; tests/test_analytics.mjs; scripts/validate_dashboard.mjs; Impeccable detector; local HTTP smoke
     status: verified
     verified_on: 2026-08-09
+  - id: E-018
+    claim: "Revision 29db1f055d32 adds a fail-closed M4 intake gate that inventories 19 governed issuance archives without emitting disclosure row values, reports zero approved M4 archives, and remains blocked until the source contract and required factor/supplemental files pass exact governance and schema checks."
+    source: scripts/source_inventory.py; tests/test_source_inventory.py; .project/m4-source-contract.json; .project/m4-data-intake.md
+    status: verified
+    verified_on: 2026-08-09

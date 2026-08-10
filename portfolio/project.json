@@ -4,6 +4,6 @@
   "title": "Freddie Mac MBS Issuance Monitoring",
   "status": "issuance-workflow",
   "summary": "Governed local Freddie Mac MBS issuance monitoring with exact schema control, reconciled quality/provenance, aggregate-only publication, and a static analyst dashboard.",
-  "scope": "Implemented: issuance measures, source-schema and period validation, documented exclusions, fail-closed quality, provenance, and aggregate publication. Planned: composition, factor/runoff/prepayment, governed analyst API, evaluated cited AI, cloud pilot, and public release.",
-  "evidence": ["E-001", "E-002", "E-003", "E-007", "E-008", "E-009", "E-010", "E-011", "E-012", "E-013", "E-014", "E-015", "E-016", "E-017"]
+  "scope": "Implemented: issuance measures and composition, source-schema and period validation, documented exclusions, fail-closed quality/provenance, aggregate publication, and a value-free M4 source-intake gate. Planned: factor/runoff/prepayment, governed analyst API, evaluated cited AI, cloud pilot, and public release.",
+  "evidence": ["E-001", "E-002", "E-003", "E-007", "E-008", "E-009", "E-010", "E-011", "E-012", "E-013", "E-014", "E-015", "E-016", "E-017", "E-018"]
 }

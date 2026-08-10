@@ -30,6 +30,7 @@ Where did issuance accelerate, cool, and change composition over the observed pe
 - Generates latest change, observed range, mix finding, and investigation prompts from the active payload rather than fixed months.
 - Provides resilient loading/error/retry states, year-aware chart labels and summaries, keyboard focus, forced-color support, and responsive evidence views.
 - Runs automated official-file, failure-path, idempotence, payload, non-destructive, and static-preview checks.
+- Inventories restricted source archives without logging disclosure row values and keeps M4 blocked until an approved source contract, exact schemas, and required factor/supplemental families are present.
 
 ## Verified baseline
 
@@ -43,7 +44,7 @@ Where did issuance accelerate, cool, and change composition over the observed pe
 
 - The implemented source set is issuance-only. Issuance-date factor and current UPB are not measures of subsequent runoff.
 - Mix is term-family monitoring only; 458 observations outside the approved UMBS mapping remain `Other / Unmapped prefix`.
-- Balance movement, paydown, CPR/prepayment, timeliness, and supplemental monitoring require separately approved monthly factor and supplemental files.
+- Balance movement, paydown, CPR/prepayment, timeliness, and supplemental monitoring require separately approved monthly factor and supplemental files; the machine-readable intake contract is still pending.
 - Authenticated analyst mode, AI, cloud infrastructure, deployment, and public publication are not implemented or authorized.
 - The product is descriptive operational analytics; it does not make borrower decisions or provide investment, valuation, hedging, or trading recommendations.
 
