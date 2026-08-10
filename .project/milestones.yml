@@ -21,8 +21,9 @@ milestones:
       - README documents a verified test, raw-load, and preview path.
   - id: M2
     title: Build the trust foundation
-    status: in-progress
+    status: completed
     approval: current_milestone
+    evidence: [E-010, E-011, E-012, E-013, E-014]
     acceptance:
       - Git revision lineage is initialized with raw source files ignored.
       - Data and evaluation contracts plus data dictionary and metric glossary exist.
@@ -34,7 +35,7 @@ milestones:
       - CI runs the same full check and static-preview smoke path used locally.
   - id: M3
     title: Complete the issuance decision workflow
-    status: pending-M2
+    status: next
     acceptance:
       - Findings and investigation prompts are derived from loaded data.
       - An approved Prefix-to-product taxonomy powers an issuance-mix view with explicit unknown handling.

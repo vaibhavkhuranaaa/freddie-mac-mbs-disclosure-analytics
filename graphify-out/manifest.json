@@ -5,8 +5,8 @@
     "semantic_hash": "fdef99cdca94a7fcf6005e6ae4f7a1cb"
   },
   "app/data/dashboard.json": {
-    "mtime": 1786326158.1248848,
-    "ast_hash": "49ef4199719b37e865ad79ccb16251ae",
+    "mtime": 1786326634.4915185,
+    "ast_hash": "8e426ce84b30388feaf3ce286e6ef61a",
     "semantic_hash": ""
   },
   "app/data/synthetic_monthly_aggregate.json": {
@@ -45,13 +45,13 @@
     "semantic_hash": ""
   },
   ".project/handoff.md": {
-    "mtime": 1786326558.6862235,
-    "ast_hash": "7c3ae85d4e2390539ca2a6eb811e816a",
+    "mtime": 1786326683.1490014,
+    "ast_hash": "550f7c470687490e175d35bfc78bbf99",
     "semantic_hash": ""
   },
   ".project/milestones.yml": {
-    "mtime": 1786326130.3565705,
-    "ast_hash": "9dd808c8e67768241c799dd5cc0762b4",
+    "mtime": 1786326682.624401,
+    "ast_hash": "21106244347089fb7666e6bc230b8da1",
     "semantic_hash": ""
   },
   "PROJECT.md": {
@@ -90,9 +90,9 @@
     "semantic_hash": ""
   },
   ".project/evidence.yml": {
-    "mtime": 1785903563.3911138,
-    "ast_hash": "f200f0aa152915580e5b55848005dba5",
-    "semantic_hash": "f200f0aa152915580e5b55848005dba5"
+    "mtime": 1786326682.536166,
+    "ast_hash": "34cb5717a90f02bdfd9894f447ffa755",
+    "semantic_hash": ""
   },
   "scripts/smoke_static.py": {
     "mtime": 1786326316.2170608,
@@ -110,8 +110,8 @@
     "semantic_hash": ""
   },
   ".project/approvals.yml": {
-    "mtime": 1786326130.1660385,
-    "ast_hash": "e5847d60630f060dc42f367c452f119c",
+    "mtime": 1786326682.7211978,
+    "ast_hash": "7ed51fe81421a5c1d27d48a8815efe9f",
     "semantic_hash": ""
   },
   ".project/data.md": {
@@ -135,8 +135,8 @@
     "semantic_hash": ""
   },
   ".project/state.md": {
-    "mtime": 1786326558.4046035,
-    "ast_hash": "d945b99fe4d2f9bbfd6a9ea18c88d7e3",
+    "mtime": 1786326682.94387,
+    "ast_hash": "863618240f16918afec56db33d8ba518",
     "semantic_hash": ""
   },
   "AGENTS.md": {
@@ -145,8 +145,8 @@
     "semantic_hash": ""
   },
   "CASE-STUDY.md": {
-    "mtime": 1786326130.9090118,
-    "ast_hash": "946ce6e39e747e3844615797ee750438",
+    "mtime": 1786326683.2404702,
+    "ast_hash": "f47877127cc848c1c95643e2392b2385",
     "semantic_hash": ""
   },
   "CLAUDE.md": {

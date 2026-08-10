@@ -1478,21 +1478,21 @@
       "norm_label": "current result"
     },
     {
-      "label": "Exact next action",
+      "label": "Exact next milestone",
       "file_type": "document",
       "source_file": ".project/handoff.md",
       "source_location": "L9",
       "_origin": "ast",
-      "id": "project_handoff_exact_next_action",
+      "id": "project_handoff_exact_next_milestone",
       "community": 4,
       "community_name": "Handoff",
-      "norm_label": "exact next action"
+      "norm_label": "exact next milestone"
     },
     {
       "label": "Guardrails",
       "file_type": "document",
       "source_file": ".project/handoff.md",
-      "source_location": "L16",
+      "source_location": "L20",
       "_origin": "ast",
       "id": "project_handoff_guardrails",
       "community": 4,
@@ -1503,7 +1503,7 @@
       "label": "Recovery commands",
       "file_type": "document",
       "source_file": ".project/handoff.md",
-      "source_location": "L23",
+      "source_location": "L27",
       "_origin": "ast",
       "id": "project_handoff_recovery_commands",
       "community": 4,
@@ -2031,7 +2031,7 @@
       "label": "Analyst use",
       "file_type": "document",
       "source_file": "CASE-STUDY.md",
-      "source_location": "L23",
+      "source_location": "L24",
       "_origin": "ast",
       "id": "case_study_analyst_use",
       "community": 20,
@@ -2042,7 +2042,7 @@
       "label": "Limitations",
       "file_type": "document",
       "source_file": "CASE-STUDY.md",
-      "source_location": "L27",
+      "source_location": "L28",
       "_origin": "ast",
       "id": "case_study_limitations",
       "community": 20,
@@ -5330,14 +5330,14 @@
       "weight": 1.0,
       "_origin": "ast",
       "source": "project_handoff_handoff",
-      "target": "project_handoff_exact_next_action",
+      "target": "project_handoff_exact_next_milestone",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": ".project/handoff.md",
-      "source_location": "L16",
+      "source_location": "L20",
       "weight": 1.0,
       "_origin": "ast",
       "source": "project_handoff_handoff",
@@ -5348,7 +5348,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": ".project/handoff.md",
-      "source_location": "L23",
+      "source_location": "L27",
       "weight": 1.0,
       "_origin": "ast",
       "source": "project_handoff_handoff",
@@ -5808,7 +5808,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "CASE-STUDY.md",
-      "source_location": "L23",
+      "source_location": "L24",
       "weight": 1.0,
       "_origin": "ast",
       "source": "case_study_freddie_mac_mbs_disclosure_intelligence",
@@ -5830,7 +5830,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "CASE-STUDY.md",
-      "source_location": "L27",
+      "source_location": "L28",
       "weight": 1.0,
       "_origin": "ast",
       "source": "case_study_freddie_mac_mbs_disclosure_intelligence",
@@ -6153,5 +6153,6 @@
       "target": "docs_hiring_manager_review_remediation_plan"
     }
   ],
-  "hyperedges": []
+  "hyperedges": [],
+  "built_at_commit": "b0a4cf8764487712c07027b84d6f3e8ca4ffe20b"
 }

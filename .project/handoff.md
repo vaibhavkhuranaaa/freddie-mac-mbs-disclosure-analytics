@@ -2,21 +2,25 @@
 
 ## Current result
 
-M2 implementation is complete and awaiting its source-control/evidence closure. The pipeline now enforces exact official schema fingerprints and period bounds, maintains a reconciled source manifest and quality ledger, documents status-`C` blank-balance exclusions, quarantines invalid/duplicate rows, and blocks publication on any error.
+M2 is complete. Pipeline revision `b0a4cf876448` enforces exact official schema fingerprints and period bounds, maintains a reconciled source manifest and quality ledger, documents status-`C` blank-balance exclusions, quarantines invalid/duplicate rows, and blocks publication on any error.
 
-The authorized rebuild reconciles 60,604 source rows into 59,904 accepted/published observations and 700 documented exclusions, with zero rejected and duplicate rows. The aggregate payload carries source period, generated time, pipeline revision, build ID, schema versions, and quality counts.
+Build `7c0f195305e1...` reconciles 60,604 source rows into 59,904 accepted/published observations and 700 documented exclusions, with zero rejected and duplicate rows. Twelve automated tests, the governed payload validator, the static preview smoke path, project-record checks, and Graphify health checks pass.
 
-## Exact next action
+## Exact next milestone
 
-1. Commit the M2 implementation with the configured human Git identity.
-2. Rebuild the authorized aggregate so `pipeline_revision` names the implementation commit.
-3. Record final M2 evidence, refresh Graphify/signature, run `npm run check`, and commit the verified evidence payload.
-4. Mark M2 complete and begin M3 from `.project/milestones.yml`.
+Complete **M3 — Complete the issuance decision workflow** from `.project/milestones.yml`.
+
+1. Replace fixed March/April findings with data-derived comparisons and investigation prompts.
+2. Remove the uninformative issuance-date factor view.
+3. Define and test a Prefix-to-product taxonomy with explicit `Unknown/Unmapped` coverage.
+4. Publish issuance-mix aggregates plus quality, freshness, methodology, and limitations.
+5. Implement loading, empty, partial, stale, and error states; year-aware chart labels and summaries; keyboard and responsive behavior.
+6. Apply Impeccable's incumbent-system refinement and run its detector once after UI edits.
 
 ## Guardrails
 
 - Raw ZIPs and local SQLite state remain ignored and restricted.
-- Current public claims remain issuance-only.
+- Current claims remain issuance-only; mix begins only after its taxonomy is documented and tested.
 - Factor, runoff, prepayment, AI, cloud, deployment, and publication remain gated.
 - Do not create a remote, push, provision, spend, deploy, or publish without the corresponding recorded approval.
 
@@ -27,5 +31,3 @@ npm run load:raw
 npm run check
 npm run serve
 ```
-
-Open `http://127.0.0.1:4173` after the checks for a local preview.

@@ -45,3 +45,28 @@ evidence:
     source: app/data/dashboard.json; local preview smoke test
     status: verified
     verified_on: 2026-08-04
+  - id: E-010
+    claim: "The pipeline recognizes exact ordered-header fingerprints for fre-is-legacy-v1 through 2025-11 and fre-is-fico-v2 beginning 2025-12, and blocks unrecognized or period-incompatible schemas."
+    source: scripts/pipeline.py; tests/test_pipeline.py
+    status: verified
+    verified_on: 2026-08-09
+  - id: E-011
+    claim: "Build 7c0f195305e1 reconciles 60,604 physical rows to 59,904 accepted/published observations and 700 documented status-C exclusions, with zero rejected and duplicate rows."
+    source: app/data/dashboard.json; local/mbs.sqlite
+    status: verified
+    verified_on: 2026-08-09
+  - id: E-012
+    claim: "Twelve automated tests, the governed aggregate validator, the static preview smoke path, and the project-record freshness check pass for pipeline revision b0a4cf876448."
+    source: tests/test_pipeline.py; scripts/validate_dashboard.mjs; scripts/smoke_static.py; .github/workflows/quality.yml
+    status: verified
+    verified_on: 2026-08-09
+  - id: E-013
+    claim: "A local Git repository on main records the M2 implementation under configured human identity at revision b0a4cf876448; raw ZIPs and local SQLite artifacts are ignored."
+    source: .git; .gitignore
+    status: verified
+    verified_on: 2026-08-09
+  - id: E-014
+    claim: "Graphify was refreshed after the M2 source and record changes; the graph health diagnostic found no missing, dangling, self-loop, duplicate, or collapsed edges."
+    source: graphify-out/GRAPH_REPORT.md; graphify-out/graph.json; .project/graph-source.sha256
+    status: verified
+    verified_on: 2026-08-09
