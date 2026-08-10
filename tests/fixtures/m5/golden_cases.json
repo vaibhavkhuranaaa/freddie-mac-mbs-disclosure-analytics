@@ -43,6 +43,26 @@
     {"period": "2025-11", "allowed_nonmissing": ["legacy_credit_score"]},
     {"period": "2025-12", "allowed_nonmissing": ["classic_fico", "vs4"]}
   ],
+  "engine_expectations": {
+    "loan_rows": 4,
+    "active_loan_rows": 2,
+    "active_loan_upb": 30000,
+    "terminated_or_zero_balance_rows": 2,
+    "issuance_upb": 10000,
+    "original_security_factor": 0.99,
+    "latest_security_factor": 0.98,
+    "latest_involuntary_removal_upb": 700,
+    "latest_involuntary_removal_count": 2,
+    "schema_transition_flag": 1
+  },
+  "grain_cases": [
+    {"id":"security-original-latest-correction","grain":"security","expected_status":"supported"},
+    {"id":"loan-active-termination-low-zero","grain":"loan","expected_status":"supported"},
+    {"id":"cohort-speed-inputs","grain":"cohort","expected_status":"blocked-by-methodology-and-source-input"},
+    {"id":"origination-vintage","grain":"vintage","expected_status":"blocked-by-source-identification"},
+    {"id":"state-counterparty-score","grain":"segment","expected_status":"supported"},
+    {"id":"source-security-loan-total","grain":"portfolio","expected_status":"supported"}
+  ],
   "coverage_cases": [
     "original-latest-correction",
     "new-issuance",

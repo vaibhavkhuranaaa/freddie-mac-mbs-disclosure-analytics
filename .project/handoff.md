@@ -4,7 +4,7 @@
 
 M5 safe supported work is complete. The machine catalog contains 54 formula-version `m5.1.0` contracts: 23 supported/implemented, 17 methodology-gated, 11 field-contract extensions, and 3 external. No gated, extended, or external contract is released.
 
-The restricted local engine processed all 35 compressed loan partitions and 264,922,553 rows plus both 9,240,038-row security correction views. It emits 256,355 released components and 180 explicitly unreleased candidates. The independent verifier passes 564 segment and weighted-component parity checks. Measured peak RSS is 29,196,288 bytes. Full and unchanged incremental outputs share SHA-256 `7f83b73d126631fe16bfa13e205dec1d4bd2ec3c22c4efa21d21252543d5d6d3`.
+The restricted local engine processed all 35 compressed loan partitions and 264,922,553 rows plus both 9,240,038-row security correction views. It emits 256,461 released components and 240 explicitly unreleased candidates. The independent verifier passes 684 segment, weighted-component, and top-N/Other parity checks plus 240 candidate-formula checks. Measured peak RSS is 32,538,624 bytes. Full and unchanged incremental outputs share SHA-256 `54e128d0590f8e7c4ed1396c0d3626cb56b08390b670d10a5fbf184b15ed6341`.
 
 M5 acceptance is blocked by genuinely external owner/domain input. M6 has not started.
 
@@ -12,8 +12,8 @@ M5 acceptance is blocked by genuinely external owner/domain input. M6 has not st
 
 1. Approve, reject, or revise the exact proposed fields in `.project/m5-approval-request.json`. Until approval and exact guide code/null/range fixtures are recorded in versioned M4 contracts, the engine must not read those row values.
 2. Approve methodology gates by technical name and formula version. Ending-balance bridge, runoff/paydown, SMM/CPR, cohort speed, burnout, principal categories, PSA, involuntary-removal share, delinquency threshold/transition metrics, modification rate, composite quality/comparability, and HHI remain unreleased.
-3. Identify a provider-supported source/field for delinquent-loan purchases if that metric remains required.
-4. Cohort/vintage real-population reconciliation remains blocked until exact issue/origination fields are approved. Golden blocker fixtures already pass.
+3. Identify provider-supported source fields for loan origination/vintage timing and delinquent-loan purchases. Neither input was located in the approved current core/loan header contracts, so the approval request does not invent a field.
+4. Cohort/vintage real-population reconciliation remains blocked until the proposed security issue date is approved and an exact loan origination/vintage source is identified. Structured golden blocker fixtures pass without reading real unallowlisted values.
 
 Do not mark M5 complete or begin M6 until applicable approval entries change in `.project/approvals.yml` and every newly approved field/formula passes golden and real reconciliation.
 
@@ -34,8 +34,8 @@ Expected M5 result:
 
 - 54 catalog contracts; 23 released supported contracts.
 - 35 loan partitions; 264,922,553 loan rows; 9,240,038 security rows.
-- 564 parity checks.
-- Checksum `7f83b73d126631fe16bfa13e205dec1d4bd2ec3c22c4efa21d21252543d5d6d3`.
+- 684 released-component parity checks and 240 candidate-formula checks.
+- Checksum `54e128d0590f8e7c4ed1396c0d3626cb56b08390b670d10a5fbf184b15ed6341`.
 
 Restricted data remains ignored under `data/raw/` and `local/`. Reviewer/public redistribution, cloud, AI, paid services, deployment, and publication remain unapproved. The repository has no configured remote; GitHub authentication was invalid at last verification.
 

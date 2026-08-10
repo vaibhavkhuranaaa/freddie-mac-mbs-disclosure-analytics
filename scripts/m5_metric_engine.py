@@ -518,7 +518,13 @@ def build_trust_metrics(
     security_contract: dict[str, Any],
     loan_contract: dict[str, Any],
 ) -> None:
+    schema_history: dict[str, dict[str, set[str]]] = defaultdict(
+        lambda: defaultdict(set)
+    )
     for row in m4.execute("SELECT * FROM source_manifest ORDER BY report_period, source_family"):
+        schema_history[row["source_family"]][row["report_period"]].add(
+            row["schema_version"]
+        )
         for component in (
             "input_count", "accepted_count", "excluded_count", "rejected_count",
             "duplicate_count", "quarantined_count", "published_count",
@@ -539,6 +545,21 @@ def build_trust_metrics(
             "latest", "source", "source_family", row["source_family"],
             int(row["quality_status"] == "pass"), 1, 1,
         )
+    for family, history in schema_history.items():
+        prior_period = None
+        prior_versions = None
+        for period, versions in sorted(history.items()):
+            changed = int(
+                prior_period is not None
+                and adjacent_month(prior_period, period)
+                and versions != prior_versions
+            )
+            emit_metric(
+                output, "schema_transition_status", "schema_transition_flag",
+                period, "latest", "source", "source_family", family,
+                changed, 1, len(versions),
+            )
+            prior_period, prior_versions = period, versions
     for row in issuance.execute("SELECT * FROM source_manifest ORDER BY report_period"):
         for component in (
             "input_count", "accepted_count", "excluded_count", "rejected_count",
@@ -737,27 +758,29 @@ def build_candidate_metrics(connection: sqlite3.Connection) -> None:
         """
         SELECT DISTINCT report_period, dimension FROM metric_component
         WHERE contract_id IN ('state_composition','counterparty_composition')
-          AND component LIKE '%_upb'
-        """
+          AND dimension IN ('state','seller','servicer')
+    """
     ):
-        values = [
-            int(row[0]) for row in connection.execute(
-                """
-                SELECT numerator FROM metric_component
-                WHERE report_period=? AND dimension=?
-                  AND contract_id IN ('state_composition','counterparty_composition')
-                  AND component=?
-                """,
-                (period, dimension, f"{dimension}_upb"),
-            )
-        ]
-        candidate = hhi(values)
-        if candidate is not None:
-            emit_metric(
-                connection, "hhi_concentration", f"{dimension}_upb_hhi", period,
-                "latest", "loan-period", dimension, "All", 0, None, len(values),
-                released=False, value=format(candidate, ".15g"),
-            )
+        for basis in ("count", "upb"):
+            values = [
+                int(row[0]) for row in connection.execute(
+                    """
+                    SELECT numerator FROM metric_component
+                    WHERE report_period=? AND dimension=?
+                      AND contract_id IN ('state_composition','counterparty_composition')
+                      AND component=?
+                    """,
+                    (period, dimension, f"{dimension}_{basis}"),
+                )
+            ]
+            candidate = hhi(values)
+            if candidate is not None:
+                emit_metric(
+                    connection, "hhi_concentration",
+                    f"{dimension}_{basis}_hhi", period,
+                    "latest", "loan-period", dimension, "All", 0, None,
+                    len(values), released=False, value=format(candidate, ".15g"),
+                )
     thresholds = {"30_plus": {"30-59", "60-89", "90+"}, "60_plus": {"60-89", "90+"}, "90_plus": {"90+"}}
     periods = [row[0] for row in connection.execute(
         "SELECT DISTINCT report_period FROM metric_component WHERE contract_id='delinquency_distribution'"

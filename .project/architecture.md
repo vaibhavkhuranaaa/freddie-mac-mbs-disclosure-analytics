@@ -46,7 +46,7 @@ M4 SQLite security facts + compressed loan partitions + governed issuance facts
   -> restricted local SQLite metric store
 ```
 
-All 23 currently supported contracts are implemented. The engine scans 264,922,553 loan rows and both 9,240,038-row security correction views with 29,196,288 bytes measured peak RSS. It emits 256,355 released components and 180 explicitly unreleased candidates. Full and unchanged incremental runs share checksum `7f83b73d126631fe16bfa13e205dec1d4bd2ec3c22c4efa21d21252543d5d6d3`; 564 segment and weighted-component parity checks pass.
+All 23 currently supported contracts are implemented. The engine scans 264,922,553 loan rows and both 9,240,038-row security correction views with 32,538,624 bytes measured peak RSS. It emits 256,461 released components and 240 explicitly unreleased candidates. Full and unchanged incremental runs share checksum `54e128d0590f8e7c4ed1396c0d3626cb56b08390b670d10a5fbf184b15ed6341`; 684 segment and weighted-component parity checks pass.
 
 ## Target logical architecture
 

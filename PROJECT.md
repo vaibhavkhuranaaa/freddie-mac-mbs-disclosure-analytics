@@ -32,7 +32,7 @@ Help a stakeholder decide whether a disclosure release is trustworthy, what chan
 - Loading/error/retry, year-aware descriptions, keyboard focus, forced colors, responsive layout, automated tests, and static smoke verification.
 - Value-free inventory of the acquired monthly-security and loan-level source population.
 - Versioned 54-measure M5 catalog: 23 supported and implemented, 17 methodology-gated, 11 field-contract extensions, and 3 external families.
-- Streaming M5 components across all 264,922,553 loan-period and 9,240,038 security-period facts with 29.2 MB measured peak RSS, 564 parity checks, and idempotent checksum evidence.
+- Streaming M5 components across all 264,922,553 loan-period and 9,240,038 security-period facts with 32.5 MB measured peak RSS, 684 parity checks, and idempotent checksum evidence.
 
 ## Target decision product
 

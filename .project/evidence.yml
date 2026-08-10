@@ -136,12 +136,12 @@ evidence:
     status: verified
     verified_on: 2026-08-10
   - id: E-033
-    claim: "The streaming M5 engine implements all 23 supported contracts over all 35 loan partitions and both security correction views, producing 256,355 released components and 180 explicitly unreleased candidates with measured peak RSS of 29,196,288 bytes."
+    claim: "The streaming M5 engine implements all 23 supported contracts over all 35 loan partitions and both security correction views, producing 256,461 released components and 240 explicitly unreleased candidates with measured peak RSS of 32,538,624 bytes."
     source: local/m5-metrics.sqlite; scripts/m5_metric_engine.py
     status: verified-local-restricted
     verified_on: 2026-08-10
   - id: E-034
-    claim: "All 264,922,553 loan rows and 9,240,038 security rows reconcile; 564 segment/weighted parity checks pass; full and unchanged incremental outputs share SHA-256 7f83b73d126631fe16bfa13e205dec1d4bd2ec3c22c4efa21d21252543d5d6d3; no gated metric is released."
+    claim: "All 264,922,553 loan rows and 9,240,038 security rows reconcile; 684 segment/weighted/top-N parity checks and 240 unreleased candidate-formula checks pass; full and unchanged incremental outputs share SHA-256 54e128d0590f8e7c4ed1396c0d3626cb56b08390b670d10a5fbf184b15ed6341; no gated metric is released."
     source: scripts/verify_m5_metrics.py; tests/fixtures/m5/golden_cases.json; local/m5-metrics.sqlite
     status: verified
     verified_on: 2026-08-10

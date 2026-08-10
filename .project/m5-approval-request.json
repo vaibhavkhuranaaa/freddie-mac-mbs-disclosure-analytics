@@ -74,11 +74,25 @@
       "key_and_timing": "Immutable archive checksum plus acquisition event; never substitute publication-derived as_of_timestamp."
     }
   ],
+  "unlocated_required_inputs": [
+    {
+      "input": "loan origination or provider-defined vintage date",
+      "needed_for": ["cohort_prepayment_speed", "burnout_seasoning", "vintage reconciliation"],
+      "status": "source-identification-required",
+      "approval_question": "Which provider-supported field or source family defines loan origination/vintage timing, including nulls, corrections, and applicability? No such field is proposed above because it was not located in the approved current core/loan header contracts."
+    },
+    {
+      "input": "delinquent-loan purchase count and UPB",
+      "needed_for": ["delinquent_loan_purchases"],
+      "status": "source-identification-required",
+      "approval_question": "Which provider-supported core or supplemental fields define delinquent-loan purchases, native grain, timing, corrections, and amount/count semantics?"
+    }
+  ],
   "field_rules_required_before_approval": [
     "For every proposed field, copy exact provider code meanings, null/sentinel tokens, range rules, schema validity windows, correction behavior, and applicability from the governing disclosure guide into the amended machine contract.",
     "Add non-sensitive golden fixtures for every code set, sentinel, schema transition, score-model transition, and invalid value before any real value is parsed.",
     "Keep all fields restricted and reviewer/public excluded until separate redistribution approval.",
-    "Do not add FactSupplementalDistribution for these fields: the listed mission, green, and social fields are present in approved core-file header metadata. Delinquent-loan-purchase measures remain blocked because no approved current core/loan field was located."
+    "Do not add FactSupplementalDistribution for the proposed fields: mission, green, and social fields were located in core-file header metadata. Origination/vintage and delinquent-loan-purchase measures remain blocked because no approved current core/loan field was located."
   ],
   "methodology_gates": [
     {"metrics":["comparability_status","data_quality_score"],"approval_question":"Approve the named component rules and weights only if every failed component remains visible and fail-closed?"},

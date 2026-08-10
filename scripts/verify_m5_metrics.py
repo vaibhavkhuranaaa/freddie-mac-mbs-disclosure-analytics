@@ -61,6 +61,20 @@ def verify(database: Path, m4_database: Path, catalog_path: Path) -> dict:
         security_periods = scalar(m4, "SELECT COUNT(DISTINCT report_period) FROM FactSecurityPeriodLatest")
         if security_population_rows != security_periods * 2:
             raise VerificationError("original/latest security period coverage failed")
+        expected_schema_scopes = scalar(
+            m4,
+            "SELECT COUNT(*) FROM (SELECT DISTINCT report_period, source_family FROM source_manifest)",
+        )
+        actual_schema_scopes = scalar(
+            metrics,
+            """
+            SELECT COUNT(*) FROM metric_component
+            WHERE contract_id='schema_transition_status'
+              AND component='schema_transition_flag' AND released=1
+            """,
+        )
+        if actual_schema_scopes != expected_schema_scopes:
+            raise VerificationError("schema transition coverage failed")
 
         parity_checks = 0
         for period, correction_view, grain, dimension, component, denominator, component_sum in metrics.execute(
@@ -91,6 +105,102 @@ def verify(database: Path, m4_database: Path, catalog_path: Path) -> dict:
             parity_checks += 1
             if denominator != component_sum:
                 raise VerificationError("score-model distribution parity failed")
+
+        for period, correction_view, grain, dimension, basis, denominator, component_sum, rows in metrics.execute(
+            """
+            SELECT report_period, correction_view, grain, dimension,
+                   CASE WHEN component LIKE '%_count' THEN 'count' ELSE 'upb' END,
+                   MAX(CAST(denominator AS INTEGER)),
+                   SUM(CAST(numerator AS INTEGER)), COUNT(*)
+            FROM metric_component
+            WHERE released=1
+              AND dimension IN ('state_summary','seller_summary','servicer_summary')
+            GROUP BY 1, 2, 3, 4, 5
+            """
+        ):
+            parity_checks += 1
+            if rows != 2 or denominator != component_sum:
+                raise VerificationError("top-N and Other summary parity failed")
+
+        hhi_basis_gaps = scalar(
+            metrics,
+            """
+            SELECT COUNT(*) FROM (
+              SELECT report_period, dimension,
+                     COUNT(DISTINCT CASE
+                       WHEN component LIKE '%_count_hhi' THEN 'count'
+                       WHEN component LIKE '%_upb_hhi' THEN 'upb'
+                     END) AS bases
+              FROM metric_component
+              WHERE contract_id='hhi_concentration' AND released=0
+              GROUP BY report_period, dimension
+              HAVING bases != 2
+            )
+            """,
+        )
+        if hhi_basis_gaps:
+            raise VerificationError("HHI count/UPB candidate coverage failed")
+
+        candidate_formula_checks = 0
+        for period, dimension, component, value in metrics.execute(
+            """
+            SELECT report_period, dimension, component, value
+            FROM metric_component
+            WHERE contract_id='hhi_concentration' AND released=0
+            """
+        ):
+            basis = "count" if component.endswith("_count_hhi") else "upb"
+            values = [
+                int(row[0]) for row in metrics.execute(
+                    """
+                    SELECT numerator FROM metric_component
+                    WHERE released=1 AND report_period=? AND correction_view='latest'
+                      AND dimension=? AND component=?
+                    """,
+                    (period, dimension, f"{dimension}_{basis}"),
+                )
+            ]
+            expected = m5_metric_engine.hhi(values)
+            candidate_formula_checks += 1
+            if expected is None or value is None or abs(float(value) - expected) > 1e-12:
+                raise VerificationError("HHI candidate formula reconciliation failed")
+
+        threshold_bands = {
+            "30_plus": {"30-59", "60-89", "90+"},
+            "60_plus": {"60-89", "90+"},
+            "90_plus": {"90+"},
+        }
+        for period, component, numerator, denominator in metrics.execute(
+            """
+            SELECT report_period, component, numerator, denominator
+            FROM metric_component
+            WHERE contract_id='delinquency_threshold_rates' AND released=0
+            """
+        ):
+            label, basis = component.rsplit("_", 1)
+            components = {
+                row[0]: int(row[1]) for row in metrics.execute(
+                    """
+                    SELECT member, numerator FROM metric_component
+                    WHERE released=1 AND contract_id='delinquency_distribution'
+                      AND report_period=? AND correction_view='latest'
+                      AND component=?
+                    """,
+                    (period, f"delinquency_band_{basis}"),
+                )
+            }
+            expected_denominator = sum(
+                amount for member, amount in components.items() if member != m5_metric_engine.MISSING
+            )
+            expected_numerator = sum(
+                amount for member, amount in components.items()
+                if member in threshold_bands[label]
+            )
+            candidate_formula_checks += 1
+            if (int(numerator), int(denominator)) != (
+                expected_numerator, expected_denominator
+            ):
+                raise VerificationError("delinquency threshold candidate reconciliation failed")
 
         partition_components = {
             tuple(row[:7]): (int(row[7]), None if row[8] is None else int(row[8]), int(row[9]))
@@ -147,6 +257,7 @@ def verify(database: Path, m4_database: Path, catalog_path: Path) -> dict:
             "loan_rows": scanned_rows,
             "security_rows": expected_security,
             "segment_weighted_parity_checks": parity_checks,
+            "candidate_formula_checks": candidate_formula_checks,
             "candidate_components": scalar(metrics, "SELECT COUNT(*) FROM metric_component WHERE released=0"),
             "peak_rss_bytes": scalar(metrics, "SELECT MAX(peak_rss_bytes) FROM input_partition"),
             "snapshot_sha256": m5_metric_engine.normalized_snapshot(metrics),

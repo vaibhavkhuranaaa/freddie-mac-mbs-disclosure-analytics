@@ -11,8 +11,8 @@ Read AGENTS.md, PROJECT.md, DESIGN.md, .project/milestones.yml, .project/approva
 M5 supported engine evidence:
 - 54 formula-version m5.1.0 contracts: 23 supported/implemented, 17 methodology-gated, 11 field-contract extensions, 3 external.
 - 35/35 loan partitions and 264,922,553 rows; both 9,240,038-row security views.
-- 256,355 released components, 180 unreleased candidates, 564 parity checks, 29,196,288-byte peak RSS.
-- Full/incremental SHA-256 7f83b73d126631fe16bfa13e205dec1d4bd2ec3c22c4efa21d21252543d5d6d3.
+- 256,461 released components, 240 unreleased candidates, 684 released-component parity checks, 240 candidate-formula checks, 32,538,624-byte peak RSS.
+- Full/incremental SHA-256 54e128d0590f8e7c4ed1396c0d3626cb56b08390b670d10a5fbf184b15ed6341.
 - No gated, extended, or external contract is released. M6 has not started.
 
 Apply only approvals explicitly recorded in .project/approvals.yml:

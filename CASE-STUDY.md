@@ -21,7 +21,7 @@ Disclosure analytics fails business users when polished charts hide missing reco
 - Identical backfill/incremental snapshot checksum and zero sampled restricted-value matches in tracked artifacts.
 - 54 versioned metric contracts classified as 23 supported, 17 methodology-gated, 11 field-contract extensions, and 3 external families.
 - All 23 supported contracts implemented over 264,922,553 loan rows and both 9,240,038-row security correction views.
-- 564 segment/weighted parity checks, 29.2 MB measured peak RSS, and identical full/incremental metric checksum `7f83b73d126631fe16bfa13e205dec1d4bd2ec3c22c4efa21d21252543d5d6d3`.
+- 684 segment/weighted parity checks, 32.5 MB measured peak RSS, and identical full/incremental metric checksum `54e128d0590f8e7c4ed1396c0d3626cb56b08390b670d10a5fbf184b15ed6341`.
 
 ## Product expansion
 

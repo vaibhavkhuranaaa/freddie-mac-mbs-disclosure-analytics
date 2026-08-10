@@ -25,6 +25,7 @@ def add_m4_manifest(
     period,
     accepted,
     partition=None,
+    schema_version="golden",
 ):
     db.execute(
         """
@@ -35,7 +36,7 @@ def add_m4_manifest(
           excluded_count, rejected_count, duplicate_count, quarantined_count,
           published_count, partition_path, partition_sha256, partition_row_count,
           quality_status
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, 'golden', '0.4.0', ?, ?, 0, 0, 0, 0, ?, ?, ?, ?, 'pass')
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, ?, '0.4.0', ?, ?, 0, 0, 0, 0, ?, ?, ?, ?, 'pass')
         """,
         (
             source_id,
@@ -46,6 +47,7 @@ def add_m4_manifest(
             f"{period}-07",
             f"{period}-07T23:59:59Z",
             source_file,
+            schema_version,
             accepted,
             accepted,
             accepted,
@@ -182,15 +184,33 @@ class M5MetricEngineTests(unittest.TestCase):
             GOLDEN["score_transition"][0]["allowed_nonmissing"],
             GOLDEN["score_transition"][1]["allowed_nonmissing"],
         )
+        grain_cases = {case["grain"]: case for case in GOLDEN["grain_cases"]}
+        self.assertEqual(
+            set(grain_cases), {"security", "loan", "cohort", "vintage", "segment", "portfolio"}
+        )
+        self.assertTrue(grain_cases["cohort"]["expected_status"].startswith("blocked"))
+        self.assertTrue(grain_cases["vintage"]["expected_status"].startswith("blocked"))
+        required_cases = {
+            "original-latest-correction", "new-issuance", "missing-period",
+            "termination", "involuntary-removal", "low-balance",
+            "zero-denominator", "schema-transition", "score-model-transition",
+            "comparison-ineligible", "formula-gate-failure", "security-grain",
+            "loan-grain", "cohort-grain-blocked-by-field-contract",
+            "vintage-grain-blocked-by-field-contract", "segment-grain",
+            "portfolio-grain",
+        }
+        self.assertEqual(set(GOLDEN["coverage_cases"]), required_cases)
 
     def test_streaming_partition_preserves_additive_components(self):
         with tempfile.TemporaryDirectory() as folder:
             path = Path(folder) / "golden.csv.gz"
             write_partition(path)
             aggregate = m5_metric_engine.scan_loan_partition(path, "2026-01")
-        self.assertEqual(aggregate.rows, 4)
-        self.assertEqual(aggregate.active_rows, 2)
-        self.assertEqual(aggregate.active_upb, 30000)
+        expected = GOLDEN["engine_expectations"]
+        self.assertEqual(aggregate.rows, expected["loan_rows"])
+        self.assertEqual(aggregate.active_rows, expected["active_loan_rows"])
+        self.assertEqual(aggregate.active_upb, expected["active_loan_upb"])
+        self.assertEqual(aggregate.rows - aggregate.active_rows, expected["terminated_or_zero_balance_rows"])
         self.assertEqual(aggregate.weighted["wala"], [600000, 30000, 2])
         self.assertEqual(aggregate.deferred_upb, 1000)
         self.assertEqual(aggregate.deferred_denominator_upb, 30000)
@@ -213,6 +233,13 @@ class M5MetricEngineTests(unittest.TestCase):
                     db, 2, "fu260107.zip", "monthly-loan-level-1", "2026-01", rows,
                     (str(relative), partition_hash, rows),
                 )
+                add_m4_manifest(
+                    db, 3, "fd260207.zip", "monthly-security-core-1", "2026-02", 0,
+                    schema_version="golden-v2",
+                )
+                add_m4_manifest(
+                    db, 4, "fd260108.zip", "monthly-security-core-1", "2026-01", 1,
+                )
                 db.executemany(
                     """
                     INSERT INTO fact_security_period (
@@ -220,11 +247,12 @@ class M5MetricEngineTests(unittest.TestCase):
                       security_status, correction_indicator, current_upb_cents,
                       factor_e8, involuntary_removal_upb_cents,
                       involuntary_removal_count, record_hash
-                    ) VALUES (1, ?, '2026-01', ?, 'GLD', ?, 'N', ?, ?, ?, ?, ?)
+                    ) VALUES (?, ?, '2026-01', ?, 'GLD', ?, ?, ?, ?, ?, ?, ?)
                     """,
                     [
-                        (2, "GSEC01", "A", 30000, 99000000, 500, 1, b"one"),
-                        (3, "GSEC02", "D", 0, 98000000, 0, 0, b"two"),
+                        (1, 2, "GSEC01", "A", "N", 30000, 99000000, 500, 1, b"one"),
+                        (1, 3, "GSEC02", "D", "N", 0, 98000000, 0, 0, b"two"),
+                        (4, 2, "GSEC01", "A", "C", 29000, 98000000, 700, 2, b"corrected"),
                     ],
                 )
                 db.executemany(
@@ -263,7 +291,8 @@ class M5MetricEngineTests(unittest.TestCase):
             backfill = m5_metric_engine.build(*args)
             incremental = m5_metric_engine.build(*args, incremental=True)
             self.assertEqual(backfill["snapshot_sha256"], incremental["snapshot_sha256"])
-            self.assertEqual(backfill["loan_rows"], 4)
+            expected = GOLDEN["engine_expectations"]
+            self.assertEqual(backfill["loan_rows"], expected["loan_rows"])
             with sqlite3.connect(output) as db:
                 self.assertEqual(
                     db.execute("SELECT COUNT(*) FROM metric_component WHERE released=1 AND contract_id='smm'").fetchone()[0],
@@ -275,10 +304,63 @@ class M5MetricEngineTests(unittest.TestCase):
                 )
                 self.assertEqual(
                     float(db.execute(
+                        "SELECT value FROM metric_component WHERE contract_id='factor_level_change' AND component='factor_level' AND correction_view='original'"
+                    ).fetchone()[0]),
+                    expected["original_security_factor"],
+                )
+                self.assertEqual(
+                    float(db.execute(
                         "SELECT value FROM metric_component WHERE contract_id='factor_level_change' AND component='factor_level' AND correction_view='latest'"
                     ).fetchone()[0]),
-                    0.99,
+                    expected["latest_security_factor"],
                 )
+                self.assertEqual(
+                    int(db.execute(
+                        "SELECT numerator FROM metric_component WHERE contract_id='issuance_volume' AND component='issuance_upb'"
+                    ).fetchone()[0]),
+                    expected["issuance_upb"],
+                )
+                self.assertEqual(
+                    int(db.execute(
+                        "SELECT numerator FROM metric_component WHERE contract_id='schema_transition_status' AND component='schema_transition_flag' AND report_period='2026-02' AND member='monthly-security-core-1'"
+                    ).fetchone()[0]),
+                    expected["schema_transition_flag"],
+                )
+                self.assertEqual(
+                    int(db.execute(
+                        "SELECT numerator FROM metric_component WHERE contract_id='involuntary_removal_volume' AND component='involuntary_removal_upb' AND correction_view='latest'"
+                    ).fetchone()[0]),
+                    expected["latest_involuntary_removal_upb"],
+                )
+                self.assertEqual(
+                    int(db.execute(
+                        "SELECT numerator FROM metric_component WHERE contract_id='involuntary_removal_volume' AND component='involuntary_removal_count' AND correction_view='latest'"
+                    ).fetchone()[0]),
+                    expected["latest_involuntary_removal_count"],
+                )
+                self.assertEqual(
+                    {row[0] for row in db.execute(
+                        "SELECT component FROM metric_component WHERE contract_id='hhi_concentration'"
+                    )},
+                    {
+                        "state_count_hhi", "state_upb_hhi",
+                        "seller_count_hhi", "seller_upb_hhi",
+                        "servicer_count_hhi", "servicer_upb_hhi",
+                    },
+                )
+                summaries = list(db.execute(
+                    """
+                    SELECT dimension,
+                           CASE WHEN component LIKE '%_count' THEN 'count' ELSE 'upb' END,
+                           SUM(CAST(numerator AS INTEGER)),
+                           MAX(CAST(denominator AS INTEGER)), COUNT(*)
+                    FROM metric_component
+                    WHERE dimension IN ('state_summary','seller_summary','servicer_summary')
+                    GROUP BY 1,2
+                    """
+                ))
+                self.assertEqual(len(summaries), 6)
+                self.assertTrue(all(total == denominator and rows == 2 for _, _, total, denominator, rows in summaries))
 
 
 if __name__ == "__main__":

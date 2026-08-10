@@ -30,7 +30,7 @@ Cloud, paid services, AI, deployment, and publication remain independent approva
 - M4 approves both machine contracts and reconciles 693,640,933 physical records to 274,162,591 conformed facts plus 419,478,342 explicit supplemental exclusions, with zero rejected, duplicate, or quarantined rows.
 - All 264,922,553 loan/security joins match; backfill and incremental snapshots are identical.
 - The M5 catalog resolves 54 complete contracts; all 23 supported contracts are implemented, while 17 methodology gates, 11 field extensions, and 3 external families remain unreleased.
-- Real M5 processing reconciles all loan/security inputs, passes 564 component-parity checks with 29.2 MB peak RSS, and produces identical full/incremental checksum `7f83b73d126631fe16bfa13e205dec1d4bd2ec3c22c4efa21d21252543d5d6d3`.
+- Real M5 processing reconciles all loan/security inputs, passes 684 component-parity checks with 32.5 MB peak RSS, and produces identical full/incremental checksum `54e128d0590f8e7c4ed1396c0d3626cb56b08390b670d10a5fbf184b15ed6341`.
 
 ## Product gaps to close
 

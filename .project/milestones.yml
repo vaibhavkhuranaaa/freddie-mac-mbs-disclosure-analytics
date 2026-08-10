@@ -68,7 +68,7 @@ milestones:
     blockers:
       - Eleven metric contracts require approved M4 field extensions before real values may be read.
       - Seventeen formula contracts require recorded domain-review approval before release.
-      - Cohort and vintage real-population reconciliation cannot pass until their exact source fields are approved.
+      - Cohort and vintage real-population reconciliation cannot pass until security issue date is approved and a provider-supported loan origination/vintage source is identified.
     objective: Implement the complete disclosure-supported metric catalog with versioned formulas and golden evidence.
     deliverables:
       - Issuance, outstanding balance, factor, paydown, correction, composition, credit, collateral, delinquency, assistance, mission, and concentration measures.

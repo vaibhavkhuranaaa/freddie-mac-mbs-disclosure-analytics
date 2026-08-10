@@ -28,10 +28,10 @@ These files are ignored by Git and are not public assets. Public/demo redistribu
 ## Verified M5 supported metric engine
 
 - Machine-readable catalog contains 54 contracts: 23 supported/implemented, 17 methodology-gated, 11 field-contract extensions, and 3 external families.
-- Restricted local SQLite output contains 256,355 released additive/weighted components and 180 explicitly unreleased candidates.
+- Restricted local SQLite output contains 256,461 released additive/weighted components and 240 explicitly unreleased candidates; all candidate formulas are independently recomputed.
 - All 35 loan partitions and 264,922,553 rows reconcile; both original/latest security views cover 9,240,038 rows.
-- 564 segment and weighted-component parity checks pass with measured peak RSS of 29,196,288 bytes.
-- Full and unchanged incremental outputs share checksum `7f83b73d126631fe16bfa13e205dec1d4bd2ec3c22c4efa21d21252543d5d6d3`.
+- 684 segment and weighted-component parity checks pass with measured peak RSS of 32,538,624 bytes.
+- Full and unchanged incremental outputs share checksum `54e128d0590f8e7c4ed1396c0d3626cb56b08390b670d10a5fbf184b15ed6341`.
 
 ## Run locally
 

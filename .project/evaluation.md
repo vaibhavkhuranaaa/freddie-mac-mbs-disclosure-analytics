@@ -56,10 +56,11 @@ All M4 gates above pass. Supplemental native-grain distributions remain explicit
 | Supported implementation | 23/23 supported contracts emit released components; no gated/external contract is released |
 | Real loan reconciliation | 35/35 partitions; 264,922,553/264,922,553 rows |
 | Real security reconciliation | 9,240,038 latest rows and 9,240,038 original rows |
-| Additive/weighted parity | 564 segment and weighted numerator/denominator checks pass |
-| Idempotence | full and unchanged incremental checksum `7f83b73d126631fe16bfa13e205dec1d4bd2ec3c22c4efa21d21252543d5d6d3` |
-| Bounded memory | measured peak RSS 29,196,288 bytes while scanning the full loan population |
-| Release safety | 256,355 supported components released locally; 180 candidates explicitly unreleased; restricted-output inspection passes |
+| Additive/weighted parity | 684 segment, weighted, and top-N/Other numerator/denominator checks pass |
+| Candidate formula parity | all 240 unreleased HHI and delinquency-threshold candidates independently recompute from released components |
+| Idempotence | full and unchanged incremental checksum `54e128d0590f8e7c4ed1396c0d3626cb56b08390b670d10a5fbf184b15ed6341` |
+| Bounded memory | measured peak RSS 32,538,624 bytes while scanning the full loan population |
+| Release safety | 256,461 supported components released locally; 240 candidates explicitly unreleased; restricted-output inspection passes |
 
 M5 milestone acceptance is not complete. Cohort/vintage and eleven other measures need approved field-contract extensions; seventeen formulas need recorded domain approval. `.project/m5-approval-request.json` is pending and does not self-approve either gate.
 
