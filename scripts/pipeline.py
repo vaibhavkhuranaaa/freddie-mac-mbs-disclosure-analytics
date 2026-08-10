@@ -13,6 +13,7 @@ import re
 import sqlite3
 import subprocess
 import zipfile
+from contextlib import closing
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -458,7 +459,7 @@ def load(input_dir: Path, database: Path) -> int:
     database.parent.mkdir(parents=True, exist_ok=True)
     seen: set[tuple[str, str]] = set()
     batches: list[SourceBatch] = []
-    with sqlite3.connect(database) as connection:
+    with closing(sqlite3.connect(database)) as connection, connection:
         connection.execute("PRAGMA foreign_keys = ON")
         connection.executescript(SCHEMA)
         for path in files:
@@ -552,7 +553,7 @@ def build_mix(rows: Iterable[sqlite3.Row], months: list[dict]) -> tuple[list[dic
 
 
 def publish(database: Path, output: Path) -> None:
-    with sqlite3.connect(database) as connection:
+    with closing(sqlite3.connect(database)) as connection, connection:
         connection.row_factory = sqlite3.Row
         manifest = list(connection.execute("SELECT * FROM source_manifest ORDER BY source_file"))
         if not manifest:

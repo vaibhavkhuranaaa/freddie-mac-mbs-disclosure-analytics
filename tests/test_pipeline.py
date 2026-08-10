@@ -90,6 +90,7 @@ class PipelineTests(unittest.TestCase):
             manifest = connection.execute(
                 "SELECT input_count, accepted_count, excluded_count, rejected_count, duplicate_count, quality_status FROM source_manifest"
             ).fetchone()
+            connection.close()
             self.assertEqual(manifest, (18, 18, 0, 0, 0, "pass"))
             payload = json.loads(output.read_text())
             self.assertEqual(payload["metadata"]["observation_count"], 18)
@@ -144,6 +145,7 @@ class PipelineTests(unittest.TestCase):
             connection = sqlite3.connect(database)
             status = connection.execute("SELECT quality_status FROM source_manifest").fetchone()[0]
             detail = connection.execute("SELECT detail FROM quality_issue").fetchone()[0]
+            connection.close()
             self.assertEqual(status, "fail")
             self.assertIn("not valid after 2025-11", detail)
 
@@ -158,6 +160,7 @@ class PipelineTests(unittest.TestCase):
                 pipeline.load(Path(folder), database)
             connection = sqlite3.connect(database)
             issue = connection.execute("SELECT issue_code, detail FROM quality_issue").fetchone()
+            connection.close()
             self.assertEqual(issue[0], "INVALID_SOURCE")
             self.assertIn("missing required official columns", issue[1])
 
@@ -176,6 +179,7 @@ class PipelineTests(unittest.TestCase):
             counts = connection.execute(
                 "SELECT input_count, accepted_count, excluded_count, rejected_count, duplicate_count, quarantined_count FROM source_manifest"
             ).fetchone()
+            connection.close()
             self.assertEqual(counts, (1, 0, 0, 1, 0, 1))
 
     def test_cancelled_blank_balance_row_is_documented_exclusion(self):
@@ -201,6 +205,7 @@ class PipelineTests(unittest.TestCase):
             event = connection.execute(
                 "SELECT severity, issue_code FROM quality_issue"
             ).fetchone()
+            connection.close()
             self.assertEqual(manifest, (2, 1, 1, 0, "pass"))
             self.assertEqual(event, ("info", "EXCLUDED_CANCELLED_SECURITY"))
             self.assertEqual(json.loads(output.read_text())["metadata"]["quality"]["excluded_count"], 1)
@@ -225,6 +230,7 @@ class PipelineTests(unittest.TestCase):
                 connection.execute("SELECT COUNT(*) FROM quality_issue WHERE issue_code = 'DUPLICATE_BUSINESS_KEY'").fetchone()[0],
                 1,
             )
+            connection.close()
 
     def test_archive_layout_must_match_source_period(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -232,7 +238,9 @@ class PipelineTests(unittest.TestCase):
             database = Path(folder) / "mbs.sqlite"
             with self.assertRaises(pipeline.QualityGateError):
                 pipeline.load(Path(folder), database)
-            detail = sqlite3.connect(database).execute("SELECT detail FROM quality_issue").fetchone()[0]
+            connection = sqlite3.connect(database)
+            detail = connection.execute("SELECT detail FROM quality_issue").fetchone()[0]
+            connection.close()
             self.assertIn("expected only FRE_IS_202601.txt", detail)
 
     def test_rebuild_is_idempotent_except_generated_timestamp(self):

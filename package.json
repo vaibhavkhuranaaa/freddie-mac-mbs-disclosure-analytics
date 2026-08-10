@@ -7,6 +7,7 @@
   "scripts": {
     "load:sample": "python3 scripts/pipeline.py --input data/sample --database local/sample-mbs.sqlite --output local/sample-dashboard.json",
     "load:raw": "python3 scripts/pipeline.py --input data/raw",
+    "inventory:sources": "python3 scripts/source_inventory.py --input data/raw --contract .project/m4-source-contract.json",
     "test:python": "python3 -m unittest discover -s tests -v",
     "test:analytics": "node tests/test_analytics.mjs",
     "test": "npm run test:python && npm run test:analytics",

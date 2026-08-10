@@ -11,6 +11,8 @@
 7. The pipeline writes monthly aggregate JSON with safe period, build, schema, pipeline, and quality metadata.
 8. The browser renders issuance trends and monthly evidence from that aggregate-only payload.
 
+Before a new factor or supplemental parser is allowed, the M4 source inventory hashes the archive and records value-free package/header metadata. It remains blocked until the machine-readable contract is approved and every required family matches an exact archive/member convention and schema fingerprint. It does not emit disclosure row values and does not infer authorization from file discovery.
+
 ## Population rule
 
 Accepted issuance observations require a security identifier, Prefix, positive issuance UPB, non-negative current UPB not exceeding issuance UPB, factor in `(0,1]`, and a valid correction flag. The business key is `(report_month, security_id)`.
@@ -36,4 +38,4 @@ The aggregate layer uses Freddie Mac's Prefix Library Summary for CL/ZL (30-year
 
 ## Scope boundary
 
-Issuance-date factor and current UPB do not provide longitudinal runoff or prepayment analytics. Those measures begin only after approved monthly factor and supplemental sources have documented keys, timing, formulas, tests, and limitations.
+Issuance-date factor and current UPB do not provide longitudinal runoff or prepayment analytics. Those measures begin only after approved monthly factor and supplemental sources have documented keys, timing, formulas, tests, and limitations. The intake/readiness mechanism exists, but the contract and source files remain absent.

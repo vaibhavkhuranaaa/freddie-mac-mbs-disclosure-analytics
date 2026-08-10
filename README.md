@@ -15,6 +15,7 @@ A governed data-engineering and analytics case study. The implemented release pr
 
 ```sh
 npm run check
+npm run inventory:sources
 npm run load:raw
 npm run check
 npm run serve
@@ -22,7 +23,7 @@ npm run serve
 
 Open [http://127.0.0.1:4173](http://127.0.0.1:4173).
 
-`npm run check` is non-destructive. It runs 12 pipeline and release tests, validates the actual released aggregate payload, smoke-tests the static preview, and checks the project records. Sample output stays under ignored `local/` paths. `npm run load:raw` is the intentional rebuild from authorized ignored source files.
+`npm run check` is non-destructive. It runs the pipeline, source-intake, and release tests, validates the actual released aggregate payload, smoke-tests the static preview, and checks the project records. `npm run inventory:sources` emits only safe archive/member metadata and an M4 readiness result; it never emits disclosure row values. Sample output stays under ignored `local/` paths. `npm run load:raw` is the intentional rebuild from authorized ignored source files.
 
 ## How the quality gate works
 
@@ -39,7 +40,7 @@ The 700 excluded rows are all status-`C` securities whose issuance UPB, current 
 
 Implemented: issuance UPB, issued-security count, source correction count, exact schema control, provenance, quality reconciliation, official term-family mix, data-derived findings, resilient UI states, and aggregate-only local dashboard publication.
 
-Planned under approval-gated milestones: issuance composition, monthly factor and supplemental sources, balance/runoff/prepayment measures, authenticated analyst workflow, governed semantic API, evaluated cited assistant, cloud pilot, and public portfolio release.
+Planned under approval-gated milestones: monthly factor and supplemental source integration, balance/runoff/prepayment measures, authenticated analyst workflow, governed semantic API, evaluated cited assistant, cloud pilot, and public portfolio release. The factor-data intake contract and fail-closed inventory gate are implemented; actual integration remains blocked until authorized files and the contract amendment are approved.
 
 The project does not make borrower, investment, valuation, trading, or hedging decisions.
 
@@ -50,5 +51,6 @@ The project does not make borrower, investment, valuation, trading, or hedging d
 - `.project/evaluation.md` — verified and proposed evaluation gates
 - `.project/milestones.yml` — approved M0–M10 executable roadmap
 - `.project/refinement-plan.md` — end-to-end architecture, AI safety, and risk plan
+- `.project/m4-data-intake.md` — factor/supplemental source research and owner approval checklist
 - `.project/handoff.md` — exact continuation state
 - `CASE-STUDY.md` — stakeholder-readable current result and limitations

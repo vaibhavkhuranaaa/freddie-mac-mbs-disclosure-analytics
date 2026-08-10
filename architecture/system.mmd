@@ -9,4 +9,8 @@ flowchart LR
   G -->|Yes| E[Versioned aggregate payload]
   G -->|No| X[Block publication and investigate]
   E --> F[Static issuance-monitoring dashboard]
-  H[Monthly factor and supplemental files — planned] -. future integration .-> C
+  H[Monthly factor and supplemental files — pending owner acquisition] --> I[M4 value-free source inventory]
+  J[Approved M4 source contract] --> I
+  I --> K{Contract, required families, and schemas pass?}
+  K -->|No| X
+  K -. future approved integration .-> C

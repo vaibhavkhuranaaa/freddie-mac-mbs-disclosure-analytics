@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "status": "pending-owner-data-and-contract-approval",
+  "approved_on": null,
+  "authorization": null,
+  "public_demo_rights": null,
+  "retention": null,
+  "source_families": [],
+  "join_contract": {
+    "grain": null,
+    "effective_period": null,
+    "business_keys": [],
+    "correction_behavior": null,
+    "unmatched_policy": null
+  },
+  "field_allowlist": [],
+  "intended_measures": []
+}
