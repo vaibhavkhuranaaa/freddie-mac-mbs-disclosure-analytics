@@ -825,9 +825,9 @@
     "source_file_count": 19,
     "period_start": "2024-12",
     "period_end": "2026-06",
-    "generated_at": "2026-08-10T01:57:51Z",
+    "generated_at": "2026-08-10T02:00:56Z",
     "pipeline_version": "0.3.0",
-    "pipeline_revision": "8f47aad0732b",
+    "pipeline_revision": "c72602c3febd",
     "build_id": "5c6977cfad48f13eeb892d19da4e1340ea7864f8842f4185d9321cc3108b0c93",
     "schema_versions": [
       "fre-is-fico-v2",

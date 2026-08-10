@@ -70,3 +70,18 @@ evidence:
     source: graphify-out/GRAPH_REPORT.md; graphify-out/graph.json; .project/graph-source.sha256
     status: verified
     verified_on: 2026-08-09
+  - id: E-015
+    claim: "Pipeline revision c72602c3febd publishes 95 monthly mix rows using the official UMBS term-family taxonomy; 59,446 observations and 99.29% of issuance UPB are mapped, while 458 observations remain explicit and unmapped."
+    source: scripts/pipeline.py; app/data/dashboard.json; docs/METHODOLOGY.md
+    status: verified
+    verified_on: 2026-08-09
+  - id: E-016
+    claim: "The dashboard derives latest-change, observed-range, and mix findings from the active payload and implements loading, error, retry, year-aware chart summary, keyboard focus, forced-color, and responsive states."
+    source: app/analytics.js; app/app.js; app/index.html; app/styles.css
+    status: verified
+    verified_on: 2026-08-09
+  - id: E-017
+    claim: "M3 passes 12 Python tests, pure dashboard analytics tests, mix/payload reconciliation, Impeccable mechanical detection with no findings, and local HTTP 200 smoke verification."
+    source: tests/test_pipeline.py; tests/test_analytics.mjs; scripts/validate_dashboard.mjs; Impeccable detector; local HTTP smoke
+    status: verified
+    verified_on: 2026-08-09

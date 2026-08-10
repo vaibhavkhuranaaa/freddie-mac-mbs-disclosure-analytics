@@ -35,7 +35,8 @@ milestones:
       - CI runs the same full check and static-preview smoke path used locally.
   - id: M3
     title: Complete the issuance decision workflow
-    status: in-progress
+    status: completed
+    evidence: [E-015, E-016, E-017]
     acceptance:
       - Findings and investigation prompts are derived from loaded data.
       - An approved Prefix-to-product taxonomy powers an issuance-mix view with explicit unknown handling.
@@ -44,7 +45,7 @@ milestones:
       - Keyboard, responsive, and WCAG 2.2 AA checks pass.
   - id: M4
     title: Integrate monthly factor and approved supplemental sources
-    status: pending-data-acquisition-and-contract-approval
+    status: blocked-pending-data-acquisition-and-contract-approval
     acceptance:
       - Authorized factor and supplemental sources have approved field allowlists, timing, keys, and demo rights.
       - Immutable manifests, schema versions, quarantine, and reconciliation cover each new source family.

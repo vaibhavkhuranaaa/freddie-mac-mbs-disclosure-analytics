@@ -20,6 +20,7 @@ The authorized local workflow validates official Freddie Mac issuance ZIP names,
 - Two explicit schemas, including the observed December 2025 FICO/VS4 transition.
 - Aggregate-only dashboard payload with build, schema, period, and quality metadata.
 - Verified source revision `b0a4cf876448` and deterministic build `7c0f195305e1...`.
+- Issuance decision workflow revision `c72602c3febd` and mix-enabled build `5c6977cfad48...`.
 
 ## Analyst use
 

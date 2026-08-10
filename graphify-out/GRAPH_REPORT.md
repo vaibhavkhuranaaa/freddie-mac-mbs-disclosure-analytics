@@ -1,7 +1,7 @@
 # Graph Report - freddie-mac-mbs-disclosure-analytics  (2026-08-09)
 
 ## Corpus Check
-- 34 files · ~21,514 words
+- 34 files · ~21,690 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `8f47aad0`
+- Built from commit: `c72602c3`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -92,7 +92,7 @@ Nodes (33): Connection, Exception, Row, build_id(), build_mix(), deduplicate(), 
 
 ### Community 4 - "Handoff"
 Cohesion: 0.22
-Nodes (9): Hiring Manager Review and Remediation Plan, Current result, Exact next action, Guardrails, Handoff, Recovery commands, M2 Source Quality and Provenance, Milestone Plan (+1 more)
+Nodes (9): Hiring Manager Review and Remediation Plan, Blocking next milestone, Current result, Guardrails, Handoff, Recovery commands, M2 Source Quality and Provenance, Milestone Plan (+1 more)
 
 ### Community 5 - "validate_dashboard.mjs"
 Cohesion: 0.29
