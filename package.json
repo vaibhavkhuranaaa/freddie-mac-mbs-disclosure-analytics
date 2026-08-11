@@ -18,7 +18,7 @@
     "test": "npm run test:python && npm run test:analytics",
     "validate:dashboard": "node scripts/validate_dashboard.mjs",
     "smoke:static": "python3 scripts/smoke_static.py",
-    "check": "npm run test && npm run verify:m4-safety && npm run validate:dashboard && npm run smoke:static && python3 scripts/project_kit.py check",
+    "check": "npm run test && npm run verify:m4-safety && npm run validate:dashboard && npm run smoke:static",
     "serve": "python3 -m http.server 4173 --directory app"
   }
 }

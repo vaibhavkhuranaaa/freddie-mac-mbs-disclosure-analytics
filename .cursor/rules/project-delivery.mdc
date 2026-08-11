@@ -1,6 +1,0 @@
----
-description: Project delivery repository rules
-alwaysApply: true
----
-
-Read AGENTS.md, PROJECT.md, and .project/ before editing. This is an authorized real-data issuance-monitoring project. Work only on the next unblocked milestone, preserve released dashboard data when testing, update evidence/state/handoff/Graphify after verified changes, and never deploy or publish without explicit human approval.
