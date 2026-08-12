@@ -152,8 +152,8 @@ def fixture_contract(kind, headers):
 
 class M4ConformanceTests(unittest.TestCase):
     def test_repository_contracts_are_approved_and_machine_valid(self):
-        security = source_inventory.load_contract(ROOT / ".project/m4-source-contract.json")
-        loan = source_inventory.load_contract(ROOT / ".project/m4-loan-source-contract.json")
+        security = source_inventory.load_contract(ROOT / "contracts/m4-source-contract.json")
+        loan = source_inventory.load_contract(ROOT / "contracts/m4-loan-source-contract.json")
         self.assertEqual(security["status"], "approved")
         self.assertEqual(loan["status"], "approved")
         self.assertEqual(len(security["source_families"]), 4)

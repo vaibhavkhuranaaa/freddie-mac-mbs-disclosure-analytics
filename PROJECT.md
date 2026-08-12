@@ -36,7 +36,7 @@ Help a stakeholder decide whether a disclosure release is trustworthy, what chan
 
 ## Target decision product
 
-The complete page, metric, semantic-model, visual, accessibility, governance, and history contract is `docs/BI_PRODUCT_SPEC.md`. The executable M0–M12 sequence is `.project/milestones.yml`.
+The complete page, metric, semantic-model, visual, accessibility, governance, and history contract is `docs/BI_PRODUCT_SPEC.md`. The executable M0–M12 sequence is maintained in the private delivery workspace.
 
 The target covers:
 

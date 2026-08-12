@@ -5,9 +5,9 @@
   "private": true,
   "description": "Freddie Mac MBS issuance analytics case study.",
   "scripts": {
-    "load:sample": "python3 scripts/pipeline.py --input data/sample --database local/sample-mbs.sqlite --output local/sample-dashboard.json",
+    "load:sample": "python3 scripts/pipeline.py --input tests/fixtures/issuance-sample --database local/sample-mbs.sqlite --output local/sample-dashboard.json",
     "load:raw": "python3 scripts/pipeline.py --input data/raw",
-    "inventory:sources": "python3 scripts/source_inventory.py --input data/raw --contract .project/m4-source-contract.json --contract .project/m4-loan-source-contract.json --require-ready",
+    "inventory:sources": "python3 scripts/source_inventory.py --input data/raw --contract contracts/m4-source-contract.json --contract contracts/m4-loan-source-contract.json --require-ready",
     "load:m4": "python3 scripts/m4_conformance.py --input data/raw --database local/m4-conformed.sqlite",
     "verify:m4": "python3 scripts/m4_conformance.py --input data/raw --database local/m4-conformed.sqlite --incremental",
     "verify:m4-safety": "python3 scripts/verify_m4_safety.py",

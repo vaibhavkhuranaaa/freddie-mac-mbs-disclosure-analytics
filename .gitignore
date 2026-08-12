@@ -57,3 +57,5 @@ docs/takeover-prompt.md
 docs/continuation-guide.md
 scripts/project_kit.py
 docs/NEXT_CHAT_PROMPT.md
+.project/
+data/

@@ -274,7 +274,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--database", type=Path, default=Path("local/m5-metrics.sqlite"))
     parser.add_argument("--m4-database", type=Path, default=Path("local/m4-conformed.sqlite"))
-    parser.add_argument("--catalog", type=Path, default=Path(".project/m5-metric-catalog.json"))
+    parser.add_argument("--catalog", type=Path, default=Path("contracts/m5-metric-catalog.json"))
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
     try:

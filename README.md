@@ -57,7 +57,7 @@ Implemented through M3: issuance UPB/count, corrections, official term-family co
 
 Implemented M5 boundary: every currently supported local metric contract, additive numerator/denominator components, correction views, score-model separation, real-inventory reconciliation, and bounded-memory streaming. M5 acceptance remains blocked by recorded field-contract and domain-methodology approvals; M6 has not started. M6–M9 add the certified Power BI model, nontechnical dashboard, investigation workflow, and governed API. M10–M12 remain separately gated AI, private-cloud, and reviewer-publication work.
 
-The [BI product specification](docs/BI_PRODUCT_SPEC.md) defines the pages, industry metric catalog, semantic model, visuals, user experience, governance, and history recommendation. The [milestone plan](.project/milestones.yml) is the execution contract.
+The [BI product specification](docs/BI_PRODUCT_SPEC.md) defines the pages, industry metric catalog, semantic model, visuals, user experience, governance, and history recommendation. [Scope](docs/scope.md) records implemented and planned boundaries.
 
 The project does not make borrower, investment, valuation, trading, hedging, or unsupported causal decisions.
 
@@ -66,9 +66,10 @@ The project does not make borrower, investment, valuation, trading, hedging, or 
 - `PROJECT.md` — business and scope contract
 - `DESIGN.md` — BI visual, interaction, language, and accessibility rules
 - `docs/BI_PRODUCT_SPEC.md` — complete decision product and metric specification
-- `.project/refinement-plan.md` — architectural and delivery rationale
-- `.project/milestones.yml` — executable M0–M12 roadmap
-- `.project/data.md` — rights, grain, fields, quality, retention, and release boundary
-- `.project/evaluation.md` — verification and stakeholder success gates
-- `.project/state.md` and `.project/handoff.md` — exact continuation state
+- `docs/architecture.md` — current and target system design
+- `docs/scope.md` — implemented, gated, and excluded capabilities
+- `docs/data-dictionary.md` — grains, fields, classifications, and release boundaries
+- `docs/metric-glossary.md` — governed measure definitions and limitations
+- `contracts/` — versioned machine source and metric contracts
+- Private sibling delivery workspace — approvals, milestones, evaluation evidence, state, and handoff
 - `CASE-STUDY.md` — current verified result and target value

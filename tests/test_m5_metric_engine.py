@@ -138,14 +138,14 @@ def write_partition(path):
 
 class M5MetricEngineTests(unittest.TestCase):
     def test_catalog_resolves_complete_contracts_and_support_matrix(self):
-        catalog, _ = m5_metric_engine.load_catalog(ROOT / ".project/m5-metric-catalog.json")
+        catalog, _ = m5_metric_engine.load_catalog(ROOT / "contracts/m5-metric-catalog.json")
         self.assertEqual(len(catalog), GOLDEN["catalog"]["metrics"])
         counts = {
             status: sum(contract["status"] == status for contract in catalog.values())
             for status in GOLDEN["catalog"]["support_counts"]
         }
         self.assertEqual(counts, GOLDEN["catalog"]["support_counts"])
-        required = set(json.loads((ROOT / ".project/m5-metric-catalog.json").read_text())["contract_required_fields"])
+        required = set(json.loads((ROOT / "contracts/m5-metric-catalog.json").read_text())["contract_required_fields"])
         self.assertTrue(all(required <= contract.keys() for contract in catalog.values()))
         self.assertIn("unreleased", catalog["smm"]["release_modes"]["authorized"])
         self.assertIn("absent", catalog["external_market_valuation_metrics"]["release_modes"]["authorized"])
@@ -284,9 +284,9 @@ class M5MetricEngineTests(unittest.TestCase):
             output = root / "m5.sqlite"
             args = (
                 m4_path, partition_root, issuance_path, output,
-                ROOT / ".project/m5-metric-catalog.json",
-                ROOT / ".project/m4-source-contract.json",
-                ROOT / ".project/m4-loan-source-contract.json",
+                ROOT / "contracts/m5-metric-catalog.json",
+                ROOT / "contracts/m4-source-contract.json",
+                ROOT / "contracts/m4-loan-source-contract.json",
             )
             backfill = m5_metric_engine.build(*args)
             incremental = m5_metric_engine.build(*args, incremental=True)

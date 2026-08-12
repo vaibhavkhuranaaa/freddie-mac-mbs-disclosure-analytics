@@ -771,7 +771,7 @@ def main() -> int:
     )
     args = parser.parse_args()
     try:
-        contract_paths = args.contract or [Path(".project/m4-source-contract.json")]
+        contract_paths = args.contract or [Path("contracts/m4-source-contract.json")]
         contract = (
             load_contract(contract_paths[0])
             if len(contract_paths) == 1

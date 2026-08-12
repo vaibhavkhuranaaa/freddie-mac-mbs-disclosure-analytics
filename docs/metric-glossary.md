@@ -4,7 +4,7 @@ The complete catalog and availability classification are in `docs/BI_PRODUCT_SPE
 
 ## M5 implementation status
 
-The machine catalog is `.project/m5-metric-catalog.json`: 54 complete contracts at formula version `m5.1.0`. Twenty-three supported contracts are implemented in the restricted local engine. Seventeen methodology-gated contracts, eleven field-contract extensions, and three external families are unreleased. `.project/m5-approval-request.json` records the exact pending fields and domain questions.
+The machine catalog is `contracts/m5-metric-catalog.json`: 54 complete contracts at formula version `m5.1.0`. Twenty-three supported contracts are implemented in the restricted local engine. Seventeen methodology-gated contracts, eleven field-contract extensions, and three external families are unreleased. Pending owner and domain decisions remain private delivery records.
 
 Released components include release/accounting controls, governed issuance flow, security/loan ending populations, factor level/change, WALA/WAM, model-separated credit scores, delinquency-band distributions, modification-program volume, deferred balance/share, state/counterparty composition, and Top-10/Other concentration components. HHI itself remains an unreleased candidate.
 

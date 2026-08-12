@@ -73,7 +73,7 @@ class PipelineTests(unittest.TestCase):
                     sys.executable,
                     "scripts/pipeline.py",
                     "--input",
-                    "data/sample",
+                    "tests/fixtures/issuance-sample",
                     "--database",
                     str(database),
                     "--output",
@@ -250,9 +250,9 @@ class PipelineTests(unittest.TestCase):
                 Path(folder) / "first.json",
                 Path(folder) / "second.json",
             )
-            pipeline.load(ROOT / "data/sample", database)
+            pipeline.load(ROOT / "tests/fixtures/issuance-sample", database)
             pipeline.publish(database, first)
-            pipeline.load(ROOT / "data/sample", database)
+            pipeline.load(ROOT / "tests/fixtures/issuance-sample", database)
             pipeline.publish(database, second)
             first_payload = json.loads(first.read_text())
             second_payload = json.loads(second.read_text())

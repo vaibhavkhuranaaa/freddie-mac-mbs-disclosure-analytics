@@ -247,8 +247,8 @@ class SourceInventoryTests(unittest.TestCase):
     def test_repository_approved_contracts_and_raw_inventory_are_ready(self):
         contract = source_inventory.load_contract_bundle(
             [
-                ROOT / ".project/m4-source-contract.json",
-                ROOT / ".project/m4-loan-source-contract.json",
+                ROOT / "contracts/m4-source-contract.json",
+                ROOT / "contracts/m4-loan-source-contract.json",
             ]
         )
         inventory = source_inventory.build_inventory(
@@ -290,7 +290,7 @@ class SourceInventoryTests(unittest.TestCase):
                     "--input",
                     folder,
                     "--contract",
-                    ".project/m4-source-contract.json",
+                    "contracts/m4-source-contract.json",
                     "--require-ready",
                 ],
                 cwd=ROOT,
