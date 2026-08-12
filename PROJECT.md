@@ -31,7 +31,7 @@ Help a stakeholder decide whether a disclosure release is trustworthy, what chan
 - Issuance UPB/count, corrections, approved term-family composition, active-data findings, investigation prompts, evidence, and limitations.
 - Loading/error/retry, year-aware descriptions, keyboard focus, forced colors, responsive layout, automated tests, and static smoke verification.
 - Value-free inventory of the acquired monthly-security and loan-level source population.
-- Versioned 54-measure M5 catalog: 23 supported and implemented, 17 methodology-gated, 11 field-contract extensions, and 3 external families.
+- Versioned 54-measure M5 catalog: 27 supported and implemented, 13 methodology-gated, 11 field-contract extensions, and 3 external families.
 - Streaming M5 components across all 264,922,553 loan-period and 9,240,038 security-period facts with 32.5 MB measured peak RSS, 684 parity checks, and idempotent checksum evidence.
 
 ## Target decision product
@@ -51,7 +51,7 @@ Price, yield, OAS, spreads, duration, convexity, WAL, market return, MSR, macro 
 
 ## Current implementation boundary
 
-M0–M4 are complete. M5 has implemented every currently supported contract and is blocked at its external acceptance gates: methodology approval for 17 formulas and approved field extensions for 11 measures. No gated formula is released, and M6 has not begun.
+M0–M4 are complete. M5 is in progress after restricted-local field and methodology approval. The first four approved derived measures are implemented from current conformed facts; remaining formulas and field extensions stay unreleased until their exact source, timing, eligibility, and fixture prerequisites pass. Provider-supported loan vintage and delinquent-loan-purchase inputs remain deferred, and M6 has not begun.
 
 AI services, cloud infrastructure, paid resources, deployment, and publication are not approved. The product is descriptive operational analytics and does not make borrower, investment, valuation, trading, hedging, or causal recommendations.
 

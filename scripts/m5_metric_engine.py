@@ -22,7 +22,7 @@ from typing import Any, Iterable
 
 import pipeline
 
-PIPELINE_VERSION = "0.5.0"
+PIPELINE_VERSION = "0.5.2"
 TOP_N = 10
 MISSING = "Missing"
 REQUIRED_LOAN_COLUMNS = {
@@ -651,7 +651,7 @@ def security_rows(connection: sqlite3.Connection, view: str) -> Iterable[sqlite3
     return connection.execute(
         f"""
         SELECT report_period, security_id, prefix, security_status,
-               correction_indicator, current_upb_cents, factor_e8,
+               correction_indicator, current_upb_cents, loan_count, factor_e8,
                legacy_credit_score, classic_fico, vs4,
                involuntary_removal_upb_cents, involuntary_removal_count
         FROM {view}
@@ -669,8 +669,10 @@ def build_security_metrics(
     periods: dict[str, dict[str, Any]] = defaultdict(
         lambda: {
             "rows": 0, "active_count": 0, "active_upb": 0,
+            "active_loan_count": 0, "active_loan_count_missing": 0,
             "factor_num": 0, "factor_den": 0, "corrections": 0,
             "correction_upb": 0, "removal_upb": 0, "removal_count": 0,
+            "removal_upb_missing": 0, "removal_count_missing": 0,
             "prefix": defaultdict(lambda: [0, 0]),
             "scores": defaultdict(lambda: [0, 0, 0]),
         }
@@ -690,11 +692,21 @@ def build_security_metrics(
         if row["correction_indicator"] != "N":
             target["corrections"] += 1
             target["correction_upb"] += max(current_upb or 0, 0)
-        target["removal_upb"] += max(row["involuntary_removal_upb_cents"] or 0, 0)
-        target["removal_count"] += max(row["involuntary_removal_count"] or 0, 0)
+        if row["involuntary_removal_upb_cents"] is None:
+            target["removal_upb_missing"] += 1
+        else:
+            target["removal_upb"] += max(row["involuntary_removal_upb_cents"], 0)
+        if row["involuntary_removal_count"] is None:
+            target["removal_count_missing"] += 1
+        else:
+            target["removal_count"] += max(row["involuntary_removal_count"], 0)
         if active:
             target["active_count"] += 1
             target["active_upb"] += current_upb
+            if row["loan_count"] is None:
+                target["active_loan_count_missing"] += 1
+            else:
+                target["active_loan_count"] += max(row["loan_count"], 0)
             target["prefix"][row["prefix"]][0] += 1
             target["prefix"][row["prefix"]][1] += current_upb
             if row["factor_e8"] is not None:
@@ -750,10 +762,32 @@ def build_security_metrics(
                 else format(numerator / denominator / 100_000_000, ".15g")
             ),
         )
+    prior_period = None
+    prior = None
+    for period, target in sorted(periods.items()):
+        if prior_period is not None and adjacent_month(prior_period, period):
+            emit_metric(
+                output, "involuntary_removal_share", "involuntary_removal_count_share",
+                period, correction_view, "security-period", "portfolio", "All",
+                target["removal_count"],
+                None
+                if target["removal_count_missing"] or prior["active_loan_count_missing"]
+                else prior["active_loan_count"],
+                target["rows"],
+            )
+            emit_metric(
+                output, "involuntary_removal_share", "involuntary_removal_upb_share",
+                period, correction_view, "security-period", "portfolio", "All",
+                target["removal_upb"],
+                None if target["removal_upb_missing"] else prior["active_upb"],
+                target["rows"],
+            )
+        prior_period = period
+        prior = target
     return row_count
 
 
-def build_candidate_metrics(connection: sqlite3.Connection) -> None:
+def build_approved_derived_metrics(connection: sqlite3.Connection) -> None:
     for period, dimension in connection.execute(
         """
         SELECT DISTINCT report_period, dimension FROM metric_component
@@ -773,13 +807,13 @@ def build_candidate_metrics(connection: sqlite3.Connection) -> None:
                     (period, dimension, f"{dimension}_{basis}"),
                 )
             ]
-            candidate = hhi(values)
-            if candidate is not None:
+            value = hhi(values)
+            if value is not None:
                 emit_metric(
                     connection, "hhi_concentration",
                     f"{dimension}_{basis}_hhi", period,
                     "latest", "loan-period", dimension, "All", 0, None,
-                    len(values), released=False, value=format(candidate, ".15g"),
+                    len(values), value=format(value, ".15g"),
                 )
     thresholds = {"30_plus": {"30-59", "60-89", "90+"}, "60_plus": {"60-89", "90+"}, "90_plus": {"90+"}}
     periods = [row[0] for row in connection.execute(
@@ -800,7 +834,51 @@ def build_candidate_metrics(connection: sqlite3.Connection) -> None:
             for basis in ("count", "upb"):
                 eligible = sum(value[0] for key, value in components.items() if key[0] == f"delinquency_band_{basis}" and key[1] != MISSING)
                 numerator = sum(value[0] for key, value in components.items() if key[0] == f"delinquency_band_{basis}" and key[1] in bands)
-                emit_metric(connection, "delinquency_threshold_rates", f"{label}_{basis}", period, "latest", "loan-period", "delinquency_threshold", label, numerator, eligible, observations=eligible, released=False)
+                observations = sum(
+                    value[0] for key, value in components.items()
+                    if key[0] == "delinquency_band_count" and key[1] != MISSING
+                )
+                emit_metric(
+                    connection, "delinquency_threshold_rates", f"{label}_{basis}",
+                    period, "latest", "loan-period", "delinquency_threshold", label,
+                    numerator, eligible, observations=observations,
+                )
+    for period, active_count, active_upb in connection.execute(
+        """
+        SELECT report_period,
+               MAX(CASE WHEN component='loan_count' THEN CAST(numerator AS INTEGER) END),
+               MAX(CASE WHEN component='loan_upb' THEN CAST(numerator AS INTEGER) END)
+        FROM metric_component
+        WHERE contract_id='current_outstanding_balance_population'
+          AND correction_view='latest' AND dimension='portfolio'
+          AND component IN ('loan_count','loan_upb')
+        GROUP BY report_period
+        """
+    ):
+        modified = {
+            row[0]: int(row[1])
+            for row in connection.execute(
+                """
+                SELECT CASE WHEN component='modification_count' THEN 'count' ELSE 'upb' END,
+                       numerator
+                FROM metric_component
+                WHERE contract_id='modification_volume' AND report_period=?
+                  AND correction_view='latest' AND dimension='modification'
+                  AND member='Disclosed program'
+                """,
+                (period,),
+            )
+        }
+        emit_metric(
+            connection, "modification_rate", "modification_count_rate", period,
+            "latest", "loan-period", "portfolio", "All", modified.get("count", 0),
+            active_count, observations=active_count,
+        )
+        emit_metric(
+            connection, "modification_rate", "modification_upb_rate", period,
+            "latest", "loan-period", "portfolio", "All", modified.get("upb", 0),
+            active_upb, observations=active_count,
+        )
 
 
 def add_top_n_components(connection: sqlite3.Connection) -> None:
@@ -982,7 +1060,7 @@ def build(
         ):
             emit_metric(output, "new_issuance_share_ending_book", "issuance_share", period, "latest", "portfolio", "portfolio", "All", issuance_upb, ending_upb)
         add_top_n_components(output)
-        build_candidate_metrics(output)
+        build_approved_derived_metrics(output)
         summary = verify(output, m4, catalog, security_latest)
         output.execute("DELETE FROM run_metadata")
         output.executemany(

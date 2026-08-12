@@ -25,13 +25,13 @@ These files are ignored by Git and are not public assets. Public/demo redistribu
 - Restricted outputs contain 9,240,038 security-period and 264,922,553 loan-period facts. All loan joins are matched in the acquired population; unmatched, ambiguous, late, ineligible, and terminated behaviors remain golden-tested.
 - Backfill and unchanged incremental runs produce snapshot SHA-256 `ec3862e9f6c1f4531424a26e4d3934b12b4e690ebb14fe58e8fd343c81074528`.
 
-## Verified M5 supported metric engine
+## Verified M5 metric engine
 
-- Machine-readable catalog contains 54 contracts: 23 supported/implemented, 17 methodology-gated, 11 field-contract extensions, and 3 external families.
-- Restricted local SQLite output contains 256,461 released additive/weighted components and 240 explicitly unreleased candidates; all candidate formulas are independently recomputed.
+- Machine-readable catalog contains 54 contracts: 27 supported/implemented, 13 methodology-gated, 11 field-contract extensions, and 3 external families.
+- Restricted local SQLite output contains 256,821 released additive, weighted, and approved derived components; HHI, delinquency-threshold rates, modification rate, and involuntary-removal share are released for restricted local use.
 - All 35 loan partitions and 264,922,553 rows reconcile; both original/latest security views cover 9,240,038 rows.
-- 684 segment and weighted-component parity checks pass with measured peak RSS of 32,538,624 bytes.
-- Full and unchanged incremental outputs share checksum `54e128d0590f8e7c4ed1396c0d3626cb56b08390b670d10a5fbf184b15ed6341`.
+- 684 segment/weighted checks and 360 independent derived-formula checks pass with measured peak RSS of 37,355,520 bytes.
+- Full and unchanged incremental outputs share checksum `8cf4ad7505701afcc58b7449631bed393d289922ee15e085e139e95040678ace`.
 
 ## Run locally
 
@@ -55,7 +55,7 @@ Open [http://127.0.0.1:4173](http://127.0.0.1:4173).
 
 Implemented through M3: issuance UPB/count, corrections, official term-family composition, exact schemas, provenance, reconciliation, data-derived findings, resilient UI states, and aggregate-only local publication.
 
-Implemented M5 boundary: every currently supported local metric contract, additive numerator/denominator components, correction views, score-model separation, real-inventory reconciliation, and bounded-memory streaming. M5 acceptance remains blocked by recorded field-contract and domain-methodology approvals; M6 has not started. M6–M9 add the certified Power BI model, nontechnical dashboard, investigation workflow, and governed API. M10–M12 remain separately gated AI, private-cloud, and reviewer-publication work.
+Implemented M5 boundary: every currently supported local metric contract, additive numerator/denominator components, approved derived formulas, correction views, score-model separation, real-inventory reconciliation, and bounded-memory streaming. M5 remains in progress while exact provider rules, field extensions, transition methods, and deferred inputs are resolved; M6 has not started. M6–M9 add the certified Power BI model, nontechnical dashboard, investigation workflow, and governed API. M10–M12 remain separately gated AI, private-cloud, and reviewer-publication work.
 
 The [BI product specification](docs/BI_PRODUCT_SPEC.md) defines the pages, industry metric catalog, semantic model, visuals, user experience, governance, and history recommendation. [Scope](docs/scope.md) records implemented and planned boundaries.
 

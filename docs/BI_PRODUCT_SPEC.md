@@ -90,7 +90,7 @@ Availability labels:
 | Factor level and factor change | Current factor and period-over-period movement | Acquired |
 | Ending-balance bridge | Beginning balance + issuance/adjustments − principal reductions = ending balance | Methodology gate |
 | Gross and net paydown/runoff | Balance reduction with explicit issuance, correction, removal, and termination treatment | Methodology gate |
-| Involuntary removal count/UPB/share | Provider-disclosed involuntary removals relative to beginning population | Acquired |
+| Involuntary removal count/UPB/share | Provider-disclosed involuntary removals relative to the adjacent prior active population | Supported for restricted local use |
 
 ### Prepayment and cash-flow behavior
 
@@ -112,10 +112,10 @@ Freddie Mac's Daily Prepayment Report publishes daily voluntary total prepayment
 | Metric | Definition / business use | Availability |
 | --- | --- | --- |
 | Days-delinquent distribution | Current, 1–29, 30–59, 60–89, 90+, and approved severe bands | Acquired |
-| 30+/60+/90+ delinquency rate | Delinquent active-loan count and UPB divided by eligible active population | Methodology gate |
+| 30+/60+/90+ delinquency rate | Delinquent active-loan count and UPB divided by eligible non-missing active population | Supported for restricted local use |
 | Roll and cure rates | Movement between delinquency states on a consistent beginning cohort | Methodology gate |
 | New delinquency and re-default | Newly entering a delinquency band and returning after cure/modification | Methodology gate |
-| Modification count/rate and capitalized amount | Modified loans and amounts divided by eligible population | Acquired/methodology gate |
+| Modification count/rate and capitalized amount | Modified loans and amounts divided by eligible population | Count/rate supported locally; capitalized amount requires field extension |
 | Deferred UPB/share | Non-interest-bearing and total deferral balances relative to current UPB | Acquired |
 | Borrower-assistance and alternative-resolution share | Loans with disclosed assistance/resolution indicators | Acquired |
 | Government-guarantee and MI share | Current UPB/count by guarantee and insurance status | Acquired |
@@ -133,7 +133,7 @@ Freddie Mac's Daily Prepayment Report publishes daily voluntary total prepayment
 | First-time-homebuyer share | Count/UPB share using disclosed indicator | Acquired |
 | State concentration | Count/UPB/share and change by property state | Acquired |
 | Seller and servicer concentration | Top-N share and segment exposure | Acquired |
-| HHI concentration | Sum of squared entity or geography shares; formula/version displayed | Methodology gate |
+| HHI concentration | Sum of squared entity or geography shares; formula/version displayed | Supported for restricted local use |
 | Mission Density Score / Mission Criteria Share | Provider-disclosed mission metrics | Acquired for applicable securities |
 | Green, social, and special-eligibility shares | Provider-disclosed flags; no impact claim without separate evidence | Acquired |
 

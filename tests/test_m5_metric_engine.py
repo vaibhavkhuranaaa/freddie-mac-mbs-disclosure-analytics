@@ -148,6 +148,8 @@ class M5MetricEngineTests(unittest.TestCase):
         required = set(json.loads((ROOT / "contracts/m5-metric-catalog.json").read_text())["contract_required_fields"])
         self.assertTrue(all(required <= contract.keys() for contract in catalog.values()))
         self.assertIn("unreleased", catalog["smm"]["release_modes"]["authorized"])
+        self.assertIn("local aggregate", catalog["hhi_concentration"]["release_modes"]["authorized"])
+        self.assertEqual(catalog["delinquency_threshold_rates"]["status"], "supported")
         self.assertIn("absent", catalog["external_market_valuation_metrics"]["release_modes"]["authorized"])
 
     def test_formula_gates_are_deterministic_and_fail_closed(self):
@@ -240,19 +242,28 @@ class M5MetricEngineTests(unittest.TestCase):
                 add_m4_manifest(
                     db, 4, "fd260108.zip", "monthly-security-core-1", "2026-01", 1,
                 )
+                add_m4_manifest(
+                    db, 5, "fd260307.zip", "monthly-security-core-1", "2026-03", 1,
+                )
+                add_m4_manifest(
+                    db, 6, "fd260407.zip", "monthly-security-core-1", "2026-04", 1,
+                )
                 db.executemany(
                     """
                     INSERT INTO fact_security_period (
                       source_id, source_row, report_period, security_id, prefix,
                       security_status, correction_indicator, current_upb_cents,
-                      factor_e8, involuntary_removal_upb_cents,
+                      loan_count, factor_e8, involuntary_removal_upb_cents,
                       involuntary_removal_count, record_hash
-                    ) VALUES (?, ?, '2026-01', ?, 'GLD', ?, ?, ?, ?, ?, ?, ?)
+                    ) VALUES (?, ?, ?, ?, 'GLD', ?, ?, ?, ?, ?, ?, ?, ?)
                     """,
                     [
-                        (1, 2, "GSEC01", "A", "N", 30000, 99000000, 500, 1, b"one"),
-                        (1, 3, "GSEC02", "D", "N", 0, 98000000, 0, 0, b"two"),
-                        (4, 2, "GSEC01", "A", "C", 29000, 98000000, 700, 2, b"corrected"),
+                        (1, 2, "2026-01", "GSEC01", "A", "N", 30000, 3, 99000000, 500, 1, b"one"),
+                        (1, 3, "2026-01", "GSEC02", "D", "N", 0, 0, 98000000, 0, 0, b"two"),
+                        (4, 2, "2026-01", "GSEC01", "A", "C", 29000, 2, 98000000, 700, 2, b"corrected"),
+                        (3, 2, "2026-02", "GSEC01", "A", "N", 28000, None, 97000000, 300, 1, b"february"),
+                        (5, 2, "2026-03", "GSEC01", "A", "N", 27000, 2, 96000000, 200, 1, b"march"),
+                        (6, 2, "2026-04", "GSEC01", "A", "N", 26000, 2, 95000000, None, 1, b"april"),
                     ],
                 )
                 db.executemany(
@@ -299,18 +310,18 @@ class M5MetricEngineTests(unittest.TestCase):
                     0,
                 )
                 self.assertGreater(
-                    db.execute("SELECT COUNT(*) FROM metric_component WHERE released=0 AND contract_id='hhi_concentration'").fetchone()[0],
+                    db.execute("SELECT COUNT(*) FROM metric_component WHERE released=1 AND contract_id='hhi_concentration'").fetchone()[0],
                     0,
                 )
                 self.assertEqual(
                     float(db.execute(
-                        "SELECT value FROM metric_component WHERE contract_id='factor_level_change' AND component='factor_level' AND correction_view='original'"
+                        "SELECT value FROM metric_component WHERE contract_id='factor_level_change' AND component='factor_level' AND correction_view='original' AND report_period='2026-01'"
                     ).fetchone()[0]),
                     expected["original_security_factor"],
                 )
                 self.assertEqual(
                     float(db.execute(
-                        "SELECT value FROM metric_component WHERE contract_id='factor_level_change' AND component='factor_level' AND correction_view='latest'"
+                        "SELECT value FROM metric_component WHERE contract_id='factor_level_change' AND component='factor_level' AND correction_view='latest' AND report_period='2026-01'"
                     ).fetchone()[0]),
                     expected["latest_security_factor"],
                 )
@@ -328,15 +339,59 @@ class M5MetricEngineTests(unittest.TestCase):
                 )
                 self.assertEqual(
                     int(db.execute(
-                        "SELECT numerator FROM metric_component WHERE contract_id='involuntary_removal_volume' AND component='involuntary_removal_upb' AND correction_view='latest'"
+                        "SELECT numerator FROM metric_component WHERE contract_id='involuntary_removal_volume' AND component='involuntary_removal_upb' AND correction_view='latest' AND report_period='2026-01'"
                     ).fetchone()[0]),
                     expected["latest_involuntary_removal_upb"],
                 )
                 self.assertEqual(
                     int(db.execute(
-                        "SELECT numerator FROM metric_component WHERE contract_id='involuntary_removal_volume' AND component='involuntary_removal_count' AND correction_view='latest'"
+                        "SELECT numerator FROM metric_component WHERE contract_id='involuntary_removal_volume' AND component='involuntary_removal_count' AND correction_view='latest' AND report_period='2026-01'"
                     ).fetchone()[0]),
                     expected["latest_involuntary_removal_count"],
+                )
+                for component, expected_key in (
+                    ("involuntary_removal_count_share", "latest_involuntary_removal_count_share"),
+                    ("involuntary_removal_upb_share", "latest_involuntary_removal_upb_share"),
+                ):
+                    self.assertAlmostEqual(
+                        float(db.execute(
+                            "SELECT value FROM metric_component WHERE contract_id='involuntary_removal_share' AND component=? AND correction_view='latest' AND report_period='2026-02'",
+                            (component,),
+                        ).fetchone()[0]),
+                        expected[expected_key],
+                    )
+                for component, expected_key in (
+                    ("modification_count_rate", "modification_count_rate"),
+                    ("modification_upb_rate", "modification_upb_rate"),
+                ):
+                    self.assertAlmostEqual(
+                        float(db.execute(
+                            "SELECT value FROM metric_component WHERE contract_id='modification_rate' AND component=?",
+                            (component,),
+                        ).fetchone()[0]),
+                        expected[expected_key],
+                    )
+                self.assertAlmostEqual(
+                    float(db.execute(
+                        "SELECT value FROM metric_component WHERE contract_id='delinquency_threshold_rates' AND component='90_plus_count'"
+                    ).fetchone()[0]),
+                    0.5,
+                )
+                self.assertEqual(
+                    db.execute(
+                        "SELECT COUNT(*) FROM metric_component WHERE contract_id IN ('hhi_concentration','delinquency_threshold_rates','modification_rate','involuntary_removal_share') AND released=0"
+                    ).fetchone()[0],
+                    0,
+                )
+                self.assertIsNone(
+                    db.execute(
+                        "SELECT value FROM metric_component WHERE contract_id='involuntary_removal_share' AND component='involuntary_removal_count_share' AND correction_view='latest' AND report_period='2026-03'"
+                    ).fetchone()[0]
+                )
+                self.assertIsNone(
+                    db.execute(
+                        "SELECT value FROM metric_component WHERE contract_id='involuntary_removal_share' AND component='involuntary_removal_upb_share' AND correction_view='latest' AND report_period='2026-04'"
+                    ).fetchone()[0]
                 )
                 self.assertEqual(
                     {row[0] for row in db.execute(

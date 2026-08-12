@@ -3,8 +3,8 @@
   "catalog": {
     "metrics": 54,
     "support_counts": {
-      "supported": 23,
-      "methodology-gated": 17,
+      "supported": 27,
+      "methodology-gated": 13,
       "contract-extension-required": 11,
       "external": 3
     }
@@ -53,6 +53,10 @@
     "latest_security_factor": 0.98,
     "latest_involuntary_removal_upb": 700,
     "latest_involuntary_removal_count": 2,
+    "latest_involuntary_removal_upb_share": 0.0103448275862069,
+    "latest_involuntary_removal_count_share": 0.5,
+    "modification_count_rate": 0.5,
+    "modification_upb_rate": 0.666666666666667,
     "schema_transition_flag": 1
   },
   "grain_cases": [

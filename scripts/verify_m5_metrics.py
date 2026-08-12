@@ -84,6 +84,13 @@ def verify(database: Path, m4_database: Path, catalog_path: Path) -> dict:
                    SUM(CAST(numerator AS INTEGER))
             FROM metric_component
             WHERE released=1
+              AND contract_id IN (
+                'delinquency_distribution',
+                'current_outstanding_balance_population',
+                'state_composition',
+                'counterparty_composition',
+                'modification_volume'
+              )
               AND dimension IN ('delinquency_band','prefix','state','seller','servicer','modification')
             GROUP BY report_period, correction_view, grain, dimension, component
             """
@@ -132,21 +139,37 @@ def verify(database: Path, m4_database: Path, catalog_path: Path) -> dict:
                        WHEN component LIKE '%_upb_hhi' THEN 'upb'
                      END) AS bases
               FROM metric_component
-              WHERE contract_id='hhi_concentration' AND released=0
+              WHERE contract_id='hhi_concentration' AND released=1
               GROUP BY report_period, dimension
               HAVING bases != 2
             )
             """,
         )
         if hhi_basis_gaps:
-            raise VerificationError("HHI count/UPB candidate coverage failed")
+            raise VerificationError("HHI count/UPB derived coverage failed")
+        expected_hhi = scalar(
+            metrics,
+            """
+            SELECT COUNT(*) * 2 FROM (
+              SELECT DISTINCT report_period, dimension FROM metric_component
+              WHERE contract_id IN ('state_composition','counterparty_composition')
+                AND dimension IN ('state','seller','servicer')
+            )
+            """,
+        )
+        actual_hhi = scalar(
+            metrics,
+            "SELECT COUNT(*) FROM metric_component WHERE contract_id='hhi_concentration' AND released=1",
+        )
+        if actual_hhi != expected_hhi:
+            raise VerificationError("HHI derived population coverage failed")
 
-        candidate_formula_checks = 0
+        derived_formula_checks = 0
         for period, dimension, component, value in metrics.execute(
             """
             SELECT report_period, dimension, component, value
             FROM metric_component
-            WHERE contract_id='hhi_concentration' AND released=0
+            WHERE contract_id='hhi_concentration' AND released=1
             """
         ):
             basis = "count" if component.endswith("_count_hhi") else "upb"
@@ -161,9 +184,9 @@ def verify(database: Path, m4_database: Path, catalog_path: Path) -> dict:
                 )
             ]
             expected = m5_metric_engine.hhi(values)
-            candidate_formula_checks += 1
+            derived_formula_checks += 1
             if expected is None or value is None or abs(float(value) - expected) > 1e-12:
-                raise VerificationError("HHI candidate formula reconciliation failed")
+                raise VerificationError("HHI formula reconciliation failed")
 
         threshold_bands = {
             "30_plus": {"30-59", "60-89", "90+"},
@@ -174,7 +197,7 @@ def verify(database: Path, m4_database: Path, catalog_path: Path) -> dict:
             """
             SELECT report_period, component, numerator, denominator
             FROM metric_component
-            WHERE contract_id='delinquency_threshold_rates' AND released=0
+            WHERE contract_id='delinquency_threshold_rates' AND released=1
             """
         ):
             label, basis = component.rsplit("_", 1)
@@ -196,11 +219,159 @@ def verify(database: Path, m4_database: Path, catalog_path: Path) -> dict:
                 amount for member, amount in components.items()
                 if member in threshold_bands[label]
             )
-            candidate_formula_checks += 1
+            derived_formula_checks += 1
             if (int(numerator), int(denominator)) != (
                 expected_numerator, expected_denominator
             ):
-                raise VerificationError("delinquency threshold candidate reconciliation failed")
+                raise VerificationError("delinquency threshold reconciliation failed")
+
+        expected_thresholds = scalar(
+            metrics,
+            "SELECT COUNT(DISTINCT report_period) * 6 FROM metric_component WHERE contract_id='delinquency_distribution'",
+        )
+        actual_thresholds = scalar(
+            metrics,
+            "SELECT COUNT(*) FROM metric_component WHERE contract_id='delinquency_threshold_rates' AND released=1",
+        )
+        if actual_thresholds != expected_thresholds:
+            raise VerificationError("delinquency threshold population coverage failed")
+
+        for period, component, numerator, denominator in metrics.execute(
+            """
+            SELECT report_period, component, numerator, denominator
+            FROM metric_component
+            WHERE contract_id='modification_rate' AND released=1
+            """
+        ):
+            basis = "count" if component.endswith("_count_rate") else "upb"
+            source = metrics.execute(
+                """
+                SELECT CAST(numerator AS INTEGER), CAST(denominator AS INTEGER)
+                FROM metric_component
+                WHERE contract_id='modification_volume' AND report_period=?
+                  AND component=? AND member='Disclosed program'
+                """,
+                (period, f"modification_{basis}"),
+            ).fetchone()
+            expected_numerator = 0 if source is None else source[0]
+            expected_denominator = metrics.execute(
+                """
+                SELECT CAST(numerator AS INTEGER) FROM metric_component
+                WHERE contract_id='current_outstanding_balance_population'
+                  AND report_period=? AND correction_view='latest'
+                  AND dimension='portfolio' AND component=?
+                """,
+                (period, f"loan_{basis}"),
+            ).fetchone()[0]
+            derived_formula_checks += 1
+            if (int(numerator), int(denominator)) != (
+                expected_numerator, expected_denominator
+            ):
+                raise VerificationError("modification-rate reconciliation failed")
+        expected_modification = scalar(
+            metrics,
+            "SELECT COUNT(DISTINCT report_period) * 2 FROM metric_component WHERE contract_id='current_outstanding_balance_population' AND component='loan_count'",
+        )
+        actual_modification = scalar(
+            metrics,
+            "SELECT COUNT(*) FROM metric_component WHERE contract_id='modification_rate' AND released=1",
+        )
+        if actual_modification != expected_modification:
+            raise VerificationError("modification-rate population coverage failed")
+
+        expected_removal_rows = 0
+        for correction_view in ("original", "latest"):
+            periods = [
+                row[0] for row in metrics.execute(
+                    """
+                    SELECT report_period FROM metric_component
+                    WHERE contract_id='current_outstanding_balance_population'
+                      AND component='security_count' AND correction_view=?
+                    ORDER BY report_period
+                    """,
+                    (correction_view,),
+                )
+            ]
+            expected_removal_rows += 2 * sum(
+                m5_metric_engine.adjacent_month(prior, current)
+                for prior, current in zip(periods, periods[1:])
+            )
+        actual_removal_rows = scalar(
+            metrics,
+            "SELECT COUNT(*) FROM metric_component WHERE contract_id='involuntary_removal_share' AND released=1",
+        )
+        if actual_removal_rows != expected_removal_rows:
+            raise VerificationError("involuntary-removal-share population coverage failed")
+        for period, correction_view, component, numerator, denominator in metrics.execute(
+            """
+            SELECT report_period, correction_view, component, numerator, denominator
+            FROM metric_component
+            WHERE contract_id='involuntary_removal_share' AND released=1
+            """
+        ):
+            periods = [
+                row[0] for row in metrics.execute(
+                    """
+                    SELECT report_period FROM metric_component
+                    WHERE contract_id='current_outstanding_balance_population'
+                      AND component='security_count' AND correction_view=?
+                      AND report_period < ? ORDER BY report_period DESC LIMIT 1
+                    """,
+                    (correction_view, period),
+                )
+            ]
+            if not periods or not m5_metric_engine.adjacent_month(periods[0], period):
+                raise VerificationError("involuntary-removal-share interval is not adjacent")
+            basis = "count" if component.endswith("_count_share") else "upb"
+            expected_numerator = metrics.execute(
+                """
+                SELECT CAST(numerator AS INTEGER) FROM metric_component
+                WHERE contract_id='involuntary_removal_volume' AND report_period=?
+                  AND correction_view=? AND component=?
+                """,
+                (period, correction_view, f"involuntary_removal_{basis}"),
+            ).fetchone()[0]
+            if basis == "count":
+                active_rows, missing_rows, active_loan_count = m4.execute(
+                    f"""
+                    SELECT COUNT(*),
+                           SUM(CASE WHEN loan_count IS NULL THEN 1 ELSE 0 END),
+                           COALESCE(SUM(loan_count),0)
+                    FROM FactSecurityPeriod{correction_view.title()}
+                    WHERE report_period=? AND security_status='A' AND current_upb_cents > 0
+                    """,
+                    (periods[0],),
+                ).fetchone()
+                expected_denominator = None if missing_rows else active_loan_count
+            else:
+                expected_denominator = metrics.execute(
+                    """
+                    SELECT CAST(numerator AS INTEGER) FROM metric_component
+                    WHERE contract_id='current_outstanding_balance_population'
+                      AND report_period=? AND correction_view=?
+                      AND component='security_upb' AND dimension='portfolio'
+                    """,
+                    (periods[0], correction_view),
+                ).fetchone()[0]
+            source_column = (
+                "involuntary_removal_count" if basis == "count"
+                else "involuntary_removal_upb_cents"
+            )
+            if scalar(
+                m4,
+                f"""
+                SELECT COUNT(*) FROM FactSecurityPeriod{correction_view.title()}
+                WHERE report_period=? AND {source_column} IS NULL
+                """,
+                (period,),
+            ):
+                expected_denominator = None
+            derived_formula_checks += 1
+            actual_denominator = None if denominator is None else int(denominator)
+            if (int(numerator), actual_denominator) != (
+                expected_numerator, expected_denominator
+            ):
+                raise VerificationError("involuntary-removal-share reconciliation failed")
 
         partition_components = {
             tuple(row[:7]): (int(row[7]), None if row[8] is None else int(row[8]), int(row[9]))
@@ -223,7 +394,9 @@ def verify(database: Path, m4_database: Path, catalog_path: Path) -> dict:
                    grain, dimension, member, numerator, denominator, observations
             FROM metric_component
             WHERE grain='loan-period'
-              AND contract_id NOT IN ('hhi_concentration','delinquency_threshold_rates')
+              AND contract_id NOT IN (
+                'hhi_concentration','delinquency_threshold_rates','modification_rate'
+              )
               AND dimension NOT LIKE '%_summary'
             """
         ):
@@ -239,11 +412,13 @@ def verify(database: Path, m4_database: Path, catalog_path: Path) -> dict:
             ):
                 raise VerificationError("weighted or additive partition consolidation failed")
 
+        placeholders = ",".join("?" for _ in supported)
         if scalar(
             metrics,
-            "SELECT COUNT(*) FROM metric_component WHERE released=1 AND contract_id IN ('smm','cpr','paydown_runoff','delinquency_roll_cure','hhi_concentration')",
+            f"SELECT COUNT(*) FROM metric_component WHERE released=0 AND contract_id IN ({placeholders})",
+            tuple(sorted(supported)),
         ):
-            raise VerificationError("methodology-gated formula was released")
+            raise VerificationError("a supported metric component remained unreleased")
         if scalar(
             metrics,
             "SELECT COUNT(*) FROM metric_component WHERE component LIKE 'rolling_%' AND contract_id='current_outstanding_balance_population'",
@@ -257,7 +432,7 @@ def verify(database: Path, m4_database: Path, catalog_path: Path) -> dict:
             "loan_rows": scanned_rows,
             "security_rows": expected_security,
             "segment_weighted_parity_checks": parity_checks,
-            "candidate_formula_checks": candidate_formula_checks,
+            "derived_formula_checks": derived_formula_checks,
             "candidate_components": scalar(metrics, "SELECT COUNT(*) FROM metric_component WHERE released=0"),
             "peak_rss_bytes": scalar(metrics, "SELECT MAX(peak_rss_bytes) FROM input_partition"),
             "snapshot_sha256": m5_metric_engine.normalized_snapshot(metrics),

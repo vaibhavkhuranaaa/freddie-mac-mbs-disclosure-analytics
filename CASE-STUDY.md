@@ -19,8 +19,8 @@ Disclosure analytics fails business users when polished charts hide missing reco
 - 693,640,933 M4 rows reconciled with zero rejected, duplicate, or quarantined records.
 - 9,240,038 security-period and 264,922,553 loan-period facts; every real loan join matched.
 - Identical backfill/incremental snapshot checksum and zero sampled restricted-value matches in tracked artifacts.
-- 54 versioned metric contracts classified as 23 supported, 17 methodology-gated, 11 field-contract extensions, and 3 external families.
-- All 23 supported contracts implemented over 264,922,553 loan rows and both 9,240,038-row security correction views.
+- 54 versioned metric contracts classified as 27 supported, 13 methodology-gated, 11 field-contract extensions, and 3 external families.
+- All 27 supported contracts implemented over 264,922,553 loan rows and both 9,240,038-row security correction views, including approved HHI, delinquency-threshold, modification-rate, and involuntary-removal-share methods.
 - 684 segment/weighted parity checks, 32.5 MB measured peak RSS, and identical full/incremental metric checksum `54e128d0590f8e7c4ed1396c0d3626cb56b08390b670d10a5fbf184b15ed6341`.
 
 ## Product expansion

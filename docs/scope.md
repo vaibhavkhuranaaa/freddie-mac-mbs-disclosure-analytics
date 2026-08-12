@@ -4,11 +4,11 @@
 
 - M0 to M3: governed issuance ingestion, reconciliation, quality controls, aggregate payload, and accessible local dashboard.
 - M4: approved monthly-security and monthly-loan contracts, correction-aware conformed facts, reason-coded joins, restricted-output safety, and incremental parity.
-- Supported M5 boundary: 23 metric contracts with versioned additive or weighted components, score-model separation, segment reconciliation, and bounded-memory processing.
+- Supported M5 boundary: 27 metric contracts with versioned additive, weighted, and approved derived components, score-model separation, segment reconciliation, and bounded-memory processing.
 
 ## Active milestone
 
-M5 remains blocked. Seventeen formulas require recorded methodology approval. Eleven measures require approved field-contract extensions. Cohort and vintage reconciliation also needs a provider-supported loan origination or vintage source. No gated, extended, or external metric is released.
+M5 is in progress. Field and methodology approvals are recorded for restricted local processing. Four source-ready methodologies are implemented: HHI concentration, delinquency-threshold rates, modification rate, and involuntary-removal share. Thirteen methodology contracts and eleven field-extension measures remain unreleased until their exact source and rule prerequisites pass. Provider-supported loan vintage and delinquent-loan-purchase inputs remain deferred; external metrics remain absent.
 
 ## Planned
 
