@@ -19,6 +19,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 import source_inventory
+from storage import StorageError, current_path, manifest_path, raw_path, require_isolated_build
 
 PIPELINE_VERSION = "0.4.0"
 JOIN_REASONS = {"matched", "unmatched", "ambiguous", "late", "ineligible", "terminated"}
@@ -955,23 +956,25 @@ def build(
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--input", type=Path, default=Path("data/raw"))
-    parser.add_argument("--database", type=Path, default=Path("local/m4-conformed.sqlite"))
+    parser.add_argument("--input", type=Path, default=raw_path())
+    parser.add_argument("--database", type=Path, default=current_path("m4.sqlite"))
     parser.add_argument("--security-contract", type=Path, default=Path("contracts/m4-source-contract.json"))
     parser.add_argument("--loan-contract", type=Path, default=Path("contracts/m4-loan-source-contract.json"))
-    parser.add_argument("--inventory-cache", type=Path, default=Path("local/m4-inventory-cache.json"))
-    parser.add_argument("--partition-dir", type=Path, default=Path("local/m4-conformed"))
+    parser.add_argument("--inventory-cache", type=Path, default=manifest_path("source-inventory.json"))
+    parser.add_argument("--partition-dir", type=Path, default=current_path("loan"))
     parser.add_argument("--incremental", action="store_true")
     parser.add_argument("--only-source", action="append", default=[])
     parser.add_argument("--json", action="store_true", help="emit value-free reconciliation JSON")
     args = parser.parse_args()
     try:
+        if not args.incremental:
+            require_isolated_build(args.database)
         summary = build(
             args.input, args.database, args.security_contract, args.loan_contract,
             args.inventory_cache, args.partition_dir, args.incremental,
             set(args.only_source) or None,
         )
-    except (ConformanceError, source_inventory.InventoryError, OSError, sqlite3.Error, zipfile.BadZipFile) as error:
+    except (ConformanceError, source_inventory.InventoryError, StorageError, OSError, sqlite3.Error, zipfile.BadZipFile) as error:
         print(f"M4 conformance failed: {error}", file=sys.stderr)
         return 2
     if args.json:

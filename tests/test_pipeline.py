@@ -2,6 +2,7 @@ import csv
 import hashlib
 import io
 import json
+import os
 import sqlite3
 import subprocess
 import sys
@@ -273,12 +274,18 @@ class PipelineTests(unittest.TestCase):
 
     def test_sample_command_and_dashboard_validation_preserve_released_dashboard(self):
         before = hashlib.sha256(RELEASE_DASHBOARD.read_bytes()).hexdigest()
-        sample = subprocess.run(
-            ["npm", "run", "load:sample"], cwd=ROOT, check=True, capture_output=True, text=True
-        )
-        self.assertIn("Loaded 18 accepted records", sample.stdout)
-        self.assertTrue((ROOT / "local/sample-dashboard.json").is_file())
-        self.assertEqual(before, hashlib.sha256(RELEASE_DASHBOARD.read_bytes()).hexdigest())
+        with tempfile.TemporaryDirectory() as folder:
+            sample = subprocess.run(
+                ["npm", "run", "load:sample"],
+                cwd=ROOT,
+                check=True,
+                capture_output=True,
+                text=True,
+                env={**os.environ, "MBS_DATA_ROOT": folder},
+            )
+            self.assertIn("Loaded 18 accepted records", sample.stdout)
+            self.assertTrue((Path(folder) / "build/sample/dashboard.json").is_file())
+            self.assertEqual(before, hashlib.sha256(RELEASE_DASHBOARD.read_bytes()).hexdigest())
 
         validation = subprocess.run(
             ["npm", "run", "validate:dashboard"], cwd=ROOT, check=True, capture_output=True, text=True

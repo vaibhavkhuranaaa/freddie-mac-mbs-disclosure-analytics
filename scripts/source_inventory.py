@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Any
 
 import pipeline
+from storage import manifest_path, raw_path
 
 PENDING_STATUS = "authorized-data-pending-machine-contract-approval"
 APPROVED_STATUS = "approved"
@@ -750,7 +751,7 @@ def text_summary(inventory: dict[str, Any]) -> str:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--input", type=Path, default=Path("data/raw"))
+    parser.add_argument("--input", type=Path, default=raw_path())
     parser.add_argument(
         "--contract",
         type=Path,
@@ -778,8 +779,8 @@ def main() -> int:
             else load_contract_bundle(contract_paths)
         )
         cache_path = args.cache
-        if cache_path is None and args.input == Path("data/raw"):
-            cache_path = Path("local/m4-inventory-cache.json")
+        if cache_path is None and args.input == raw_path():
+            cache_path = manifest_path("source-inventory.json")
         inventory = build_inventory(args.input, contract, cache_path)
     except InventoryError as error:
         print(f"Source inventory failed: {error}", file=sys.stderr)

@@ -18,6 +18,8 @@ A governed MBS disclosure analytics product in progress. The verified baseline p
 
 These files are ignored by Git and are not public assets. Public/demo redistribution is separately gated.
 
+Restricted files live outside this repository. By default, commands use sibling `../freddie-mac-mbs-disclosure-analytics-data`; set absolute `MBS_DATA_ROOT` to use another external location. Layout is `raw/`, one `current/` release, isolated `build/`, and value-free `manifests/`.
+
 ## Verified M4 conformance
 
 - Approved machine contracts govern 71 monthly-security and 35 loan-level archives across exact legacy, FICO/VS4, retirement, and April 2026 consolidation windows.
@@ -31,7 +33,14 @@ These files are ignored by Git and are not public assets. Public/demo redistribu
 - Restricted local SQLite output contains 256,821 released additive, weighted, and approved derived components; HHI, delinquency-threshold rates, modification rate, and involuntary-removal share are released for restricted local use.
 - All 35 loan partitions and 264,922,553 rows reconcile; both original/latest security views cover 9,240,038 rows.
 - 684 segment/weighted checks and 360 independent derived-formula checks pass with measured peak RSS of 37,355,520 bytes.
-- Full and unchanged incremental outputs share checksum `8cf4ad7505701afcc58b7449631bed393d289922ee15e085e139e95040678ace`.
+- Full external-path rebuild and independent verification share checksum `08ce8c2a43990f52d1544415a49ec81584d0c856748f8b4ede423b91952bf229`.
+
+## Verified storage boundary
+
+- One external canonical set contains 125 checksummed archives; one active release contains issuance, M4, 35 loan partitions, and M5 outputs.
+- Recovery ledger records every retained and removed file with size, checksum, producer, consumers, retention, recovery source, cleanup action, and final state. All destination checksums match; all classified recoverable or valueless files were removed.
+- Product repository contains no physical analytical data, generated release, cache, bytecode, dated graph output, copied tool, stale prompt, or migrated legacy record.
+- Stable v1 analytical storage is 40,173,821,505 bytes. This exceeds the 34 GiB target, so M5.3 must meet the approved compact-partition benchmark or record a revised budget before M4 v2.
 
 ## Run locally
 
@@ -43,13 +52,16 @@ npm run load:m4
 npm run verify:m4
 npm run load:m5
 npm run verify:m5
+npm run storage:check
 npm run check
 npm run serve
 ```
 
 Open [http://127.0.0.1:4173](http://127.0.0.1:4173).
 
-`npm run check` is non-destructive: it runs Python and dashboard tests, validates the released payload, smoke-tests the static application, and checks project/Graphify freshness. `npm run inventory:sources` records only safe archive/member/schema metadata. `npm run load:raw` intentionally rebuilds the verified issuance release from authorized ignored files.
+`npm run check` is non-destructive: it runs Python and dashboard tests, validates the released payload, smoke-tests the static application, and checks project/Graphify freshness. `npm run inventory:sources` records only safe archive/member/schema metadata. `npm run storage:check` fails on repository analytical data, canonical duplicates, multiple releases, build residue, or inadequate free space. `npm run load:raw` intentionally rebuilds the verified issuance release from authorized external files.
+
+Full `load:m4` and `load:m5` commands write only to `MBS_DATA_ROOT/build/manual/`; they never replace `current/`. Incremental verification reads the active release. A later cutover requires full parity and an explicit verified switch.
 
 ## Current and target scope
 

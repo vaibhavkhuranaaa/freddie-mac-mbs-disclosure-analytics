@@ -19,6 +19,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
 
+from storage import current_path, raw_path
+
 PIPELINE_VERSION = "0.3.0"
 PREFIX_TAXONOMY_VERSION = "official-umbs-term-v1"
 PREFIX_TAXONOMY_SOURCE = "https://capitalmarkets.freddiemac.com/mbs/docs/prefix_library_explainer.pdf"
@@ -651,8 +653,8 @@ def publish(database: Path, output: Path) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input", type=Path, required=True)
-    parser.add_argument("--database", type=Path, default=Path("local/mbs.sqlite"))
+    parser.add_argument("--input", type=Path, default=raw_path())
+    parser.add_argument("--database", type=Path, default=current_path("issuance.sqlite"))
     parser.add_argument("--output", type=Path, default=Path("app/data/dashboard.json"))
     args = parser.parse_args()
     try:

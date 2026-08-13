@@ -8,8 +8,10 @@ import sys
 import zipfile
 from pathlib import Path
 
+from storage import raw_path
+
 ROOT = Path(__file__).resolve().parents[1]
-RAW = ROOT / "data/raw"
+RAW = raw_path()
 RESTRICTED_TARGETS = {
     "Security Identifier",
     "Loan Identifier",

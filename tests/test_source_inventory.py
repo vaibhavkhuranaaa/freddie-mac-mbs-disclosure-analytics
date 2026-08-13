@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 import source_inventory  # noqa: E402
+import storage  # noqa: E402
 
 
 def header_sha256(headers):
@@ -252,7 +253,7 @@ class SourceInventoryTests(unittest.TestCase):
             ]
         )
         inventory = source_inventory.build_inventory(
-            ROOT / "data/raw", contract, ROOT / "local/m4-inventory-cache.json"
+            storage.raw_path(), contract, storage.manifest_path("source-inventory.json")
         )
         self.assertEqual(inventory["m4_readiness"]["status"], "ready")
         self.assertEqual(inventory["summary"]["governed_issuance"], 19)

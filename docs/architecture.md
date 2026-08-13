@@ -17,9 +17,13 @@ flowchart LR
 
 Python transformations enforce source contracts, validity windows, duplicate rules, explicit row dispositions, correction precedence, and reproducible backfill or incremental behavior. SQLite stores control and security facts. Loan facts remain in compressed period and source partitions so the engine can scan hundreds of millions of rows with bounded memory. The metric layer consolidates exact additive components, emits only catalog-supported formulas, and independently recomputes approved HHI, delinquency-threshold, modification-rate, and involuntary-removal-share outputs before restricted-local release.
 
+Restricted storage resolves from `MBS_DATA_ROOT`, with an external `raw/` canonical archive set, one `current/` analytical release, isolated `build/` paths, and value-free `manifests/`. Storage preflight rejects repository analytical data, duplicate release state, temporary residue, or insufficient build headroom before work begins.
+
+M5.1 verified 125 canonical archives and 39 active-release files with zero checksum mismatches. Stable v1 storage is 40,173,821,505 bytes; the 34 GiB target remains the measured adoption gate for M5.3 compact-partition work.
+
 ## Data boundaries
 
-- Raw archives, row-level facts, local databases, and restricted metric components remain outside Git.
+- Raw archives, row-level facts, local databases, and restricted metric components remain outside the product repository and Git.
 - `contracts/` contains value-free source and metric contracts required to reproduce validation and calculations.
 - Current dashboard payload contains governed aggregates only.
 - Authorized analyst detail does not imply reviewer or public redistribution rights.

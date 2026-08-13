@@ -21,6 +21,7 @@ from statistics import median
 from typing import Any, Iterable
 
 import pipeline
+from storage import StorageError, current_path, require_isolated_build
 
 PIPELINE_VERSION = "0.5.2"
 TOP_N = 10
@@ -1075,10 +1076,10 @@ def build(
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--m4-database", type=Path, default=Path("local/m4-conformed.sqlite"))
-    parser.add_argument("--partition-root", type=Path, default=Path("local/m4-conformed"))
-    parser.add_argument("--issuance-database", type=Path, default=Path("local/mbs.sqlite"))
-    parser.add_argument("--output", type=Path, default=Path("local/m5-metrics.sqlite"))
+    parser.add_argument("--m4-database", type=Path, default=current_path("m4.sqlite"))
+    parser.add_argument("--partition-root", type=Path, default=current_path("loan"))
+    parser.add_argument("--issuance-database", type=Path, default=current_path("issuance.sqlite"))
+    parser.add_argument("--output", type=Path, default=current_path("m5.sqlite"))
     parser.add_argument("--catalog", type=Path, default=Path("contracts/m5-metric-catalog.json"))
     parser.add_argument("--security-contract", type=Path, default=Path("contracts/m4-source-contract.json"))
     parser.add_argument("--loan-contract", type=Path, default=Path("contracts/m4-loan-source-contract.json"))
@@ -1087,12 +1088,14 @@ def main() -> int:
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
     try:
+        if not args.incremental:
+            require_isolated_build(args.output)
         summary = build(
             args.m4_database, args.partition_root, args.issuance_database,
             args.output, args.catalog, args.security_contract, args.loan_contract,
             args.incremental, set(args.only_partition) or None,
         )
-    except (MetricError, OSError, sqlite3.Error, csv.Error, ValueError) as error:
+    except (MetricError, StorageError, OSError, sqlite3.Error, csv.Error, ValueError) as error:
         print(f"M5 metric engine failed: {error}", file=sys.stderr)
         return 2
     if args.json:
