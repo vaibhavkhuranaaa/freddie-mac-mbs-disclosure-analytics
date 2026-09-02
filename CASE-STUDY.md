@@ -1,6 +1,6 @@
 # Freddie Mac MBS Disclosure Intelligence
 
-Status: verified provider-neutral decision product through M9
+Status: verified and publicly released provider-neutral decision product through M12
 
 ## Problem
 
@@ -27,17 +27,20 @@ Disclosure analytics fails business users when polished charts hide missing reco
 - A validated 20-period dashboard payload connects all 38 supported contracts to release, issuance, portfolio, credit, concentration, cohort, and evidence views.
 - The investigation workflow persists owner, priority, status, immutable release/filter/evidence context, resolution, and mutation audit separately from source facts.
 - The authenticated semantic API matches the product payload, rejects unauthenticated access, records request audit evidence without credentials, and passed 50 concurrent acceptance requests with 12.371 ms p95 latency.
+- The bounded M10 cited assistant passed all six fixed decision, citation, privacy, safety, latency, cost, and workflow cases; its runtime route remains disabled by default.
+- The M11 Entra-authenticated Azure release candidate passed eight security, recovery, observability, load, rollback, lineage, cost, and teardown categories before complete teardown.
+- M12 publishes the live product and all 167 approved row-level source and derived artifacts; unauthenticated remote verification matched every asset size and SHA-256 digest.
 
 ## Product expansion
 
-The acquired set includes 71 monthly-security and 35 monthly loan-level archives. M4 converts them into governed native-grain facts. M5 implements every currently supported measure, including nine M4 v2 field families and loan-history transitions, and closes on the approved reduced DPR boundary. M7-M9 deliver the provider-neutral dashboard, cohort and concentration evidence, governed investigation workflow, and semantic API. M6 Power BI work remains parked and resumable against the same contracts.
+The acquired set includes 71 monthly-security and 35 monthly loan-level archives. M4 converts them into governed native-grain facts. M5 implements every currently supported measure, including nine M4 v2 field families and loan-history transitions, and closes on the approved reduced DPR boundary. M7-M9 deliver the provider-neutral dashboard, cohort and concentration evidence, governed investigation workflow, and semantic API. M10-M12 prove the bounded cited-assistant contract, private cloud operability, public product, and complete data release. M6 Power BI work remains parked and resumable against the same contracts.
 
 The metric contract spans disclosure quality, issuance, outstanding balance, factor, runoff, approved SMM/CPR, delinquency transitions, modifications, deferrals, credit/collateral distributions, geography, seller/servicer concentration, and mission indicators. It explicitly separates implemented, methodology-gated, and external-data metrics.
 
 ## Decision value
 
-A nontechnical stakeholder should be able to decide whether a release is usable, identify a material change, isolate the segment/cohort driving it, recognize corrections or comparability issues, and assign an evidence-backed investigation without SQL. Target publication retains full governed row-level detail.
+A nontechnical stakeholder can decide whether a release is usable, identify a material change, isolate the segment or cohort driving it, recognize corrections or comparability issues, and assign an evidence-backed investigation without SQL. Reviewers can reproduce those decisions from the [live product](https://vaibhavkhuranaaa.github.io/freddie-mac-mbs-disclosure-analytics/) and [complete data release](https://github.com/vaibhavkhuranaaa/freddie-mac-mbs-disclosure-analytics/releases/tag/data-v1).
 
 ## Boundaries
 
-Eleven exact-method contracts remain unreleased; two field extensions and three external families remain source-gated. The product does not infer voluntary prepayment from total balance decline, relabel involuntary removals as delinquent purchases, or claim price, yield, OAS, duration, convexity, valuation, trading, hedging, loss severity, borrower decisioning, or causation without separately governed data and methods. Full-row publication occurs later after product, integrity, and distribution-rights gates pass.
+Eleven exact-method contracts remain unreleased; two field extensions and three external families remain source-gated. The product does not infer voluntary prepayment from total balance decline, relabel involuntary removals as delinquent purchases, or claim price, yield, OAS, duration, convexity, valuation, trading, hedging, loss severity, borrower decisioning, or causation without separately governed data and methods.

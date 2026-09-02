@@ -2,7 +2,9 @@
 
 ## Current state
 
-M11 deployed the governed application and derived product payload as an authenticated Azure Container Apps release candidate, verified it, and tore it down in the same session. No remote endpoint or cloud resource remains active.
+M11 deployed the governed application and derived product payload as an authenticated Azure Container Apps release candidate, verified it, and tore it down in the same session. No Azure endpoint or cloud resource remains active.
+
+M12 publishes the verified static product through [GitHub Pages](https://vaibhavkhuranaaa.github.io/freddie-mac-mbs-disclosure-analytics/) and all approved row-level source and derived artifacts through the immutable [`data-v1` GitHub Release](https://github.com/vaibhavkhuranaaa/freddie-mac-mbs-disclosure-analytics/releases/tag/data-v1). The public manifest records every asset size and SHA-256 digest.
 
 ## Local workflow
 
@@ -19,9 +21,9 @@ Power BI M6 begins as a local Import model. Power BI Service, gateway, tenant ro
 1. Complete M4-M9 data, metric, semantic-model, dashboard, investigation, and API evidence.
 2. Approve provider/tenant, region, residency, identity, licensing, cost ceiling, retention, backup, recovery, and teardown for M11.
 3. Pass infrastructure, security, access, observability, load, failure-recovery, rollback, restore, and cost tests in a private pilot. M11 completed this gate on 2026-09-01.
-4. Approve the exact reviewer model/payload, host, visibility, checksum, source revision, screenshots, domain, budget, and teardown for M12.
+4. Verify public product health, exact source revision, complete release-asset membership, byte sizes, SHA-256 digests, accessibility, and rollback. M12 completed this gate on 2026-09-02.
 
-`netlify.toml` supports the current static application's no-build local/reviewer shape only. Its presence does not authorize deployment or public release.
+`netlify.toml` preserves a provider-neutral static-hosting option. The current public release is the GitHub Pages workflow recorded above.
 
 GitHub Actions runs the complete local verification path. A deployed release is complete only when exact source/infrastructure/application revisions, model/payload checksum, approvals, and a verified live URL are recorded.
 

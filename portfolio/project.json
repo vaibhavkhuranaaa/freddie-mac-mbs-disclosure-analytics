@@ -1,11 +1,234 @@
 {
-  "version": 5,
+  "version": 2,
   "slug": "freddie-mac-mbs-disclosure-analytics",
   "title": "Freddie Mac MBS Disclosure Intelligence",
-  "status": "analyst-product",
-  "summary": "Verified governed issuance analytics, 106-archive native-grain conformance, and a bounded-memory local metric engine implementing all 23 currently supported contracts.",
-  "scope": "M0-M4 complete. M5 supported engine verified across 264,922,553 loan rows and 9,240,038 security rows; acceptance remains blocked by 17 domain formula approvals and 11 field-contract extensions. M6-M9 have not started. AI, private cloud, reviewer redistribution, and publication remain separately gated.",
-  "productSpec": "docs/BI_PRODUCT_SPEC.md",
-  "milestones": "docs/scope.md",
-  "evidence": ["E-001", "E-002", "E-003", "E-007", "E-008", "E-009", "E-010", "E-011", "E-012", "E-013", "E-014", "E-015", "E-016", "E-017", "E-018", "E-023", "E-024", "E-026", "E-027", "E-028", "E-029", "E-030", "E-031", "E-032", "E-033", "E-034"]
+  "summary": "A public MBS disclosure decision product with exact source reconciliation, 38 released metric contracts, evidence-backed investigations, and a complete digest-verified data release.",
+  "outcome": "Delivered a public trust-to-investigation workflow over 693,640,933 physical disclosure records, 264,922,553 loan-period facts, 9,240,038 security-period facts, and all 167 approved source and derived release artifacts.",
+  "industries": ["Capital markets", "Mortgage-backed securities"],
+  "categories": ["Analytics", "Data Engineering", "Cloud", "AI/ML"],
+  "stack": ["Python", "SQLite", "gzip CSV", "JavaScript", "GitHub Actions", "GitHub Pages", "GitHub Releases", "Azure Container Apps"],
+  "githubUrl": "https://github.com/vaibhavkhuranaaa/freddie-mac-mbs-disclosure-analytics",
+  "liveUrl": "https://vaibhavkhuranaaa.github.io/freddie-mac-mbs-disclosure-analytics/",
+  "deployment": {
+    "provider": "GitHub Pages and GitHub Releases",
+    "status": "live",
+    "runtime": "Static product with immutable downloadable source and derived data assets",
+    "exposure": "anonymous",
+    "productionClaim": false,
+    "verifiedAt": "2026-09-02T08:27:49Z",
+    "expiresAt": null,
+    "evidenceRefs": ["deployment.live", "data.release", "quality.automated"]
+  },
+  "metrics": [
+    "693,640,933 physical records reconciled with zero rejected, duplicate, or quarantined rows",
+    "38 of 38 supported metric contracts released with 1,816 parity and 1,068 formula checks passing",
+    "167 of 167 approved source and derived artifacts matched remotely by size and SHA-256 digest",
+    "45,675,556,283 bytes published in the immutable data-v1 release"
+  ],
+  "stages": [
+    "Validate 125 source archives across exact package, member, schema, and reporting-window contracts",
+    "Reconcile every physical record into an explicit governed disposition",
+    "Build correction-aware security facts and compressed loan-period partitions",
+    "Calculate and independently verify only versioned source-backed measures",
+    "Connect the verified release to the decision product, investigation workflow, and semantic API",
+    "Publish the static product and every approved source and derived artifact with exact integrity verification"
+  ],
+  "architecture": [
+    "Official archives pass package, member, schema, period, duplicate, and reconciliation controls before downstream use.",
+    "Correction-aware SQLite security facts and compressed loan-period partitions preserve native grain and provenance.",
+    "A versioned metric engine emits components and formulas only for 38 approved source-backed contracts.",
+    "The browser product, investigation workflow, and semantic API consume one governed product contract.",
+    "GitHub Pages serves the decision workflow while GitHub Releases distributes all approved row-level source and derived artifacts outside Git history."
+  ],
+  "evaluation": [
+    "All 693,640,933 physical records reconcile with zero rejected, duplicate, or quarantined records.",
+    "All 38 supported contracts reconcile through 1,816 segment, weighted, and transition checks plus 1,068 formula checks.",
+    "The product passes analytics, accessibility-state, responsive-layout, investigation, API authorization, and static smoke checks.",
+    "The M11 Azure candidate passed identity, recovery, telemetry, load, rollback, cost, and teardown checks before removal.",
+    "The M12 publisher verified all remote release assets before publication and repeated anonymous verification afterward."
+  ],
+  "operationalTradeoffs": [
+    "SQLite and compressed partitions preserve exact detail with bounded memory and no recurring warehouse cost, but processing is batch-oriented.",
+    "The static product removes request-time compute and mutation exposure, while bulk review uses downloadable release assets instead of arbitrary public queries.",
+    "GitHub Releases supports the measured data volume, but flattened asset names depend on the manifest for path restoration.",
+    "The cited assistant remains disabled publicly because M10 proves a bounded contract, not a general conversational service.",
+    "Power BI remains parked because it is optional to the delivered provider-neutral workflow."
+  ],
+  "disclaimer": "This public disclosure analytics project supports descriptive release operations and MBS investigation. It does not make borrower, investment, valuation, trading, hedging, causal, or production-availability claims. Source materials remain attributable to Freddie Mac and subject to applicable provider terms.",
+  "presentation": {
+    "question": "Can an MBS disclosure release be trusted, what changed, and what evidence should be investigated next?",
+    "answer": "The product starts with exact source disposition and schema evidence, then connects certified metrics to correction-aware cohort and concentration views and immutable investigation context.",
+    "decisionSupported": "Determine whether a disclosure release is usable and assign an evidence-backed investigation without unsupported financial inference.",
+    "evaluationMode": "Complete acquired-population reconciliation, independent metric recomputation, hosted release-candidate checks, and exact public asset verification.",
+    "publicationStatus": "Live public product and complete approved row-level source and derived data release.",
+    "licenseNote": "Repository code is licensed separately; published source materials remain attributable to Freddie Mac and subject to applicable provider terms.",
+    "coverImage": "assets/dashboard-desktop.png",
+    "coverAlt": "Freddie Mac MBS disclosure dashboard showing portfolio and credit investigation views"
+  },
+  "dataDisclosure": {
+    "source": "Owner-acquired official Freddie Mac issuance, monthly-security, and monthly loan-level disclosure archives.",
+    "license": "The owner attests that no additional redistribution rights are required. Source materials remain attributable to Freddie Mac and downstream users remain responsible for applicable provider terms.",
+    "classification": "public",
+    "permittedUse": "Public reproducibility review, descriptive disclosure analytics, and evidence-backed MBS release investigation within the documented limitations.",
+    "includedFields": [
+      "All 125 acquired source disclosure archives",
+      "Complete accepted issuance observations and explicit source dispositions",
+      "Correction-aware security-period facts and compressed loan-period fact partitions",
+      "Metric components for all 38 supported contracts",
+      "Product payload and integrity manifest"
+    ],
+    "excludedFields": [
+      "Mutable investigation and request audit records",
+      "Private delivery records, credentials, temporary build files, rollback files, and SQLite sidecar files",
+      "Outputs for 11 methodology-gated, two field-extension, and three external contracts"
+    ],
+    "deployedArtifactContents": [
+      "Static decision product on GitHub Pages",
+      "125 original source archives",
+      "Active issuance, M4, loan-partition, and M5 outputs",
+      "167 approved data artifacts totaling 45,675,556,283 bytes",
+      "Manifest with logical paths, exact byte counts, and SHA-256 digests"
+    ]
+  },
+  "evidence": [
+    {
+      "id": "pipeline.reconciliation",
+      "kind": "evaluation",
+      "claim": "Every physical source record receives an explicit governed disposition and every current eligible loan-period fact joins to an approved security-period key.",
+      "source": "scripts/verify_m4_conformance.py",
+      "method": "Complete reconciliation, join taxonomy verification, incremental parity, stale-output rejection, and immutable release checks.",
+      "result": "693,640,933 records reconciled; all 264,922,553 eligible loan joins matched",
+      "execution": "deterministic"
+    },
+    {
+      "id": "metrics.verification",
+      "kind": "evaluation",
+      "claim": "Every currently supported metric contract is released and independently reconciled over both correction views and the full loan population.",
+      "source": "scripts/verify_m5_metrics.py",
+      "method": "Compare catalog-supported IDs with released components and independently recompute segment, weighted, distribution, and transition formulas.",
+      "result": "38 of 38 contracts; 1,816 parity checks and 1,068 formula checks passed",
+      "execution": "deterministic",
+      "caveat": "Eleven methodology, two field-extension, and three external contracts remain unreleased."
+    },
+    {
+      "id": "quality.automated",
+      "kind": "test",
+      "claim": "Repository quality, data safety, product, publication, infrastructure, and static checks pass.",
+      "source": ".github/workflows/quality.yml",
+      "method": "Python and JavaScript tests, restricted-output scan, payload validation, publication tests, static smoke, and diff checks.",
+      "result": true,
+      "execution": "integration"
+    },
+    {
+      "id": "data.release",
+      "kind": "disclosure",
+      "claim": "The public data-v1 release contains every approved row-level source and derived artifact with exact remote size and digest parity.",
+      "source": "https://github.com/vaibhavkhuranaaa/freddie-mac-mbs-disclosure-analytics/releases/tag/data-v1",
+      "method": "Deterministic allowlist, draft upload, exact remote membership and byte comparison, streamed SHA-256 verification, and repeated anonymous verification.",
+      "result": "167 of 167 artifacts; 45,675,556,283 bytes; zero mismatches",
+      "execution": "live"
+    },
+    {
+      "id": "deployment.live",
+      "kind": "deployment",
+      "claim": "The public static decision product serves the verified default-branch source revision through GitHub Pages.",
+      "source": "https://vaibhavkhuranaaa.github.io/freddie-mac-mbs-disclosure-analytics/",
+      "method": "Pages workflow verification, anonymous product and health checks, and exact deployed source-SHA comparison.",
+      "result": true,
+      "observedAt": "2026-09-02T08:27:49Z",
+      "environment": "GitHub Pages",
+      "execution": "live"
+    }
+  ],
+  "story": {
+    "recruiterSummary": "This product answers the first disclosure question: can the release be trusted? It reconciles every source record, exposes only supported measures, connects movements to evidence, and publishes the complete approved data release.",
+    "technicalNarrative": "Exact contracts validate packages, members, schema eras, periods, and duplicates. SQLite stores correction-aware security facts while compressed partitions preserve 264.9 million loan-period facts. A versioned engine emits 38 supported contracts. The browser and semantic API share one governed payload, and investigations preserve immutable evidence context. GitHub Pages serves the interface while GitHub Releases distributes all 167 approved source and derived artifacts under a verified manifest.",
+    "scalabilityRoadmap": [
+      "Retain compressed partitions and bounded-memory streaming while measured refresh and verification targets pass.",
+      "Add a hosted query plane only when a measured concurrency or latency requirement justifies recurring infrastructure.",
+      "Reopen Power BI only when a Windows runtime can produce engine evidence against the same contracts.",
+      "Add metrics only with explicit source, methodology, denominator, timing, correction, and golden-case evidence."
+    ],
+    "executiveSummary": "The release turns a large Freddie Mac disclosure corpus into an auditable trust-to-investigation workflow. It covers 693.6 million physical records, releases every supported contract, and preserves complete row-level source and derived data in a verified 45.7 GB release.",
+    "intendedUser": "An MBS disclosure operations analyst, market-data analyst, capital-markets reviewer, or hiring manager.",
+    "example": {
+      "title": "Investigate a disclosure movement without losing source trust",
+      "steps": [
+        "Confirm source completeness, schema validity, exclusions, and correction status",
+        "Review the material movement and its governed metric definition",
+        "Compare correction views, cohorts, credit segments, geography, seller, and servicer concentration",
+        "Open provenance and limitations behind the selected movement",
+        "Create an investigation with immutable release, filter, and evidence context"
+      ]
+    },
+    "technologyDecisions": [
+      {
+        "technology": "SQLite plus compressed period partitions",
+        "rationale": "Preserves exact detail and correction lineage across hundreds of millions of records with bounded memory.",
+        "alternative": "Provision a managed warehouse before measuring need.",
+        "tradeoff": "Processing is batch-oriented and offers no shared arbitrary-query concurrency."
+      },
+      {
+        "technology": "Static GitHub Pages product",
+        "rationale": "The public workflow needs no request-time database, credential, mutation surface, or recurring compute.",
+        "alternative": "Expose the semantic API as a permanent public service.",
+        "tradeoff": "Public users receive governed views and data downloads rather than arbitrary queries."
+      },
+      {
+        "technology": "GitHub Releases for complete data publication",
+        "rationale": "The measured asset set fits provider limits and keeps immutable data beside source, documentation, and workflow evidence.",
+        "alternative": "Commit data to Git, publish only summaries, or add another dataset provider.",
+        "tradeoff": "Flattened asset names require the manifest to restore logical paths."
+      }
+    ],
+    "evidence": [
+      {
+        "value": "693.6M",
+        "label": "Physical records reconciled",
+        "context": "Complete M4 source population",
+        "method": "Explicit source disposition and join reconciliation",
+        "evidenceRefs": ["pipeline.reconciliation"]
+      },
+      {
+        "value": "38 of 38",
+        "label": "Supported contracts released",
+        "context": "Versioned M5 metric catalog",
+        "method": "Catalog-to-output equality and independent recomputation",
+        "evidenceRefs": ["metrics.verification"]
+      },
+      {
+        "value": "167 of 167",
+        "label": "Public data artifacts verified",
+        "context": "Complete 45,675,556,283-byte data-v1 release",
+        "method": "Exact remote membership, size, and SHA-256 verification",
+        "evidenceRefs": ["data.release"]
+      }
+    ],
+    "limitations": [
+      "Eleven methodology, two field-extension, and three external contracts remain unreleased.",
+      "The product makes no borrower, investment, valuation, trading, hedging, or causal claims.",
+      "The cited assistant remains disabled in the public runtime.",
+      "Power BI remains parked and is not required for the delivered workflow.",
+      "The static product exposes no arbitrary SQL, row API, or shared investigation mutation."
+    ]
+  },
+  "resume": {
+    "bulletCandidates": [
+      {
+        "role": "Data Engineer",
+        "bullet": "Built a governed Freddie Mac MBS pipeline that reconciles 693.6 million records into 264.9 million loan-period and 9.2 million security-period facts with zero rejected, duplicate, or quarantined rows.",
+        "evidenceRefs": ["pipeline.reconciliation"]
+      },
+      {
+        "role": "Analytics Engineer",
+        "bullet": "Delivered 38 source-backed metric contracts with 1,816 parity and 1,068 formula checks across correction-aware cohort and concentration workflows.",
+        "evidenceRefs": ["metrics.verification", "quality.automated"]
+      },
+      {
+        "role": "Data Product Engineer",
+        "bullet": "Published a zero-runtime-cost MBS decision product and all 167 approved source and derived artifacts totaling 45.7 GB with exact remote integrity verification.",
+        "evidenceRefs": ["deployment.live", "data.release"]
+      }
+    ]
+  }
 }

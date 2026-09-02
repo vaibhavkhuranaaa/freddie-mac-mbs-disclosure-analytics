@@ -8,9 +8,9 @@
 
 ## Current milestone state
 
-M5 and M7-M9 are complete on the owner-approved reduced DPR boundary. Nine field-backed families plus roll, cure, new-delinquency, and redefault measures are released; all 38 supported contracts reconcile across the full population and feed the provider-neutral web product, persistent investigation workflow, and authenticated semantic API. Eleven methodology contracts, two field extensions, and three external contracts remain explicitly unreleased. M6 Power BI work is parked under decision 0018.
+M5 and M7-M12 are complete on the owner-approved reduced DPR boundary. Nine field-backed families plus roll, cure, new-delinquency, and redefault measures are released; all 38 supported contracts reconcile across the full population and feed the provider-neutral web product, persistent investigation workflow, and authenticated semantic API. Eleven methodology contracts, two field extensions, and three external contracts remain explicitly unreleased. M6 Power BI work is parked under decision 0018.
 
-## Planned
+## Milestones
 
 - M6: parked certified Power BI semantic model; resume when a Windows Power BI Desktop runtime is available.
 - M7: completed provider-neutral executive, release-health, issuance, portfolio, credit, and concentration views over the verified engine.
@@ -18,12 +18,12 @@ M5 and M7-M9 are complete on the owner-approved reduced DPR boundary. Nine field
 - M9: completed authenticated governed semantic API with parity, authorization, audit, and concurrency evidence.
 - M10: completed bounded cited-assistant evaluation with separate AI, outbound-context, and cost approval; runtime stays disabled by default.
 - M11: private cloud release candidate, completed and torn down after approved infrastructure, identity, recovery, load, rollback, cost, and teardown checks.
-- M12: full-data publication and case study after product, integrity, and distribution-rights gates.
+- M12: completed public product, complete approved row-level source and derived data release, verified manifest, and case study.
 
 ## Publication mode
 
-- Target release publishes complete row-level source and derived data with provenance and correction lineage.
-- Data remains in governed external storage until publication gates pass.
+- The [`data-v1` release](https://github.com/vaibhavkhuranaaa/freddie-mac-mbs-disclosure-analytics/releases/tag/data-v1) publishes the complete approved row-level source and derived data with provenance, correction lineage, byte sizes, and SHA-256 digests.
+- The [GitHub Pages product](https://vaibhavkhuranaaa.github.io/freddie-mac-mbs-disclosure-analytics/) exposes the verified decision workflow; repository CI and a source-revision health record protect the published build.
 
 ## Out of scope
 

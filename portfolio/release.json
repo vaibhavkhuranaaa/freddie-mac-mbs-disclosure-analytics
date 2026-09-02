@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "status": "enabled",
+  "publicProject": true,
+  "verification": {
+    "url": "https://vaibhavkhuranaaa.github.io/freddie-mac-mbs-disclosure-analytics/health.json",
+    "sourceShaField": "source_sha"
+  }
+}

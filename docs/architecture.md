@@ -25,10 +25,10 @@ M5.7 verified active release `m5-7-history-20260825` across 125 canonical archiv
 
 ## Data boundaries
 
-- Raw archives, row-level facts, databases, and metric components remain outside Git until publication.
+- Raw archives, row-level facts, databases, and metric components remain outside Git history and are published as immutable GitHub Release assets.
 - `contracts/` contains value-free source and metric contracts required to reproduce validation and calculations.
 - Current dashboard payload is an implemented product slice, not a separate publication boundary.
-- Target publication includes complete row-level source and derived data after distribution-rights verification.
+- The `data-v1` publication includes the complete approved row-level source and derived data with a manifest of asset sizes and SHA-256 digests.
 
 ## Target system
 
@@ -41,7 +41,7 @@ flowchart LR
   D --> F["Full-row publication"]
 ```
 
-Decision 0018 parks M6 until a Windows Power BI Desktop runtime is available. M7-M9 are complete through provider-neutral web and investigation contracts plus an authenticated governed API over the verified M5 engine. Decision 0019 completes the bounded cited-assistant evaluation with canonical provider inputs, exact evidence validation, deterministic prose, and a disabled-by-default runtime route. Decision 0020 verifies and tears down the private Azure release candidate. Power BI remains resumable against those contracts; publication remains a later approval gate.
+Decision 0018 parks M6 until a Windows Power BI Desktop runtime is available. M7-M9 are complete through provider-neutral web and investigation contracts plus an authenticated governed API over the verified M5 engine. Decision 0019 completes the bounded cited-assistant evaluation with canonical provider inputs, exact evidence validation, deterministic prose, and a disabled-by-default runtime route. Decision 0020 verifies and tears down the private Azure release candidate. M12 publishes the static product on GitHub Pages and the complete approved row-level source and derived data as verified GitHub Release assets. Power BI remains resumable against the same contracts.
 
 ## Verified cloud release-candidate pattern
 

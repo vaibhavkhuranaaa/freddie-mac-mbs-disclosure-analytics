@@ -10,6 +10,7 @@ A governed MBS disclosure analytics product. The verified release processes offi
 | Supported contract release | 0% | 100% (38 of 38) |
 | Investigation evidence coverage | 0% | 100% (8 of 8) |
 | M11 release-candidate acceptance | 0% | 100% (8 of 8) |
+| M12 public data integrity | 0% | 100% (167 of 167 artifacts) |
 
 [Open the live product](https://vaibhavkhuranaaa.github.io/freddie-mac-mbs-disclosure-analytics/) or [download the complete data release](https://github.com/vaibhavkhuranaaa/freddie-mac-mbs-disclosure-analytics/releases/tag/data-v1).
 
@@ -83,7 +84,7 @@ Full `load:m4` and `load:m5` commands write only to `MBS_DATA_ROOT/build/manual/
 
 Implemented through M3: issuance UPB/count, corrections, official term-family composition, exact schemas, provenance, reconciliation, data-derived findings, and resilient UI states.
 
-Implemented M5 boundary: all 38 supported contracts, additive numerator/denominator components, approved formulas, correction views, score/model/context separation, real-inventory reconciliation, bounded-memory streaming, and disk-backed loan-history transitions. M5 is complete on the owner-approved reduced DPR boundary. M7-M9 add the provider-neutral dashboard, persistent investigation workflow, and authenticated governed API over that release. M10 adds a disabled-by-default cited assistant that passed six fixed decision, citation, privacy, safety, latency, cost, and workflow cases. M11 adds a verified, Entra-authenticated Azure release candidate with recovery, observability, load, rollback, cost, and teardown evidence; no cloud endpoint remains active. Eleven methodology-gated, two field-extension, and three external contracts remain explicitly unreleased. M6 Power BI work is parked; M12 full-data publication remains separately gated.
+Implemented M5 boundary: all 38 supported contracts, additive numerator/denominator components, approved formulas, correction views, score/model/context separation, real-inventory reconciliation, bounded-memory streaming, and disk-backed loan-history transitions. M5 is complete on the owner-approved reduced DPR boundary. M7-M9 add the provider-neutral dashboard, persistent investigation workflow, and authenticated governed API over that release. M10 adds a disabled-by-default cited assistant that passed six fixed decision, citation, privacy, safety, latency, cost, and workflow cases. M11 adds a verified, Entra-authenticated Azure release candidate with recovery, observability, load, rollback, cost, and teardown evidence; no cloud endpoint remains active. M12 publishes the product and all 167 approved row-level source and derived artifacts with a digest-verified manifest. Eleven methodology-gated, two field-extension, and three external contracts remain explicitly unreleased. M6 Power BI work is parked.
 
 The [BI product specification](docs/BI_PRODUCT_SPEC.md) defines the pages, industry metric catalog, semantic model, visuals, user experience, governance, and history recommendation. [Scope](docs/scope.md) records implemented and planned boundaries.
 

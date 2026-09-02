@@ -8,7 +8,7 @@
 - **Primary stakeholder:** MBS disclosure operations or market-data analyst; executive summaries support nontechnical leadership
 - **Authorized data use:** the owner is authorized to use the acquired Freddie Mac source files at row level for this project
 - **Retention:** seven years from acquisition; delete earlier if authorization ends
-- **Current delivery:** provider-neutral Python/SQLite/browser product with a $0 operating baseline
+- **Current delivery:** public provider-neutral Python/SQLite/browser product and complete public data release
 - **Current governed issuance coverage:** 19 files, 2024-12 through 2026-06
 - **Current acquired expansion:** 71 monthly-security and 35 monthly loan-level archives in restricted ignored storage
 
@@ -16,9 +16,9 @@
 
 Help a stakeholder decide whether a disclosure release is trustworthy, what changed, which segments drove the movement, whether correction or comparability issues explain it, and what investigation to assign. Calculations, lineage, quality, and limitations must be reproducible from source to decision.
 
-## Publication target
+## Published release
 
-Publish complete row-level source and derived data with certified metrics, governed drill-through, provenance, and investigation evidence.
+The live product is published on [GitHub Pages](https://vaibhavkhuranaaa.github.io/freddie-mac-mbs-disclosure-analytics/). The immutable [`data-v1` release](https://github.com/vaibhavkhuranaaa/freddie-mac-mbs-disclosure-analytics/releases/tag/data-v1) publishes the complete approved row-level source and derived data with a digest-verified manifest, certified metrics, provenance, correction lineage, and investigation evidence.
 
 ## Implemented baseline
 
@@ -51,9 +51,9 @@ Price, yield, OAS, spreads, duration, convexity, WAL, market return, MSR, macro 
 
 ## Current implementation boundary
 
-M0-M5 and M7-M9 are complete. Nine field-backed metric families and disk-backed original/latest loan transitions feed a provider-neutral dashboard with release, issuance, portfolio, credit, concentration, cohort, and investigation workflows, explicit comparability limits, and complete release provenance. The authenticated semantic API carries the same governed contract and records request and investigation audit evidence. Freshness remains prospective; delinquent-loan purchases remain unavailable because disclosed involuntary removals are broader. DPR-backed and other source-gated measures remain explicitly unreleased. M6 Power BI work is parked under decision 0018.
+M0-M5 and M7-M12 are complete. Nine field-backed metric families and disk-backed original/latest loan transitions feed a provider-neutral dashboard with release, issuance, portfolio, credit, concentration, cohort, and investigation workflows, explicit comparability limits, and complete release provenance. The authenticated semantic API carries the same governed contract and records request and investigation audit evidence. Freshness remains prospective; delinquent-loan purchases remain unavailable because disclosed involuntary removals are broader. DPR-backed and other source-gated measures remain explicitly unreleased. M6 Power BI work is parked under decision 0018.
 
-The bounded M10 AI evaluation is approved and complete; its runtime route remains disabled by default. Cloud infrastructure, deployment, and publication are not approved. Full-data publication is planned for the publication phase after integrity and redistribution-rights gates pass. The product is descriptive operational analytics and does not make borrower, investment, valuation, trading, hedging, or causal recommendations.
+The bounded M10 AI evaluation is complete; its runtime route remains disabled by default. M11 proved the private Azure release candidate and completed teardown. M12 completed public product and full-data publication after integrity and distribution checks passed. The product is descriptive operational analytics and does not make borrower, investment, valuation, trading, hedging, or causal recommendations.
 
 ## Success criteria
 
