@@ -1,4 +1,4 @@
-# 0019 — Evaluate a bounded cited assistant
+# 0019 - Evaluate a bounded cited assistant
 
 ## Decision
 

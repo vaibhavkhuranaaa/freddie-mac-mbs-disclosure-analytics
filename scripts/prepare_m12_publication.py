@@ -20,6 +20,8 @@ PUBLIC_MANIFESTS = (
     "storage-ceiling.json",
 )
 
+# TODO: Add resumable upload support before any future asset exceeds the current single-request boundary.
+
 
 def sha256(path: Path) -> str:
     digest = hashlib.sha256()

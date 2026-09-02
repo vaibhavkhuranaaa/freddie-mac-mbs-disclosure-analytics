@@ -1,4 +1,4 @@
-# 0014 — Approve fail-closed M5 methodology
+# 0014 - Approve fail-closed M5 methodology
 
 Status: accepted
 Date: 2026-08-25
