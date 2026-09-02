@@ -6,7 +6,13 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from scripts.prepare_m12_publication import build_manifest, prepare_stage, verify_local, verify_remote
+from scripts.prepare_m12_publication import (
+    build_manifest,
+    encoded_manifest,
+    prepare_stage,
+    verify_local,
+    verify_remote,
+)
 
 
 class M12PublicationTests(unittest.TestCase):
@@ -70,6 +76,14 @@ class M12PublicationTests(unittest.TestCase):
             }
             for item in manifest["artifacts"]
         ]
+        payload = encoded_manifest(manifest)
+        remote.append(
+            {
+                "name": "publication-manifest.json",
+                "size": len(payload),
+                "digest": "sha256:" + hashlib.sha256(payload).hexdigest(),
+            }
+        )
         verify_remote(manifest, remote)
         remote.append(
             {
@@ -81,6 +95,10 @@ class M12PublicationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "exactly match"):
             verify_remote(manifest, remote)
         remote.pop()
+        remote[-1]["digest"] = "sha256:" + hashlib.sha256(b"wrong manifest").hexdigest()
+        with self.assertRaisesRegex(ValueError, "publication-manifest.json"):
+            verify_remote(manifest, remote)
+        remote[-1]["digest"] = "sha256:" + hashlib.sha256(payload).hexdigest()
         remote[0]["digest"] = "sha256:" + hashlib.sha256(b"wrong").hexdigest()
         with self.assertRaises(ValueError):
             verify_remote(manifest, remote)

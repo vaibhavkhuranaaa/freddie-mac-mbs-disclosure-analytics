@@ -29,6 +29,10 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def encoded_manifest(manifest: dict[str, object]) -> bytes:
+    return (json.dumps(manifest, indent=2, sort_keys=True) + "\n").encode()
+
+
 def active_release_id(data_root: Path) -> str:
     active = json.loads((data_root / "manifests/active-release.json").read_text())
     release_id = active.get("release_id")
@@ -121,9 +125,7 @@ def prepare_stage(data_root: Path, output: Path, card: Path) -> dict[str, object
     assets.mkdir(parents=True)
     for item in manifest["artifacts"]:
         os.link(data_root / item["logical_path"], assets / item["asset_name"])
-    (output / "publication-manifest.json").write_text(
-        json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
-    )
+    (output / "publication-manifest.json").write_bytes(encoded_manifest(manifest))
     (output / "DATASET.md").write_text(card.read_text(encoding="utf-8"), encoding="utf-8")
     return manifest
 
@@ -151,7 +153,16 @@ def github_assets(repository: str, tag: str) -> list[dict[str, object]]:
 
 
 def verify_remote(manifest: dict[str, object], assets: list[dict[str, object]]) -> None:
-    expected_names = [item["asset_name"] for item in manifest["artifacts"]]
+    manifest_payload = encoded_manifest(manifest)
+    expected = [
+        *manifest["artifacts"],
+        {
+            "asset_name": "publication-manifest.json",
+            "size_bytes": len(manifest_payload),
+            "sha256": hashlib.sha256(manifest_payload).hexdigest(),
+        },
+    ]
+    expected_names = [item["asset_name"] for item in expected]
     remote_names = [item["name"] for item in assets]
     if len(expected_names) != len(set(expected_names)):
         raise ValueError("manifest contains duplicate asset names")
@@ -160,7 +171,7 @@ def verify_remote(manifest: dict[str, object], assets: list[dict[str, object]]) 
     if set(remote_names) != set(expected_names):
         raise ValueError("remote assets do not exactly match the publication manifest")
     remote = {item["name"]: item for item in assets}
-    for item in manifest["artifacts"]:
+    for item in expected:
         found = remote.get(item["asset_name"])
         if found is None:
             raise ValueError(f"remote asset missing: {item['asset_name']}")
