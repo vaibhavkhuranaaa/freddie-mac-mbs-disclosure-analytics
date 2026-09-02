@@ -1,8 +1,8 @@
-# Freddie Mac MBS Disclosure Intelligence — BI product specification
+# Freddie Mac MBS Disclosure Intelligence - BI product specification
 
 Status: implementation-ready product contract
 
-Implementation note: the restricted M5 engine currently implements all 23 contracts supported by approved fields. Seventeen methodology-gated, eleven field-extension, and three external contracts remain unreleased; M6 has not begun.
+Implementation note: M5 is complete on the owner-approved reduced DPR boundary. The engine implements all 38 supported contracts. M5.6 releases nine M4 v2 field families and M5.7 releases disk-backed loan transitions; eleven methodology-gated, two field-extension, and three external contracts remain explicitly unreleased. Decision 0018 parks M6 Power BI work; the provider-neutral M7-M9 dashboard, investigation, and governed API lane is complete.
 
 Prepared: 2026-08-10
 
@@ -18,12 +18,9 @@ Build a governed Power BI decision product that lets a nontechnical stakeholder 
 4. Is the movement economic, operational, or caused by a correction, schema change, or missing population?
 5. What investigation should be assigned, with which source evidence?
 
-The product has two isolated modes:
+Target publication provides full security-period and loan-period detail, governed drill-through, row-level evidence, issue notes, and approved descriptive metrics.
 
-- **Authorized analyst mode:** full approved security-period and loan-period detail, governed drill-through, row-level evidence, export controls, issue notes, and all approved descriptive metrics.
-- **Reviewer mode:** explicitly approved aggregates and safe provenance only. It never inherits access merely because the analyst model exists.
-
-The current static issuance dashboard remains the verified baseline until the Power BI replacement proves metric parity and the owner approves a release change.
+The browser product is the current verified presentation baseline and implements the provider-neutral M7-M9 contracts while Power BI is parked. Power BI becomes an additional accepted client only after its own parity and release evidence passes.
 
 ## Decision workflow and information architecture
 
@@ -90,7 +87,7 @@ Availability labels:
 | Factor level and factor change | Current factor and period-over-period movement | Acquired |
 | Ending-balance bridge | Beginning balance + issuance/adjustments − principal reductions = ending balance | Methodology gate |
 | Gross and net paydown/runoff | Balance reduction with explicit issuance, correction, removal, and termination treatment | Methodology gate |
-| Involuntary removal count/UPB/share | Provider-disclosed involuntary removals relative to the adjacent prior active population | Supported for restricted local use |
+| Involuntary removal count/UPB/share | Provider-disclosed involuntary removals relative to the adjacent prior active population | Supported and implemented |
 
 ### Prepayment and cash-flow behavior
 
@@ -111,8 +108,8 @@ Freddie Mac's Daily Prepayment Report publishes daily voluntary total prepayment
 
 | Metric | Definition / business use | Availability |
 | --- | --- | --- |
-| Days-delinquent distribution | Current, 1–29, 30–59, 60–89, 90+, and approved severe bands | Acquired |
-| 30+/60+/90+ delinquency rate | Delinquent active-loan count and UPB divided by eligible non-missing active population | Supported for restricted local use |
+| Days-delinquent distribution | Current, 1-29, 30-59, 60-89, 90+, and approved severe bands | Acquired |
+| 30+/60+/90+ delinquency rate | Delinquent active-loan count and UPB divided by eligible non-missing active population | Supported and implemented |
 | Roll and cure rates | Movement between delinquency states on a consistent beginning cohort | Methodology gate |
 | New delinquency and re-default | Newly entering a delinquency band and returning after cure/modification | Methodology gate |
 | Modification count/rate and capitalized amount | Modified loans and amounts divided by eligible population | Count/rate supported locally; capitalized amount requires field extension |
@@ -133,7 +130,7 @@ Freddie Mac's Daily Prepayment Report publishes daily voluntary total prepayment
 | First-time-homebuyer share | Count/UPB share using disclosed indicator | Acquired |
 | State concentration | Count/UPB/share and change by property state | Acquired |
 | Seller and servicer concentration | Top-N share and segment exposure | Acquired |
-| HHI concentration | Sum of squared entity or geography shares; formula/version displayed | Supported for restricted local use |
+| HHI concentration | Sum of squared entity or geography shares; formula/version displayed | Supported and implemented |
 | Mission Density Score / Mission Criteria Share | Provider-disclosed mission metrics | Acquired for applicable securities |
 | Green, social, and special-eligibility shares | Provider-disclosed flags; no impact claim without separate evidence | Acquired |
 
@@ -161,7 +158,7 @@ Use a star schema with explicit measures and conformed dimensions. Avoid bidirec
 
 - `FactIssuance`: one accepted security at issuance month.
 - `FactSecurityPeriod`: one security per reporting period, latest/original correction views.
-- `FactLoanPeriod`: one authorized loan per reporting period; restricted.
+- `FactLoanPeriod`: one governed loan per reporting period.
 - `FactSupplementalDistribution`: provider distribution records at their documented grain.
 - `FactSourceQuality`: file/family/period counts, freshness, schema, and disposition.
 - `FactRestatement`: original-to-latest changes and affected measures.
@@ -169,18 +166,18 @@ Use a star schema with explicit measures and conformed dimensions. Avoid bidirec
 
 ### Dimensions
 
-`DimDate`, `DimSecurity`, `DimLoan` (restricted), `DimProduct`, `DimVintage`, `DimGeography`, `DimSeller`, `DimServicer`, `DimCreditBand`, `DimLtvBand`, `DimLoanPurpose`, `DimOccupancy`, `DimPropertyType`, `DimChannel`, `DimAssistanceProgram`, `DimSourceFile`, and `DimSchemaVersion`.
+`DimDate`, `DimSecurity`, `DimLoan`, `DimProduct`, `DimVintage`, `DimGeography`, `DimSeller`, `DimServicer`, `DimCreditBand`, `DimLtvBand`, `DimLoanPurpose`, `DimOccupancy`, `DimPropertyType`, `DimChannel`, `DimAssistanceProgram`, `DimSourceFile`, and `DimSchemaVersion`.
 
-Use surrogate warehouse keys, retain source keys only in restricted dimensions, and implement role-playing dates where issue, origination, maturity, acquisition, and reporting dates differ.
+Use surrogate warehouse keys, preserve source-key provenance, and implement role-playing dates where issue, origination, maturity, acquisition, and reporting dates differ.
 
 ### Model behavior
 
-- Import mode is the local baseline; use incremental refresh only after period-boundary and correction tests pass.
+- Import mode is the baseline; use incremental refresh only after period-boundary and correction tests pass.
 - Provide `As reported` and `Latest known` calculation views. Never overwrite the evidence of an original publication.
 - Use field parameters for controlled measure/segment switching, not arbitrary data access.
-- Use aggregations or summary facts for executive pages while retaining authorized drill-through to governed detail.
-- Define row-level security by analyst role/population only when Power BI Service is approved. Object-level security hides restricted identifiers/fields. Workspace write roles are not treated as RLS-protected consumers.
-- Disable or constrain underlying-data export, Analyze in Excel, and Build permissions for restricted datasets when service deployment is approved.
+- Summary facts may improve executive-page performance; full governed detail remains in the same model and target publication.
+- Define row-level or object-level security only when a deployed access policy requires it. Workspace write roles are not treated as RLS-protected consumers.
+- Validate export, Analyze in Excel, and Build permissions against the approved deployment policy when service deployment is approved.
 
 ## Interaction and visual standards
 
@@ -194,15 +191,15 @@ Use surrogate warehouse keys, retain source keys only in restricted dimensions, 
 
 ## Governance, privacy, and retention
 
-- Row-level use is approved for the authorized local product. Raw and derived restricted data are retained seven years from acquisition and deleted earlier if authorization ends.
+- Row-level use is approved. Raw and derived data are retained seven years from acquisition and deleted earlier if authorization ends.
 - Seven-year retention is a lifecycle rule, not an analytical-history claim. The current analytical history begins with the acquired files; extend it only through verified packages and schemas.
-- Restricted data stays out of Git, public artifacts, screenshots, logs, prompts, traces, and reviewer exports.
-- Public/demo redistribution remains unapproved. A public model must be generated from an explicit allowlist and pass disclosure review.
+- Source and generated data stay out of Git during development; screenshots, logs, prompts, and traces must not leak row values before publication.
+- Target publication includes complete row-level source and derived data. Publication still requires the product, integrity, provenance, and distribution-rights gates.
 - AI, cloud services, paid resources, deployment, and publication remain separate approval gates.
 
 ## History recommendation
 
-The current 2024/2025–2026 acquisition is enough to build and validate the model but is short for stable seasonality and rate-cycle interpretation. After M4–M6 prove schema-safe backfill, target at least five years of monthly history and preferably the full approved seven-year analytical window. Retain each acquired file for seven years from acquisition; do not confuse that retention clock with a promise that seven years of observations are already present.
+The current 2024/2025-2026 acquisition is enough to build and validate the model but is short for stable seasonality and rate-cycle interpretation. After M4-M6 prove schema-safe backfill, target at least five years of monthly history and preferably the full approved seven-year analytical window. Retain each acquired file for seven years from acquisition; do not confuse that retention clock with a promise that seven years of observations are already present.
 
 ## Authoritative references
 

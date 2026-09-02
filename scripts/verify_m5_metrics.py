@@ -25,11 +25,30 @@ def scalar(connection: sqlite3.Connection, query: str, params=()) -> int:
 def verify(database: Path, m4_database: Path, catalog_path: Path) -> dict:
     catalog, _ = m5_metric_engine.load_catalog(catalog_path)
     with (
-        closing(sqlite3.connect(database)) as metrics,
-        closing(sqlite3.connect(m4_database)) as m4,
+        closing(sqlite3.connect(f"file:{database.resolve()}?mode=ro", uri=True)) as metrics,
+        closing(sqlite3.connect(f"file:{m4_database.resolve()}?mode=ro", uri=True)) as m4,
     ):
         metrics.row_factory = sqlite3.Row
         m4.row_factory = sqlite3.Row
+        try:
+            m4_fingerprints = {
+                row[0]
+                for row in m4.execute(
+                    "SELECT DISTINCT build_fingerprint FROM source_manifest"
+                )
+            }
+            recorded = metrics.execute(
+                "SELECT value FROM run_metadata WHERE key='m4_build_fingerprint'"
+            ).fetchone()
+        except sqlite3.Error as error:
+            raise VerificationError("M4/M5 release fingerprint metadata is missing") from error
+        if (
+            len(m4_fingerprints) != 1
+            or not next(iter(m4_fingerprints))
+            or recorded is None
+            or recorded[0] != next(iter(m4_fingerprints))
+        ):
+            raise VerificationError("M5 was not built from the active M4 v2 release")
         supported = {name for name, item in catalog.items() if item["status"] == "supported"}
         released = {
             row[0] for row in metrics.execute(
@@ -37,7 +56,10 @@ def verify(database: Path, m4_database: Path, catalog_path: Path) -> dict:
             )
         }
         if supported != released:
-            raise VerificationError("supported metric contracts do not match released contracts")
+            raise VerificationError(
+                "supported metric contracts do not match released contracts: "
+                f"missing={sorted(supported - released)} extra={sorted(released - supported)}"
+            )
         expected_partitions, expected_loan_rows = m4.execute(
             "SELECT COUNT(*), SUM(partition_row_count) FROM source_manifest WHERE partition_path IS NOT NULL AND quality_status='pass'"
         ).fetchone()
@@ -114,6 +136,26 @@ def verify(database: Path, m4_database: Path, catalog_path: Path) -> dict:
             if denominator != component_sum:
                 raise VerificationError("score-model distribution parity failed")
 
+        for period, correction_view, grain, dimension, component, denominator, component_sum in metrics.execute(
+            """
+            SELECT report_period, correction_view, grain, dimension, component,
+                   MAX(CAST(denominator AS INTEGER)),
+                   SUM(CAST(numerator AS INTEGER))
+            FROM metric_component
+            WHERE released=1
+              AND contract_id IN (
+                'assistance_resolution_share','guarantee_mi_share','ltv_metrics',
+                'loan_property_composition','first_time_homebuyer_share',
+                'mission_metrics','green_social_eligibility'
+              )
+              AND dimension != 'portfolio'
+            GROUP BY report_period, correction_view, grain, dimension, component
+            """
+        ):
+            parity_checks += 1
+            if denominator != component_sum:
+                raise VerificationError("M5.6 field-extension distribution parity failed")
+
         for period, correction_view, grain, dimension, basis, denominator, component_sum, rows in metrics.execute(
             """
             SELECT report_period, correction_view, grain, dimension,
@@ -166,6 +208,21 @@ def verify(database: Path, m4_database: Path, catalog_path: Path) -> dict:
             raise VerificationError("HHI derived population coverage failed")
 
         derived_formula_checks = 0
+        for contract, numerator, denominator, value in metrics.execute(
+            """
+            SELECT contract_id, numerator, denominator, value
+            FROM metric_component
+            WHERE released=1 AND contract_id IN ('weighted_rates','ltv_metrics','dti_metric')
+              AND dimension='portfolio' AND denominator IS NOT NULL
+            """
+        ):
+            expected = int(numerator) / int(denominator)
+            if contract == "weighted_rates":
+                expected /= 1000
+            derived_formula_checks += 1
+            if value is None or abs(float(value) - expected) > 1e-12:
+                raise VerificationError("M5.6 weighted field formula reconciliation failed")
+
         for period, dimension, component, value in metrics.execute(
             """
             SELECT report_period, dimension, component, value
@@ -374,6 +431,105 @@ def verify(database: Path, m4_database: Path, catalog_path: Path) -> dict:
             ):
                 raise VerificationError("involuntary-removal-share reconciliation failed")
 
+        transition_coverage = scalar(
+            metrics,
+            """
+            SELECT COUNT(*) FROM metric_component
+            WHERE contract_id='delinquency_roll_cure'
+              AND component='eligible_origin_count'
+            """,
+        )
+        transition_periods = scalar(
+            metrics,
+            "SELECT COUNT(DISTINCT report_period) FROM input_partition",
+        )
+        if transition_coverage != transition_periods * 2:
+            raise VerificationError("original/latest transition coverage failed")
+
+        matrix: dict[tuple[str, str, str, str], list[tuple[str, int, int]]] = {}
+        for period, view, component, member, numerator, denominator in metrics.execute(
+            """
+            SELECT report_period, correction_view, component, member,
+                   CAST(numerator AS INTEGER), CAST(denominator AS INTEGER)
+            FROM metric_component
+            WHERE contract_id='delinquency_roll_cure'
+              AND component IN ('transition_count','transition_upb')
+            """
+        ):
+            origin, destination = member.split(" to ", 1)
+            matrix.setdefault((period, view, component, origin), []).append(
+                (destination, numerator, denominator)
+            )
+        for rows in matrix.values():
+            parity_checks += 1
+            if len({row[2] for row in rows}) != 1 or sum(row[1] for row in rows) != rows[0][2]:
+                raise VerificationError("transition matrix denominator parity failed")
+
+        for period, view, component, numerator, denominator in metrics.execute(
+            """
+            SELECT report_period, correction_view, component,
+                   CAST(numerator AS INTEGER), CAST(denominator AS INTEGER)
+            FROM metric_component
+            WHERE contract_id='new_delinquency_redefault'
+              AND component IN ('new_delinquency_count','new_delinquency_upb')
+            """
+        ):
+            source_component = "transition_count" if component.endswith("count") else "transition_upb"
+            rows = matrix.get((period, view, source_component, "Current"), [])
+            expected_numerator = sum(
+                row[1] for row in rows if row[0] in {"30-59", "60-89", "90+"}
+            )
+            expected_denominator = 0 if not rows else rows[0][2]
+            derived_formula_checks += 1
+            if (numerator, denominator) != (expected_numerator, expected_denominator):
+                raise VerificationError("new-delinquency transition reconciliation failed")
+
+        for period, view, trigger, basis, total in metrics.execute(
+            """
+            SELECT report_period, correction_view, member,
+                   CASE WHEN component LIKE '%_count' THEN 'count' ELSE 'upb' END,
+                   CAST(numerator AS INTEGER)
+            FROM metric_component
+            WHERE contract_id='new_delinquency_redefault'
+              AND component IN ('trigger_cohort_count','trigger_cohort_upb')
+            """
+        ):
+            redefault = metrics.execute(
+                """
+                SELECT CAST(numerator AS INTEGER), CAST(denominator AS INTEGER)
+                FROM metric_component
+                WHERE contract_id='new_delinquency_redefault'
+                  AND report_period=? AND correction_view=? AND member=?
+                  AND component=?
+                """,
+                (period, view, trigger, f"redefault_{basis}"),
+            ).fetchone()
+            censored = metrics.execute(
+                """
+                SELECT CAST(numerator AS INTEGER), CAST(denominator AS INTEGER)
+                FROM metric_component
+                WHERE contract_id='new_delinquency_redefault'
+                  AND report_period=? AND correction_view=? AND member=?
+                  AND component=?
+                """,
+                (period, view, trigger, f"right_censored_{basis}"),
+            ).fetchone()
+            derived_formula_checks += 1
+            if (
+                redefault is None or censored is None
+                or censored[1] != total
+                or redefault[1] + censored[0] != total
+            ):
+                raise VerificationError("redefault censoring reconciliation failed")
+
+        stored_history_rows = json.loads(
+            metrics.execute(
+                "SELECT value FROM run_metadata WHERE key='history_rows'"
+            ).fetchone()[0]
+        )
+        if stored_history_rows != scanned_rows:
+            raise VerificationError("loan history source-row reconciliation failed")
+
         partition_components = {
             tuple(row[:7]): (int(row[7]), None if row[8] is None else int(row[8]), int(row[9]))
             for row in metrics.execute(
@@ -404,9 +560,10 @@ def verify(database: Path, m4_database: Path, catalog_path: Path) -> dict:
             key = tuple(row[:7])
             expected = partition_components.get(key)
             actual = (int(row[7]), None if row[8] is None else int(row[8]), int(row[9]))
-            distribution = row[5] in {
-                "delinquency_band", "prefix", "state", "seller", "servicer", "modification"
-            } or row[5].startswith("score:")
+            distribution = (
+                row[5] in m5_metric_engine.DISTRIBUTION_DIMENSIONS
+                or row[5].startswith("score:")
+            )
             if expected is not None and (
                 (distribution and (actual[0], actual[2]) != (expected[0], expected[2]))
                 or (not distribution and actual != expected)
@@ -436,6 +593,10 @@ def verify(database: Path, m4_database: Path, catalog_path: Path) -> dict:
             "derived_formula_checks": derived_formula_checks,
             "candidate_components": scalar(metrics, "SELECT COUNT(*) FROM metric_component WHERE released=0"),
             "peak_rss_bytes": scalar(metrics, "SELECT MAX(peak_rss_bytes) FROM input_partition"),
+            "history_components": scalar(metrics, "SELECT COUNT(*) FROM transition_component"),
+            "history_peak_bytes": json.loads(metrics.execute(
+                "SELECT value FROM run_metadata WHERE key='history_peak_bytes'"
+            ).fetchone()[0]),
             "snapshot_sha256": m5_metric_engine.normalized_snapshot(metrics),
         }
         stored = json.loads(

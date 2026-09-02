@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "contract_id": "cited-assistant-v1",
+  "status": "approved-for-bounded-evaluation",
+  "provider": "Google Gemini API",
+  "default_model": "gemini-3.5-flash-lite",
+  "runtime": {
+    "enabled_by_default": false,
+    "enable_variable": "MBS_AI_ENABLED",
+    "key_variable": "GEMINI_API_KEY",
+    "request_cap_variable": "MBS_AI_MAX_REQUESTS",
+    "cost_cap_variable": "MBS_AI_MAX_COST_USD",
+    "maximum_question_characters": 500,
+    "maximum_context_characters": 15000,
+    "maximum_output_tokens": 1024,
+    "thinking_level": "minimal",
+    "raw_user_question_sent_to_provider": false,
+    "provider_prose_returned_to_user": false
+  },
+  "response_fields": ["summary", "facts", "limitations", "next_action", "refused", "refusal_reason"],
+  "citation_fields": ["evidence_id", "label", "value"],
+  "allowed_context": [
+    "release and metric version",
+    "quality and comparability status",
+    "coverage",
+    "latest released portfolio metrics",
+    "top-ten concentration",
+    "released evidence identifiers"
+  ],
+  "preflight_refusals": [
+    "borrower, loan, or security identifiers",
+    "investment, trading, valuation, hedging, or lending advice",
+    "unsupported period comparisons",
+    "causal claims"
+  ],
+  "prohibited": [
+    "raw source rows",
+    "arbitrary SQL",
+    "provider grounding or search tools",
+    "credentials in URLs, prompts, responses, or audit logs",
+    "uncited factual claims"
+  ],
+  "grounding": "The provider selects exact evidence objects for allowlisted concentration intents; exact core-metric retrieval is deterministic. The application validates exact labels and values, requires the intent-specific evidence set, and renders all user-facing prose locally."
+}

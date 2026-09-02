@@ -15,21 +15,81 @@ import zipfile
 from collections import Counter
 from contextlib import closing
 from dataclasses import dataclass
+from datetime import datetime
+from decimal import Decimal
 from pathlib import Path
 from typing import Any, Iterable
 
+import m4_field_rules
 import source_inventory
 from storage import StorageError, current_path, manifest_path, raw_path, require_isolated_build
 
-PIPELINE_VERSION = "0.4.0"
+PIPELINE_VERSION = "0.5.0"
 JOIN_REASONS = {"matched", "unmatched", "ambiguous", "late", "ineligible", "terminated"}
 SECURITY_STATUSES = {"A", "P", "C", "D"}
 SECURITY_CORRECTIONS = {"Y", "N"}
 LOAN_CORRECTIONS = {"Y", "N", "A", "D"}
 BATCH_SIZE = 10_000
 
+SECURITY_V2_COLUMNS = [
+    ("issue_date", "issue_date"),
+    ("maturity_date", "maturity_date"),
+    ("wa_net_interest_rate", "wa_net_interest_rate_milli_pct"),
+    ("wa_issuance_interest_rate", "wa_issuance_interest_rate_milli_pct"),
+    ("wa_current_interest_rate", "wa_current_interest_rate_milli_pct"),
+    ("wa_ltv", "wa_ltv_pct"),
+    ("wa_cltv", "wa_cltv_pct"),
+    ("wa_dti", "wa_dti_pct"),
+    ("wa_eltv", "wa_eltv_pct"),
+    ("mission_density_score", "mission_density_score_centi"),
+    ("mission_criteria_share", "mission_criteria_share_centi_pct"),
+    ("green_indicator", "green_indicator"),
+    ("social_indicator", "social_indicator"),
+    ("mission_index_version", "mission_index_version"),
+]
+LOAN_V2_COLUMNS = [
+    ("original_interest_rate", "original_interest_rate_milli_pct"),
+    ("issuance_interest_rate", "issuance_interest_rate_milli_pct"),
+    ("current_interest_rate", "current_interest_rate_milli_pct"),
+    ("issuance_net_interest_rate", "issuance_net_interest_rate_milli_pct"),
+    ("current_net_interest_rate", "current_net_interest_rate_milli_pct"),
+    ("first_payment_date", "first_payment_date"),
+    ("maturity_date", "maturity_date"),
+    ("ltv", "ltv_pct"),
+    ("cltv", "cltv_pct"),
+    ("dti", "dti_pct"),
+    ("first_time_homebuyer", "first_time_homebuyer"),
+    ("loan_purpose", "loan_purpose"),
+    ("occupancy_status", "occupancy_status"),
+    ("number_of_units", "number_of_units"),
+    ("property_type", "property_type"),
+    ("channel", "channel"),
+    ("mortgage_insurance_percent", "mortgage_insurance_pct"),
+    ("mortgage_insurance_cancellation", "mortgage_insurance_cancellation"),
+    ("government_insured_guarantee", "government_insured_guarantee"),
+    ("modification_type", "modification_type"),
+    ("number_of_modifications", "number_of_modifications"),
+    ("total_capitalized_amount", "total_capitalized_amount_cents"),
+    ("original_deferred_amount", "original_deferred_amount_cents"),
+    ("eltv", "eltv_pct"),
+    ("origination_first_payment_date", "origination_first_payment_date"),
+    ("alternative_resolution", "alternative_resolution"),
+    ("alternative_resolution_count", "alternative_resolution_count"),
+    ("total_deferral_amount", "total_deferral_amount_cents"),
+    ("borrower_assistance_plan", "borrower_assistance_plan"),
+    ("special_eligibility_program", "special_eligibility_program"),
+]
+STATUS_CODES = {
+    "valid": "V",
+    "null": "0",
+    "not_available": "N",
+    "not_applicable": "A",
+}
+PREFIX_CLASS_CONTRACT = Path("contracts/freddie-prefix-row-classes-v1.json")
+
 SCHEMA = """
 PRAGMA foreign_keys = ON;
+PRAGMA user_version = 2;
 
 CREATE TABLE IF NOT EXISTS source_manifest (
   source_id INTEGER PRIMARY KEY,
@@ -43,6 +103,7 @@ CREATE TABLE IF NOT EXISTS source_manifest (
   archive_size_bytes INTEGER NOT NULL,
   schema_version TEXT NOT NULL,
   pipeline_version TEXT NOT NULL,
+  build_fingerprint TEXT NOT NULL DEFAULT '',
   input_count INTEGER NOT NULL,
   accepted_count INTEGER NOT NULL,
   excluded_count INTEGER NOT NULL,
@@ -93,6 +154,21 @@ CREATE TABLE IF NOT EXISTS fact_security_period (
   vs4 INTEGER,
   involuntary_removal_upb_cents INTEGER,
   involuntary_removal_count INTEGER,
+  issue_date TEXT,
+  maturity_date TEXT,
+  wa_net_interest_rate_milli_pct INTEGER,
+  wa_issuance_interest_rate_milli_pct INTEGER,
+  wa_current_interest_rate_milli_pct INTEGER,
+  wa_ltv_pct INTEGER,
+  wa_cltv_pct INTEGER,
+  wa_dti_pct INTEGER,
+  wa_eltv_pct INTEGER,
+  mission_density_score_centi INTEGER,
+  mission_criteria_share_centi_pct INTEGER,
+  green_indicator TEXT,
+  social_indicator TEXT,
+  mission_index_version TEXT,
+  v2_field_statuses TEXT NOT NULL DEFAULT '',
   record_hash BLOB NOT NULL,
   UNIQUE (report_period, security_id, source_id),
   FOREIGN KEY (source_id) REFERENCES source_manifest(source_id)
@@ -126,6 +202,37 @@ CREATE TABLE IF NOT EXISTS fact_loan_period (
   property_state TEXT,
   seller_name TEXT,
   servicer_name TEXT,
+  original_interest_rate_milli_pct INTEGER,
+  issuance_interest_rate_milli_pct INTEGER,
+  current_interest_rate_milli_pct INTEGER,
+  issuance_net_interest_rate_milli_pct INTEGER,
+  current_net_interest_rate_milli_pct INTEGER,
+  first_payment_date TEXT,
+  maturity_date TEXT,
+  ltv_pct INTEGER,
+  cltv_pct INTEGER,
+  dti_pct INTEGER,
+  first_time_homebuyer TEXT,
+  loan_purpose TEXT,
+  occupancy_status TEXT,
+  number_of_units INTEGER,
+  property_type TEXT,
+  channel TEXT,
+  mortgage_insurance_pct INTEGER,
+  mortgage_insurance_cancellation TEXT,
+  government_insured_guarantee TEXT,
+  modification_type TEXT,
+  number_of_modifications INTEGER,
+  total_capitalized_amount_cents INTEGER,
+  original_deferred_amount_cents INTEGER,
+  eltv_pct INTEGER,
+  origination_first_payment_date TEXT,
+  alternative_resolution TEXT,
+  alternative_resolution_count INTEGER,
+  total_deferral_amount_cents INTEGER,
+  borrower_assistance_plan TEXT,
+  special_eligibility_program TEXT,
+  v2_field_statuses TEXT NOT NULL DEFAULT '',
   join_reason TEXT NOT NULL CHECK (join_reason IN ('matched', 'unmatched', 'ambiguous', 'late', 'ineligible', 'terminated')),
   record_hash BLOB NOT NULL,
   UNIQUE (report_period, loan_id, security_id, source_id),
@@ -277,14 +384,91 @@ def parse_factor_date(raw: bytes, expected_period: str) -> str:
     return period
 
 
+def contract_fields(contract: dict[str, Any]) -> list[dict[str, Any]]:
+    return [*contract["field_allowlist"], *contract.get("field_contracts", [])]
+
+
 def field_positions(headers: list[str], contract: dict[str, Any]) -> dict[str, int | None]:
     positions: dict[str, int | None] = {}
-    for field in contract["field_allowlist"]:
+    for field in contract_fields(contract):
         positions[field["target"]] = next(
             (headers.index(name) for name in field["source_names"] if name in headers),
             None,
         )
     return positions
+
+
+def load_prefix_rules(
+    path: Path = PREFIX_CLASS_CONTRACT,
+) -> tuple[dict[str, str], dict[str, dict[str, list[str]]]]:
+    try:
+        contract = json.loads(path.read_text(encoding="utf-8"))
+        classes = contract["classes"]
+        prohibited = contract["prohibited_when"]
+    except (KeyError, OSError, json.JSONDecodeError) as error:
+        raise ConformanceError("prefix row-class contract is invalid") from error
+    result: dict[str, str] = {}
+    for row_class_name, prefixes in classes.items():
+        for prefix in prefixes:
+            if prefix in result:
+                raise ConformanceError("prefix row-class contract overlaps")
+            result[prefix] = row_class_name
+    return result, prohibited
+
+
+def normalize_v2_value(field: dict[str, Any], value: Any) -> Any:
+    if value is None:
+        return None
+    if field["type"] == "decimal":
+        return int(Decimal(value) * (10 ** int(field["scale"])))
+    if field["type"] == "date":
+        raw_format = field["raw_format"]
+        parsed = datetime.strptime(value, "%m%Y" if raw_format == "MMCCYY" else "%m%d%Y")
+        return parsed.strftime("%Y-%m" if raw_format == "MMCCYY" else "%Y-%m-%d")
+    return value
+
+
+def parse_v2_values(
+    fields: list[bytes],
+    positions: dict[str, int | None],
+    contract: dict[str, Any],
+    item: dict[str, Any],
+    correction: str,
+    columns: list[tuple[str, str]],
+    prefix_rules: tuple[dict[str, str], dict[str, dict[str, list[str]]]],
+    kind: str,
+) -> tuple[list[Any], str]:
+    rules = m4_field_rules.field_map(contract) if contract.get("field_contracts") else {}
+    if not rules:
+        return [None] * len(columns), "-" * len(columns)
+    prefix_classes, prohibited = prefix_rules
+    row_class_name = prefix_classes.get(
+        cell(fields, positions, "prefix").strip().decode("utf-8"), "standard"
+    )
+    context = {
+        "family": item["source_family"],
+        "schema_version": item["schema_version"],
+        "report_period": item["report_period"],
+        "correction_indicator": correction,
+        "row_class": row_class_name,
+        "prohibited_targets": {
+            target
+            for target, row_classes in prohibited[kind].items()
+            if row_class_name in row_classes
+        },
+    }
+    values: list[Any] = []
+    statuses: list[str] = []
+    for target, _ in columns:
+        field = rules[target]
+        if positions.get(target) is None:
+            raise ConformanceError(f"approved schema omits contracted field: {target}")
+        result = m4_field_rules.validate_value(
+            field, cell(fields, positions, target).decode("utf-8"), context
+        )
+        values.append(normalize_v2_value(field, result["value"]))
+        statuses.append(STATUS_CODES.get(result["status"], "?"))
+    return values, "".join(statuses)
 
 
 def cell(fields: list[bytes], positions: dict[str, int | None], target: str) -> bytes:
@@ -323,6 +507,58 @@ def source_metadata(item: dict[str, Any]) -> tuple[str, str, str]:
     return member, published, f"{published}T23:59:59Z"
 
 
+def build_fingerprint(
+    security_contract: dict[str, Any], loan_contract: dict[str, Any]
+) -> str:
+    identity = {
+        "pipeline_version": PIPELINE_VERSION,
+        "parser_sha256": source_inventory.sha256_file(Path(__file__)),
+        "field_rules_sha256": source_inventory.sha256_file(
+            Path(m4_field_rules.__file__)
+        ),
+        "prefix_classes_sha256": source_inventory.sha256_file(PREFIX_CLASS_CONTRACT),
+        "security_contract": source_inventory.contract_signature(security_contract),
+        "loan_contract": source_inventory.contract_signature(loan_contract),
+        "storage_schema_sha256": hashlib.sha256(SCHEMA.encode()).hexdigest(),
+        "partition_format_sha256": hashlib.sha256(
+            json.dumps(
+                {
+                    "version": 2,
+                    "columns": LOAN_PARTITION_COLUMNS,
+                    "encoding": "utf-8",
+                    "compression": "gzip-1",
+                    "line_ending": "\\n",
+                },
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode()
+        ).hexdigest(),
+    }
+    return hashlib.sha256(
+        json.dumps(identity, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+
+
+def assert_compatible_release(database: Path, fingerprint: str) -> None:
+    if not database.is_file():
+        return
+    try:
+        with closing(
+            sqlite3.connect(f"file:{database.resolve()}?mode=ro", uri=True)
+        ) as connection:
+            version = connection.execute("PRAGMA user_version").fetchone()[0]
+            fingerprints = {
+                row[0]
+                for row in connection.execute(
+                    "SELECT DISTINCT build_fingerprint FROM source_manifest"
+                )
+            }
+    except sqlite3.Error as error:
+        raise ConformanceError("existing M4 release is stale or incompatible") from error
+    if version != 2 or fingerprints != {fingerprint}:
+        raise ConformanceError("existing M4 release fingerprint does not match v2 inputs")
+
+
 def create_manifest(
     connection: sqlite3.Connection,
     item: dict[str, Any],
@@ -335,15 +571,15 @@ def create_manifest(
         INSERT INTO source_manifest (
           source_file, source_family, member_name, report_period, publication_date,
           as_of_timestamp, archive_sha256, archive_size_bytes, schema_version,
-          pipeline_version, input_count, accepted_count, excluded_count,
+          pipeline_version, build_fingerprint, input_count, accepted_count, excluded_count,
           rejected_count, duplicate_count, quarantined_count, published_count,
           partition_path, partition_sha256, partition_row_count, quality_status
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
         (
             item["name"], item["source_family"], member, item["report_period"],
             published, as_of, item["sha256"], item["size_bytes"], item["schema_version"],
-            PIPELINE_VERSION, result.input_count, result.accepted_count,
+            PIPELINE_VERSION, item["_build_fingerprint"], result.input_count, result.accepted_count,
             result.excluded_count, result.rejected_count, result.duplicate_count,
             result.rejected_count + result.duplicate_count,
             result.accepted_count if result.status == "pass" else 0,
@@ -385,6 +621,7 @@ def iter_security_rows(
     contract: dict[str, Any],
     result: SourceResult,
 ) -> Iterable[tuple[Any, ...]]:
+    prefix_rules = load_prefix_rules()
     with zipfile.ZipFile(archive_path) as archive, archive.open(item["members"][0]["name"]) as stream:
         headers = stream.readline().decode("utf-8-sig").rstrip("\r\n").split("|")
         positions = field_positions(headers, contract)
@@ -423,12 +660,16 @@ def iter_security_rows(
                     parse_scaled(cell(fields, positions, "involuntary_removal_upb"), 2, "Involuntary Loan Removal UPB"),
                     parse_integer(cell(fields, positions, "involuntary_removal_count"), "Involuntary Loan Removal count"),
                 )
+                v2_values, v2_statuses = parse_v2_values(
+                    fields, positions, contract, item, correction,
+                    SECURITY_V2_COLUMNS, prefix_rules, "security",
+                )
                 record_hash = hashlib.sha256(b"\x1f".join(cell(fields, positions, target) for target in positions)).digest()
                 yield (
                     row_number, report_period, security_id, prefix, status, correction,
-                    *values, record_hash,
+                    *values, *v2_values, v2_statuses, record_hash,
                 )
-            except (ConformanceError, UnicodeDecodeError) as error:
+            except (ConformanceError, m4_field_rules.FieldRuleError, UnicodeDecodeError) as error:
                 result.rejected_count += 1
                 result.issues.append((row_number, "INVALID_SECURITY_ROW", str(error)))
 
@@ -488,6 +729,7 @@ def iter_loan_rows(
     securities: dict[str, list[str]],
     late_cache: dict[tuple[str, str], bool],
 ) -> Iterable[tuple[Any, ...]]:
+    prefix_rules = load_prefix_rules()
     with zipfile.ZipFile(archive_path) as archive, archive.open(item["members"][0]["name"]) as stream:
         headers = stream.readline().decode("utf-8-sig").rstrip("\r\n").split("|")
         positions = field_positions(headers, contract)
@@ -538,12 +780,16 @@ def iter_loan_rows(
                     cell(fields, positions, "seller_name").strip().decode() or None,
                     cell(fields, positions, "servicer_name").strip().decode() or None,
                 )
+                v2_values, v2_statuses = parse_v2_values(
+                    fields, positions, contract, item, correction,
+                    LOAN_V2_COLUMNS, prefix_rules, "loan",
+                )
                 record_hash = hashlib.sha256(b"\x1f".join(cell(fields, positions, target) for target in positions)).digest()
                 yield (
                     row_number, item["report_period"], loan_id, security_id, prefix,
-                    correction, *values, join_reason, record_hash,
+                    correction, *values, *v2_values, v2_statuses, join_reason, record_hash,
                 )
-            except (ConformanceError, UnicodeDecodeError) as error:
+            except (ConformanceError, m4_field_rules.FieldRuleError, UnicodeDecodeError) as error:
                 result.rejected_count += 1
                 result.issues.append((row_number, "INVALID_LOAN_ROW", str(error)))
 
@@ -571,8 +817,14 @@ def stage_security(
         source_id, source_row, report_period, security_id, prefix, security_status,
         correction_indicator, issuance_upb_cents, current_upb_cents, factor_e8,
         loan_count, legacy_credit_score, classic_fico, vs4,
-        involuntary_removal_upb_cents, involuntary_removal_count, record_hash
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        involuntary_removal_upb_cents, involuntary_removal_count,
+        issue_date, maturity_date, wa_net_interest_rate_milli_pct,
+        wa_issuance_interest_rate_milli_pct, wa_current_interest_rate_milli_pct,
+        wa_ltv_pct, wa_cltv_pct, wa_dti_pct, wa_eltv_pct,
+        mission_density_score_centi, mission_criteria_share_centi_pct,
+        green_indicator, social_indicator, mission_index_version,
+        v2_field_statuses, record_hash
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """
     def rows() -> Iterable[tuple[Any, ...]]:
         for row in iter_security_rows(input_dir / item["name"], item, contract, result):
@@ -609,8 +861,19 @@ def stage_loan(
         legacy_credit_score, classic_fico, vs4, updated_legacy_credit_score,
         updated_classic_fico, updated_vs4, days_delinquent, modification_program,
         current_deferred_upb_cents, property_state, seller_name, servicer_name,
+        original_interest_rate_milli_pct, issuance_interest_rate_milli_pct,
+        current_interest_rate_milli_pct, issuance_net_interest_rate_milli_pct,
+        current_net_interest_rate_milli_pct, first_payment_date, maturity_date,
+        ltv_pct, cltv_pct, dti_pct, first_time_homebuyer, loan_purpose,
+        occupancy_status, number_of_units, property_type, channel,
+        mortgage_insurance_pct, mortgage_insurance_cancellation,
+        government_insured_guarantee, modification_type, number_of_modifications,
+        total_capitalized_amount_cents, original_deferred_amount_cents, eltv_pct,
+        origination_first_payment_date, alternative_resolution,
+        alternative_resolution_count, total_deferral_amount_cents,
+        borrower_assistance_plan, special_eligibility_program, v2_field_statuses,
         join_reason, record_hash
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
     """
     rows = (
         (source_id, *row)
@@ -631,6 +894,7 @@ LOAN_PARTITION_COLUMNS = [
     "classic_fico", "vs4", "updated_legacy_credit_score", "updated_classic_fico",
     "updated_vs4", "days_delinquent", "modification_program",
     "current_deferred_upb_cents", "property_state", "seller_name", "servicer_name",
+    *[column for _, column in LOAN_V2_COLUMNS], "v2_field_statuses",
     "join_reason", "record_hash_sha256", "source_family", "source_file",
     "source_row", "schema_version", "publication_date", "as_of_timestamp",
 ]
@@ -669,9 +933,11 @@ def stage_loan_partition(
                 continue
             seen_keys.add(key)
             result.accepted_count += 1
-            join_counts[row[23]] += 1
+            join_index = 23 + len(LOAN_V2_COLUMNS) + 1
+            hash_index = join_index + 1
+            join_counts[row[join_index]] += 1
             writer.writerow(
-                [*row[1:23], row[23], row[24].hex(), item["source_family"],
+                [*row[1:join_index], row[join_index], row[hash_index].hex(), item["source_family"],
                  item["name"], row[0], item["schema_version"], published, as_of]
             )
     partition = None
@@ -867,6 +1133,18 @@ def verify(connection: sqlite3.Connection, expected_sources: int) -> dict[str, A
     }
 
 
+def verify_real_population(summary: dict[str, Any], loan_contract: dict[str, Any]) -> None:
+    expectations = loan_contract.get("real_population_expectations")
+    if not expectations:
+        return
+    for reason, expected in expectations["non_matched_join_counts"].items():
+        actual = summary["joins"].get(reason, 0)
+        if actual != expected:
+            raise ConformanceError(
+                f"real-population join expectation failed: {reason}={actual} expected={expected}"
+            )
+
+
 def build(
     input_dir: Path,
     database: Path,
@@ -879,11 +1157,17 @@ def build(
 ) -> dict[str, Any]:
     security_contract = source_inventory.load_contract(security_contract_path)
     loan_contract = source_inventory.load_contract(loan_contract_path)
+    fingerprint = build_fingerprint(security_contract, loan_contract)
+    if incremental:
+        assert_compatible_release(database, fingerprint)
     bundle = source_inventory.load_contract_bundle([security_contract_path, loan_contract_path])
     inventory = source_inventory.build_inventory(input_dir, bundle, inventory_cache)
     if inventory["m4_readiness"]["status"] != "ready":
         raise ConformanceError("approved source inventory is not ready")
-    all_approved = [item for item in inventory["files"] if item["kind"] == "approved-m4"]
+    all_approved = [
+        {**item, "_build_fingerprint": fingerprint}
+        for item in inventory["files"] if item["kind"] == "approved-m4"
+    ]
     approved = all_approved
     if only_sources:
         approved = [item for item in approved if item["name"] in only_sources]
@@ -903,15 +1187,17 @@ def build(
         existing = {
             row[0]: row[1:]
             for row in connection.execute(
-                "SELECT source_file, archive_sha256, partition_path, partition_sha256 FROM source_manifest"
+                "SELECT source_file, archive_sha256, partition_path, partition_sha256, build_fingerprint FROM source_manifest"
             )
         }
         selected = []
         for item in approved:
             if item["name"] in existing:
-                archive_sha, partition_path, partition_sha = existing[item["name"]]
+                archive_sha, partition_path, partition_sha, prior_fingerprint = existing[item["name"]]
                 if archive_sha != item["sha256"]:
                     raise ConformanceError("an immutable source archive changed after loading")
+                if prior_fingerprint != fingerprint:
+                    raise ConformanceError("an existing source was produced by stale M4 inputs")
                 if partition_path:
                     output = partition_dir / partition_path
                     if not output.is_file() or source_inventory.sha256_file(output) != partition_sha:
@@ -949,9 +1235,46 @@ def build(
             refresh_lineage(connection)
         expected_sources = len(all_approved)
         summary = verify(connection, expected_sources)
+        if only_sources is None:
+            verify_real_population(summary, loan_contract)
     if not incremental:
         target.replace(database)
     return summary
+
+
+def verify_release(
+    input_dir: Path,
+    database: Path,
+    security_contract_path: Path,
+    loan_contract_path: Path,
+    inventory_cache: Path,
+    partition_dir: Path,
+) -> dict[str, Any]:
+    security_contract = source_inventory.load_contract(security_contract_path)
+    loan_contract = source_inventory.load_contract(loan_contract_path)
+    fingerprint = build_fingerprint(security_contract, loan_contract)
+    assert_compatible_release(database, fingerprint)
+    inventory = source_inventory.build_inventory(
+        input_dir,
+        source_inventory.load_contract_bundle(
+            [security_contract_path, loan_contract_path]
+        ),
+        inventory_cache,
+    )
+    expected = sum(item["kind"] == "approved-m4" for item in inventory["files"])
+    with closing(
+        sqlite3.connect(f"file:{database.resolve()}?mode=ro", uri=True)
+    ) as connection:
+        register_functions(connection)
+        for relative, digest in connection.execute(
+            "SELECT partition_path, partition_sha256 FROM source_manifest WHERE partition_path IS NOT NULL"
+        ):
+            path = partition_dir / relative
+            if not path.is_file() or source_inventory.sha256_file(path) != digest:
+                raise ConformanceError("a restricted conformed partition is missing or changed")
+        summary = verify(connection, expected)
+        verify_real_population(summary, loan_contract)
+        return summary
 
 
 def main() -> int:
@@ -963,17 +1286,26 @@ def main() -> int:
     parser.add_argument("--inventory-cache", type=Path, default=manifest_path("source-inventory.json"))
     parser.add_argument("--partition-dir", type=Path, default=current_path("loan"))
     parser.add_argument("--incremental", action="store_true")
+    parser.add_argument("--verify-existing", action="store_true")
     parser.add_argument("--only-source", action="append", default=[])
     parser.add_argument("--json", action="store_true", help="emit value-free reconciliation JSON")
     args = parser.parse_args()
     try:
-        if not args.incremental:
+        if args.verify_existing and args.incremental:
+            raise ConformanceError("verify-existing and incremental are mutually exclusive")
+        if not args.incremental and not args.verify_existing:
             require_isolated_build(args.database)
-        summary = build(
-            args.input, args.database, args.security_contract, args.loan_contract,
-            args.inventory_cache, args.partition_dir, args.incremental,
-            set(args.only_source) or None,
-        )
+        if args.verify_existing:
+            summary = verify_release(
+                args.input, args.database, args.security_contract, args.loan_contract,
+                args.inventory_cache, args.partition_dir,
+            )
+        else:
+            summary = build(
+                args.input, args.database, args.security_contract, args.loan_contract,
+                args.inventory_cache, args.partition_dir, args.incremental,
+                set(args.only_source) or None,
+            )
     except (ConformanceError, source_inventory.InventoryError, StorageError, OSError, sqlite3.Error, zipfile.BadZipFile) as error:
         print(f"M4 conformance failed: {error}", file=sys.stderr)
         return 2

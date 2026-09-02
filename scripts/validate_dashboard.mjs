@@ -1,4 +1,5 @@
 import { readFile } from "node:fs/promises";
+import { validatePayload, validateSemanticPayload } from "../app/analytics.js";
 
 const source = process.argv[2] ?? new URL("../app/data/dashboard.json", import.meta.url);
 const payload = JSON.parse(await readFile(source, "utf8"));
@@ -96,4 +97,8 @@ assert(typeof mixMetadata.taxonomy_source === "string" && mixMetadata.taxonomy_s
 assert(mixMetadata.mapped_observation_count + mixMetadata.unmapped_observation_count === observationCount, "Mix observation coverage does not reconcile.");
 assert(isFiniteNumber(mixMetadata.mapped_issuance_share) && mixMetadata.mapped_issuance_share >= 0 && mixMetadata.mapped_issuance_share <= 1, "Mapped issuance share is invalid.");
 
-console.log(`Dashboard payload validation: pass (${payload.months.length} monthly rows, ${observationCount.toLocaleString("en-US")} observations, build ${metadata.build_id.slice(0, 12)}).`);
+validatePayload(payload);
+if (payload.semantic) validateSemanticPayload(payload.semantic);
+
+const semanticSummary = payload.semantic ? `, ${payload.semantic.series.length} portfolio periods, release ${payload.semantic.release_id}` : "";
+console.log(`Dashboard payload validation: pass (${payload.months.length} monthly rows, ${observationCount.toLocaleString("en-US")} observations${semanticSummary}, build ${metadata.build_id.slice(0, 12)}).`);

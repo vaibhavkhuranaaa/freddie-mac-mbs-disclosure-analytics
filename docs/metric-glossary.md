@@ -4,7 +4,7 @@ The complete catalog and availability classification are in `docs/BI_PRODUCT_SPE
 
 ## M5 implementation status
 
-The machine catalog is `contracts/m5-metric-catalog.json`: 54 complete contracts at formula version `m5.1.0`. Twenty-seven supported contracts are implemented in the restricted local engine. Thirteen methodology-gated contracts, eleven field-contract extensions, and three external families are unreleased. Approval records remain in the private delivery workspace.
+The machine catalog is `contracts/m5-metric-catalog.json`: 54 complete contracts. Thirty-eight supported contracts are implemented. Exact comparability and transition rules use approved formula version `m5.2.0`; field-backed formulas use `m5.3.0`. Eleven methodology-gated contracts, two field extensions, and three external families remain unreleased. Approval records remain in the private delivery workspace.
 
 Released components include release/accounting controls, governed issuance flow, security/loan ending populations, factor level/change, WALA/WAM, model-separated credit scores, delinquency-band and threshold rates, modification volume/rate, involuntary-removal volume/share, deferred balance/share, state/counterparty composition, Top-10/Other components, and HHI concentration.
 

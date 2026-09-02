@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "contract_id": "freddie-prefix-row-classes-v1",
+  "status": "approved",
+  "provider_source": {
+    "name": "Freddie Mac Prefix Library",
+    "url": "https://www.freddiemac.com/mbs/docs/prefixlibrary.xlsx",
+    "sha256": "47dd0f1d93f91f99166b23fef9f1586c3f8a9d7d5f7f4ab62feead4ed04ba919",
+    "retrieved_on": "2026-08-24"
+  },
+  "classification_rule": "Match the disclosed prefix exactly. Prefixes absent from every named special class are standard fixed-rate for these applicability checks.",
+  "classes": {
+    "reinstated": ["3Y", "3Z", "4I", "4J", "4K", "6T", "B9", "R0"],
+    "modified-step-rate": ["4A", "4B", "4C", "4D", "HA", "HB", "HC", "HD"],
+    "modified-fixed-rate": ["4E", "4F", "4G", "4H", "MA", "MB", "MC", "MD"],
+    "arm": ["1A", "1B", "1C", "1E", "1G", "1H", "1J", "1K", "1L", "1M", "1N", "1Q", "1R", "2B", "35", "39", "40", "41", "42", "5A", "60", "61", "63", "64", "71", "74", "75", "76", "77", "78", "84", "86", "87", "8A", "8B", "8C", "8D", "94", "96", "97"]
+  },
+  "prohibited_when": {
+    "security": {
+      "wa_current_interest_rate": ["arm"],
+      "wa_ltv": ["reperforming", "modified-fixed-rate", "modified-step-rate"],
+      "wa_cltv": ["reperforming", "modified-fixed-rate", "modified-step-rate"]
+    },
+    "loan": {
+      "current_interest_rate": ["arm"],
+      "ltv": ["reperforming", "modified-fixed-rate", "modified-step-rate"],
+      "cltv": ["reperforming", "modified-fixed-rate", "modified-step-rate"],
+      "occupancy_status": ["reperforming", "modified-fixed-rate", "modified-step-rate"],
+      "channel": ["reperforming", "modified-fixed-rate", "modified-step-rate"]
+    }
+  },
+  "limitations": [
+    "This taxonomy classifies prefix-level product applicability; it does not infer borrower or loan outcomes.",
+    "Reperforming loans disclosed under modified fixed-rate prefixes use the modified-fixed-rate class because the provider library does not expose a separate reperforming prefix label."
+  ]
+}

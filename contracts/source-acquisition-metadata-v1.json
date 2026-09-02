@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "contract_id": "source-acquisition-metadata-v1",
+  "status": "approved-contract-pending-owner-events",
+  "provider_guide": {
+    "version": "owner acquisition event contract v1",
+    "effective_on": "2026-08-24",
+    "url": "docs/METHODOLOGY.md"
+  },
+  "schema_profiles": {
+    "checksum-acquisition-event": [
+      {"family": "acquisition-event", "schema_version": "checksum-ledger-v1", "period_min": "2024-12", "period_max": null, "presence": "required"}
+    ]
+  },
+  "key": ["archive_sha256", "acquired_at"],
+  "immutable_rule": "Record the owner-controlled UTC acquisition event against the immutable archive checksum; never derive it from publication date, as-of date, filesystem metadata, or migration time.",
+  "field_contracts": [
+    {
+      "target": "acquired_at",
+      "source_names": ["owner-controlled acquisition event"],
+      "provider_field_id": "OWNER-ACQUIRED-AT-01",
+      "definition": "UTC timestamp when the owner acquired the exact checksummed archive.",
+      "type": "timestamp",
+      "raw_format": "RFC3339-UTC-seconds",
+      "max_length": 20,
+      "scale": null,
+      "unit": "timestamp",
+      "nullable": false,
+      "null_tokens": [],
+      "sentinels": [],
+      "valid_values": [],
+      "range": null,
+      "schema_profile": "checksum-acquisition-event",
+      "applies_when": {"row_classes": []},
+      "correction_rule": {"indicators": ["N"], "behavior": "append a corrected immutable event; never overwrite or infer a timestamp"},
+      "sensitivity": "restricted",
+      "release_rules": {"authorized": "restricted freshness processing after owner event is supplied", "reviewer": "not approved", "public": "not approved"},
+      "authorized_use": "prospective freshness and acquisition-lag metrics",
+      "limitation": "No current ledger contains trustworthy historical acquisition events, so real freshness remains unreleased."
+    }
+  ]
+}

@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import shutil
 import sys
 from datetime import UTC, datetime
@@ -18,6 +19,8 @@ DEFAULT_DATA_ROOT = REPOSITORY.parent / f"{REPOSITORY.name}-data"
 MIN_FREE_BYTES = 10 * 1024**3
 STABLE_TARGET_BYTES = 34 * 1024**3
 LEDGER_NAME = "recovery-ledger.json"
+ACTIVE_RELEASE_NAME = "active-release.json"
+STORAGE_CEILING_NAME = "storage-ceiling.json"
 
 
 class StorageError(RuntimeError):
@@ -40,8 +43,70 @@ def raw_path() -> Path:
     return data_root() / "raw"
 
 
+def active_release_id() -> str | None:
+    pointer = data_root() / "manifests" / ACTIVE_RELEASE_NAME
+    if not pointer.is_file():
+        return None
+    try:
+        release_id = json.loads(pointer.read_text(encoding="utf-8"))["release_id"]
+    except (KeyError, json.JSONDecodeError, OSError) as error:
+        raise StorageError("active release pointer is invalid") from error
+    if not isinstance(release_id, str) or not re.fullmatch(r"[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}", release_id):
+        raise StorageError("active release identifier is invalid")
+    return release_id
+
+
+def current_root() -> Path:
+    release_id = active_release_id()
+    return (
+        data_root() / "current"
+        if release_id is None
+        else data_root() / "releases" / release_id
+    )
+
+
 def current_path(name: str) -> Path:
-    return data_root() / "current" / name
+    return current_root() / name
+
+
+def promote_release(staged: Path, release_id: str) -> dict[str, Any]:
+    root = data_root()
+    staged_resolved = staged.resolve()
+    build_root = (root / "build").resolve()
+    if build_root not in staged_resolved.parents:
+        raise StorageError("release promotion requires an isolated build bundle")
+    if not re.fullmatch(r"[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}", release_id):
+        raise StorageError("release identifier is invalid")
+    expected = {"issuance.sqlite", "m4.sqlite", "m5.sqlite", "loan"}
+    if not staged.is_dir() or {item.name for item in staged.iterdir()} != expected:
+        raise StorageError("staged release bundle is incomplete")
+    destination = root / "releases" / release_id
+    if destination.exists():
+        raise StorageError("release destination already exists")
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    staged.replace(destination)
+    pointer = root / "manifests" / ACTIVE_RELEASE_NAME
+    pointer.parent.mkdir(parents=True, exist_ok=True)
+    temporary = pointer.with_suffix(".json.building")
+    temporary.write_text(
+        json.dumps({"release_id": release_id}, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    temporary.replace(pointer)
+    return {"status": "pass", "release_id": release_id, "path": str(destination)}
+
+
+def approved_storage_ceiling() -> int:
+    path = data_root() / "manifests" / STORAGE_CEILING_NAME
+    if not path.is_file():
+        return STABLE_TARGET_BYTES
+    try:
+        ceiling = json.loads(path.read_text(encoding="utf-8"))["ceiling_bytes"]
+    except (KeyError, json.JSONDecodeError, OSError) as error:
+        raise StorageError("storage ceiling record is invalid") from error
+    if not isinstance(ceiling, int) or ceiling <= 0:
+        raise StorageError("storage ceiling must be a positive integer")
+    return ceiling
 
 
 def manifest_path(name: str) -> Path:
@@ -374,6 +439,29 @@ def source_from_display(value: str, ops_root: Path | None) -> Path:
     return Path(value)
 
 
+def active_destination(item: dict[str, Any]) -> Path:
+    value = item["destination_path"]
+    destination = source_from_display(value, None)
+    legacy_prefix = "MBS_DATA_ROOT/current/"
+    release_prefix = "MBS_DATA_ROOT/releases/"
+    if (
+        destination.is_file()
+        or not item["artifact_class"].startswith("active-")
+        or active_release_id() is None
+    ):
+        return destination
+    if value.startswith(legacy_prefix):
+        relative = value.removeprefix(legacy_prefix)
+    elif value.startswith(release_prefix) and "/" in value.removeprefix(release_prefix):
+        relative = value.removeprefix(release_prefix).split("/", 1)[1]
+    else:
+        return destination
+    destination = current_root() / relative
+    if destination.is_file():
+        item["destination_path"] = display_path(destination)
+    return destination
+
+
 def finalize_ledger(ops_root: Path | None) -> dict[str, Any]:
     ledger = load_ledger()
     for item in ledger["items"]:
@@ -382,7 +470,11 @@ def finalize_ledger(ops_root: Path | None) -> dict[str, Any]:
         if source.exists():
             raise StorageError(f"cleanup target remains: {item['source_path']}")
         if destination_value:
-            destination = source_from_display(destination_value, ops_root)
+            destination = (
+                active_destination(item)
+                if item["artifact_class"].startswith("active-")
+                else source_from_display(destination_value, ops_root)
+            )
             if not destination.is_file():
                 raise StorageError(f"migrated artifact is missing: {destination_value}")
             expected_size = item.get("verified_size_bytes", item["size_bytes"])
@@ -418,7 +510,7 @@ def record_verified_release(m4_snapshot: str, m5_snapshot: str) -> dict[str, Any
     for item in ledger["items"]:
         if not item["artifact_class"].startswith("active-"):
             continue
-        destination = source_from_display(item["destination_path"], None)
+        destination = active_destination(item)
         if not destination.is_file():
             raise StorageError(f"verified active artifact is missing: {item['destination_path']}")
         item["verified_size_bytes"] = destination.stat().st_size
@@ -531,29 +623,37 @@ def remaining_repository_artifacts(ops_root: Path | None) -> list[str]:
     return sorted({display_path(path, ops_root) for path in paths})
 
 
-def final_preflight(ops_root: Path | None, enforce_budget: bool = False) -> dict[str, Any]:
+def final_preflight(
+    ops_root: Path | None,
+    enforce_budget: bool = False,
+    require_build_headroom: bool = True,
+) -> dict[str, Any]:
     root = data_root()
     ledger = load_ledger()
+    active_root = current_root()
     expected_current = {"issuance.sqlite", "m4.sqlite", "m5.sqlite", "loan"}
-    actual_current = {item.name for item in (root / "current").iterdir()}
+    actual_current = {item.name for item in active_root.iterdir()}
     if actual_current != expected_current:
         raise StorageError(
             f"active release layout differs: expected={sorted(expected_current)} actual={sorted(actual_current)}"
         )
     required_files = [
-        root / "current/issuance.sqlite",
-        root / "current/m4.sqlite",
-        root / "current/m5.sqlite",
+        active_root / "issuance.sqlite",
+        active_root / "m4.sqlite",
+        active_root / "m5.sqlite",
     ]
     if any(not path.is_file() for path in required_files):
         raise StorageError("active release is incomplete")
-    if not any(files_under(root / "current/loan")):
+    if not any(files_under(active_root / "loan")):
         raise StorageError("active loan partition set is empty")
     temporary = list(files_under(root / "build")) + list(root.rglob("*.building")) + list(
         root.rglob("*.migrating")
     )
     if temporary:
         raise StorageError(f"temporary residue remains: {temporary[0]}")
+    rollback = list(files_under(root / "rollback"))
+    if rollback:
+        raise StorageError(f"verified rollback release remains: {rollback[0]}")
     residue = remaining_repository_artifacts(ops_root)
     if residue:
         raise StorageError(f"repository or legacy residue remains: {residue[0]}")
@@ -565,16 +665,18 @@ def final_preflight(ops_root: Path | None, enforce_budget: bool = False) -> dict
     actual_raw = {display_path(path, ops_root) for path in files_under(root / "raw")}
     if actual_raw != expected_raw:
         raise StorageError("canonical raw inventory differs from the recovery ledger")
-    stable_bytes = tree_bytes(root / "raw") + tree_bytes(root / "current")
-    budget_pass = stable_bytes <= STABLE_TARGET_BYTES
+    stable_bytes = tree_bytes(root / "raw") + tree_bytes(active_root)
+    stable_target = approved_storage_ceiling()
+    budget_pass = stable_bytes <= stable_target
     if enforce_budget and not budget_pass:
         raise StorageError(
-            f"stable storage exceeds target: actual={stable_bytes} target={STABLE_TARGET_BYTES}"
+            f"stable storage exceeds target: actual={stable_bytes} target={stable_target}"
         )
     free_bytes = shutil.disk_usage(root).free
-    estimated_build_bytes = tree_bytes(root / "current")
+    estimated_build_bytes = tree_bytes(active_root)
     required_free = estimated_build_bytes + MIN_FREE_BYTES
-    if free_bytes < required_free:
+    headroom_pass = free_bytes >= required_free
+    if require_build_headroom and not headroom_pass:
         raise StorageError(
             f"insufficient build headroom: free={free_bytes} required={required_free}"
         )
@@ -586,11 +688,11 @@ def final_preflight(ops_root: Path | None, enforce_budget: bool = False) -> dict
         "temporary_files": 0,
         "repository_residue": 0,
         "stable_bytes": stable_bytes,
-        "stable_target_bytes": STABLE_TARGET_BYTES,
+        "stable_target_bytes": stable_target,
         "stable_budget_pass": budget_pass,
         "free_bytes": free_bytes,
         "required_build_free_bytes": required_free,
-        "headroom_pass": True,
+        "headroom_pass": headroom_pass,
     }
 
 
@@ -612,6 +714,11 @@ def main() -> int:
     preflight_parser.add_argument("--phase", choices=("migration", "final"), default="final")
     preflight_parser.add_argument("--ops-root", type=Path)
     preflight_parser.add_argument("--enforce-budget", action="store_true")
+    preflight_parser.add_argument(
+        "--closure",
+        action="store_true",
+        help="validate stable storage without asserting capacity for another full build",
+    )
     args = parser.parse_args()
     try:
         if args.command == "migrate":
@@ -627,7 +734,11 @@ def main() -> int:
         elif args.phase == "migration":
             result = migration_preflight()
         else:
-            result = final_preflight(args.ops_root, args.enforce_budget)
+            result = final_preflight(
+                args.ops_root,
+                args.enforce_budget,
+                require_build_headroom=not args.closure,
+            )
     except (OSError, StorageError, ValueError, json.JSONDecodeError) as error:
         print(f"Storage check failed: {error}", file=sys.stderr)
         return 2

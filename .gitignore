@@ -41,6 +41,8 @@ GEMINI.md
 **/.aider*
 .agent-audit/
 **/.agent-audit/
+.impeccable/
+**/.impeccable/
 .github/copilot-instructions.md
 **/copilot-instructions.md
 .github/prompts/

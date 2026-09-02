@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "contract_id": "semantic-api-v1",
+  "status": "approved",
+  "base_path": "/v1",
+  "transport": {
+    "binding": "127.0.0.1",
+    "protocol": "http",
+    "cache": "no-store",
+    "maximum_request_bytes": 65536
+  },
+  "authorization": {
+    "scheme": "Bearer",
+    "secret_environment_variable": "MBS_API_TOKEN",
+    "minimum_secret_characters": 16,
+    "mutation_actor_header": "X-Actor",
+    "secrets_logged": false
+  },
+  "routes": [
+    {"method": "GET", "path": "/v1/health", "authorization": "public", "response": "service status and schema version"},
+    {"method": "GET", "path": "/v1/dashboard", "authorization": "bearer", "response": "validated provider-neutral product contract"},
+    {"method": "POST", "path": "/v1/assistant", "authorization": "bearer and explicit runtime opt-in", "response": "bounded cited answer or deterministic refusal"},
+    {"method": "GET", "path": "/v1/investigations", "authorization": "bearer", "response": "allowlisted investigation records"},
+    {"method": "POST", "path": "/v1/investigations", "authorization": "bearer plus actor", "response": "created investigation with immutable evidence"},
+    {"method": "PATCH", "path": "/v1/investigations/{id}", "authorization": "bearer plus actor", "response": "updated mutable investigation fields"},
+    {"method": "GET", "path": "/v1/investigations/{id}/audit", "authorization": "bearer", "response": "investigation mutation audit"},
+    {"method": "GET", "path": "/v1/audit/requests", "authorization": "bearer", "response": "API request outcome audit without headers or bodies"}
+  ],
+  "allowlists": {
+    "dashboard": "released issuance and M5 product contract only",
+    "assistant": "released governance metadata and evidence catalog in cited-assistant-v1 only",
+    "investigation_mutable_fields": ["title", "owner", "priority", "status", "summary", "resolution"],
+    "investigation_immutable_fields": ["release_id", "report_period", "correction_view", "metric_version", "filter_context", "evidence"]
+  },
+  "prohibited": [
+    "arbitrary SQL",
+    "unrestricted raw-row route",
+    "borrower, loan, or security identifiers in assistant context",
+    "investment, trading, valuation, hedging, lending, or unsupported causal advice",
+    "secret or authorization-header logging",
+    "evidence or release-provenance mutation",
+    "unsupported metric substitution"
+  ]
+}

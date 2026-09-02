@@ -852,5 +852,552 @@
       "unmapped_issuance_upb": 7901810800.0,
       "mapped_issuance_share": 0.9928567299135553
     }
+  },
+  "semantic": {
+    "schema_version": 1,
+    "release_id": "m5-7-history-20260825",
+    "generated_at": "2026-08-26T04:23:54.127956+00:00",
+    "correction_view": "latest",
+    "quality": {
+      "status": "pass",
+      "detail": "Verified M5 release and full-population reconciliation passed."
+    },
+    "comparability": {
+      "status": "unavailable",
+      "detail": "The comparability contract is not released; adjacent-period deltas are descriptive only."
+    },
+    "coverage": {
+      "period_start": "2025-01",
+      "period_end": "2026-08",
+      "period_count": 20
+    },
+    "metadata": {
+      "pipeline_version": "0.7.0",
+      "metric_version": "m5.2.0",
+      "catalog_contracts": 54,
+      "supported_contracts": 38,
+      "released_components": 1040131,
+      "security_rows": 9240038,
+      "loan_rows": 264922553,
+      "snapshot_sha256": "786b09b022bc4ab24a3e78c13947fac05410a5d3e946b2b616debc188b47bcea"
+    },
+    "series": [
+      {
+        "month": "2025-01",
+        "delinquency_30_rate": 0.0,
+        "delinquency_60_rate": 0.0,
+        "delinquency_90_rate": 0.0,
+        "average_loan_balance": 227019.90609006,
+        "correction_count": 6211,
+        "loan_count": 13210345,
+        "loan_upb": 2999011281317.29,
+        "modification_rate": 0.00308735313120134
+      },
+      {
+        "month": "2025-02",
+        "delinquency_30_rate": 0.0,
+        "delinquency_60_rate": 0.0,
+        "delinquency_90_rate": 0.0,
+        "average_loan_balance": 227326.078154532,
+        "correction_count": 10117,
+        "loan_count": 13242848,
+        "loan_upb": 3010444699436.59,
+        "modification_rate": 0.00306686295878349
+      },
+      {
+        "month": "2025-03",
+        "delinquency_30_rate": 0.0,
+        "delinquency_60_rate": 0.0,
+        "delinquency_90_rate": 0.0,
+        "average_loan_balance": 227379.660696815,
+        "correction_count": 3389,
+        "loan_count": 13246453,
+        "loan_upb": 3011973988576.31,
+        "modification_rate": 0.00305123190336311
+      },
+      {
+        "month": "2025-04",
+        "delinquency_30_rate": 0.0,
+        "delinquency_60_rate": 0.0,
+        "delinquency_90_rate": 0.0,
+        "average_loan_balance": 227474.110185682,
+        "correction_count": 1327,
+        "loan_count": 13241823,
+        "loan_upb": 3012171904161.3,
+        "modification_rate": 0.00303689303202437
+      },
+      {
+        "month": "2025-05",
+        "delinquency_30_rate": 0.0,
+        "delinquency_60_rate": 0.0,
+        "delinquency_90_rate": 0.0,
+        "average_loan_balance": 227569.332508785,
+        "correction_count": 613,
+        "loan_count": 13228362,
+        "loan_upb": 3010369510524.57,
+        "modification_rate": 0.0030235791853897
+      },
+      {
+        "month": "2025-06",
+        "delinquency_30_rate": 0.0,
+        "delinquency_60_rate": 0.0,
+        "delinquency_90_rate": 0.0,
+        "average_loan_balance": 227848.115538564,
+        "correction_count": 748,
+        "loan_count": 13225212,
+        "loan_upb": 3013339631798.0,
+        "modification_rate": 0.00300751322549688
+      },
+      {
+        "month": "2025-07",
+        "delinquency_30_rate": 0.0,
+        "delinquency_60_rate": 0.0,
+        "delinquency_90_rate": 0.0,
+        "average_loan_balance": 228174.375111334,
+        "correction_count": 492,
+        "loan_count": 13230974,
+        "loan_upb": 3018969224564.31,
+        "modification_rate": 0.00298965140434861
+      },
+      {
+        "month": "2025-08",
+        "delinquency_30_rate": 0.0,
+        "delinquency_60_rate": 0.0,
+        "delinquency_90_rate": 0.0,
+        "average_loan_balance": 228370.82589388097,
+        "correction_count": 1208,
+        "loan_count": 13218418,
+        "loan_upb": 3018701035670.54,
+        "modification_rate": 0.00297433475019477
+      },
+      {
+        "month": "2025-09",
+        "delinquency_30_rate": 0.0,
+        "delinquency_60_rate": 0.0,
+        "delinquency_90_rate": 0.0,
+        "average_loan_balance": 228547.325572948,
+        "correction_count": 351,
+        "loan_count": 13232351,
+        "loan_upb": 3024218432092.53,
+        "modification_rate": 0.00295419914420348
+      },
+      {
+        "month": "2025-10",
+        "delinquency_30_rate": 0.0,
+        "delinquency_60_rate": 0.0,
+        "delinquency_90_rate": 0.0,
+        "average_loan_balance": 228759.73182065,
+        "correction_count": 648,
+        "loan_count": 13238982,
+        "loan_upb": 3028545971898.41,
+        "modification_rate": 0.00293844345433811
+      },
+      {
+        "month": "2025-11",
+        "delinquency_30_rate": 0.0,
+        "delinquency_60_rate": 0.0,
+        "delinquency_90_rate": 0.0,
+        "average_loan_balance": 228887.092493086,
+        "correction_count": 511,
+        "loan_count": 13235803,
+        "loan_upb": 3029504465481.26,
+        "modification_rate": 0.0029251719748322
+      },
+      {
+        "month": "2025-12",
+        "delinquency_30_rate": 0.0,
+        "delinquency_60_rate": 0.0,
+        "delinquency_90_rate": 0.0,
+        "average_loan_balance": 229094.449660207,
+        "correction_count": 1934,
+        "loan_count": 13258075,
+        "loan_upb": 3037351395678.75,
+        "modification_rate": 0.00290456947935503
+      },
+      {
+        "month": "2026-01",
+        "delinquency_30_rate": 0.0,
+        "delinquency_60_rate": 0.0,
+        "delinquency_90_rate": 0.0,
+        "average_loan_balance": 229440.605089368,
+        "correction_count": 336,
+        "loan_count": 13261279,
+        "loan_upb": 3042675878018.93,
+        "modification_rate": 0.00288735347472895
+      },
+      {
+        "month": "2026-02",
+        "delinquency_30_rate": 0.0,
+        "delinquency_60_rate": 0.0,
+        "delinquency_90_rate": 0.0,
+        "average_loan_balance": 229675.53240481202,
+        "correction_count": 829,
+        "loan_count": 13278682,
+        "loan_upb": 3049788357984.2,
+        "modification_rate": 0.00286978782984637
+      },
+      {
+        "month": "2026-03",
+        "delinquency_30_rate": 0.0,
+        "delinquency_60_rate": 0.0,
+        "delinquency_90_rate": 0.0,
+        "average_loan_balance": 229650.36735177902,
+        "correction_count": 1525,
+        "loan_count": 13282013,
+        "loan_upb": 3050219164621.11,
+        "modification_rate": 0.00285664529917265
+      },
+      {
+        "month": "2026-04",
+        "delinquency_30_rate": 0.0,
+        "delinquency_60_rate": 0.0,
+        "delinquency_90_rate": 0.0,
+        "average_loan_balance": 229633.538165775,
+        "correction_count": 7470,
+        "loan_count": 13258819,
+        "loan_upb": 3044669518869.6,
+        "modification_rate": 0.00284580398902798
+      },
+      {
+        "month": "2026-05",
+        "delinquency_30_rate": 0.0,
+        "delinquency_60_rate": 0.0,
+        "delinquency_90_rate": 0.0,
+        "average_loan_balance": 229961.606698252,
+        "correction_count": 1270,
+        "loan_count": 13258710,
+        "loan_upb": 3048994254346.18,
+        "modification_rate": 0.00282983789524019
+      },
+      {
+        "month": "2026-06",
+        "delinquency_30_rate": 0.0,
+        "delinquency_60_rate": 0.0,
+        "delinquency_90_rate": 0.0,
+        "average_loan_balance": 230255.04027983,
+        "correction_count": 0,
+        "loan_count": 13269061,
+        "loan_upb": 3055268175030.52,
+        "modification_rate": 0.00281353744624431
+      },
+      {
+        "month": "2026-07",
+        "delinquency_30_rate": 0.0,
+        "delinquency_60_rate": 0.0,
+        "delinquency_90_rate": 0.0,
+        "average_loan_balance": 230544.87265543503,
+        "correction_count": 0,
+        "loan_count": 13257848,
+        "loan_upb": 3056528878845.12,
+        "modification_rate": 0.00281380507605759
+      },
+      {
+        "month": "2026-08",
+        "delinquency_30_rate": 0.0,
+        "delinquency_60_rate": 0.0,
+        "delinquency_90_rate": 0.0,
+        "average_loan_balance": 230782.583807753,
+        "correction_count": 0,
+        "loan_count": 13246495,
+        "loan_upb": 3057060342496.48,
+        "modification_rate": 0.00280013694188538
+      }
+    ],
+    "concentration": [
+      {
+        "entity": "seller",
+        "top_10_share": 0.39682859309364,
+        "hhi": 0.0225589032660183,
+        "top_10_upb": 1213128954715.24,
+        "portfolio_upb": 3057060342496.48
+      },
+      {
+        "entity": "servicer",
+        "top_10_share": 0.572245496210719,
+        "hhi": 0.0498101978862183,
+        "top_10_upb": 1749389012638.01,
+        "portfolio_upb": 3057060342496.48
+      },
+      {
+        "entity": "state",
+        "top_10_share": 0.54595472022993,
+        "hhi": 0.0526215674353032,
+        "top_10_upb": 1669016524013.68,
+        "portfolio_upb": 3057060342496.48
+      }
+    ],
+    "evidence": {
+      "metrics": {
+        "outstanding_upb": {
+          "contract_id": "current_outstanding_balance_population",
+          "component": "loan_upb",
+          "report_period": "2026-08",
+          "correction_view": "latest",
+          "grain": "loan-period",
+          "dimension": "portfolio",
+          "member": "All",
+          "numerator": "305706034249648",
+          "denominator": null,
+          "observations": 13246495,
+          "value": null,
+          "provenance": [
+            {
+              "source_file": "fu260806.zip",
+              "report_period": "2026-08",
+              "source_family": "monthly-loan-level-1",
+              "partition_sha256": "856eaab6a4985ca8d887f6b2fe536f126361f3dd917cd11fc0a212a961da6e58",
+              "scanned_rows": 13246495
+            }
+          ]
+        },
+        "modification_rate": {
+          "contract_id": "modification_rate",
+          "component": "modification_count_rate",
+          "report_period": "2026-08",
+          "correction_view": "latest",
+          "grain": "loan-period",
+          "dimension": "portfolio",
+          "member": "All",
+          "numerator": "37092",
+          "denominator": "13246495",
+          "observations": 13246495,
+          "value": "0.00280013694188538",
+          "provenance": [
+            {
+              "source_file": "fu260806.zip",
+              "report_period": "2026-08",
+              "source_family": "monthly-loan-level-1",
+              "partition_sha256": "856eaab6a4985ca8d887f6b2fe536f126361f3dd917cd11fc0a212a961da6e58",
+              "scanned_rows": 13246495
+            }
+          ]
+        },
+        "seller_concentration": {
+          "contract_id": "counterparty_composition",
+          "component": "seller_top_10_upb",
+          "report_period": "2026-08",
+          "correction_view": "latest",
+          "grain": "loan-period",
+          "dimension": "seller_summary",
+          "member": "Top 10",
+          "numerator": "121312895471524",
+          "denominator": "305706034249648",
+          "observations": 10,
+          "value": "0.39682859309364",
+          "provenance": [
+            {
+              "source_file": "fu260806.zip",
+              "report_period": "2026-08",
+              "source_family": "monthly-loan-level-1",
+              "partition_sha256": "856eaab6a4985ca8d887f6b2fe536f126361f3dd917cd11fc0a212a961da6e58",
+              "scanned_rows": 13246495
+            }
+          ]
+        },
+        "servicer_concentration": {
+          "contract_id": "counterparty_composition",
+          "component": "servicer_top_10_upb",
+          "report_period": "2026-08",
+          "correction_view": "latest",
+          "grain": "loan-period",
+          "dimension": "servicer_summary",
+          "member": "Top 10",
+          "numerator": "174938901263801",
+          "denominator": "305706034249648",
+          "observations": 10,
+          "value": "0.572245496210719",
+          "provenance": [
+            {
+              "source_file": "fu260806.zip",
+              "report_period": "2026-08",
+              "source_family": "monthly-loan-level-1",
+              "partition_sha256": "856eaab6a4985ca8d887f6b2fe536f126361f3dd917cd11fc0a212a961da6e58",
+              "scanned_rows": 13246495
+            }
+          ]
+        },
+        "state_concentration": {
+          "contract_id": "state_composition",
+          "component": "state_top_10_upb",
+          "report_period": "2026-08",
+          "correction_view": "latest",
+          "grain": "loan-period",
+          "dimension": "state_summary",
+          "member": "Top 10",
+          "numerator": "166901652401368",
+          "denominator": "305706034249648",
+          "observations": 10,
+          "value": "0.54595472022993",
+          "provenance": [
+            {
+              "source_file": "fu260806.zip",
+              "report_period": "2026-08",
+              "source_family": "monthly-loan-level-1",
+              "partition_sha256": "856eaab6a4985ca8d887f6b2fe536f126361f3dd917cd11fc0a212a961da6e58",
+              "scanned_rows": 13246495
+            }
+          ]
+        },
+        "issuance_change": {
+          "contract_id": "issuance_volume",
+          "component": "issuance_upb",
+          "report_period": "2026-06",
+          "correction_view": "latest",
+          "grain": "issuance",
+          "dimension": "portfolio",
+          "member": "All",
+          "numerator": "57895362159.0",
+          "denominator": null,
+          "observations": 3469,
+          "value": "57895362159.0",
+          "provenance": [
+            {
+              "source_file": "FRE_IS_202606.zip",
+              "report_period": "2026-06",
+              "source_family": "issuance",
+              "partition_sha256": "45233486d902dc6adcd8e1a5002f713ac6176912d22ce75b713751fd7e07353f",
+              "scanned_rows": 3517
+            }
+          ]
+        },
+        "issuance_peak": {
+          "contract_id": "issuance_volume",
+          "component": "issuance_upb",
+          "report_period": "2025-01",
+          "correction_view": "latest",
+          "grain": "issuance",
+          "dimension": "portfolio",
+          "member": "All",
+          "numerator": "135521328266.0",
+          "denominator": null,
+          "observations": 3337,
+          "value": "135521328266.0",
+          "provenance": [
+            {
+              "source_file": "FRE_IS_202501.zip",
+              "report_period": "2025-01",
+              "source_family": "issuance",
+              "partition_sha256": "20b5d7bf55b985c288896b72322f2f33854839afcdaefd14c3827fb78ba6bbb6",
+              "scanned_rows": 3376
+            }
+          ]
+        },
+        "issuance_mix": {
+          "contract_id": "issuance_composition",
+          "component": "group_upb",
+          "report_period": "2026-06",
+          "correction_view": "latest",
+          "grain": "issuance",
+          "dimension": "product_group",
+          "member": "30-year UMBS / Supers family",
+          "numerator": "51645451521.0",
+          "denominator": null,
+          "observations": 3469,
+          "value": "51645451521.0",
+          "provenance": [
+            {
+              "source_file": "FRE_IS_202606.zip",
+              "report_period": "2026-06",
+              "source_family": "issuance",
+              "partition_sha256": "45233486d902dc6adcd8e1a5002f713ac6176912d22ce75b713751fd7e07353f",
+              "scanned_rows": 3517
+            }
+          ]
+        }
+      },
+      "transitions": {
+        "period": "2026-08",
+        "rows": [
+          {
+            "contract_id": "delinquency_roll_cure",
+            "component": "transition_count",
+            "report_period": "2026-08",
+            "correction_view": "latest",
+            "grain": "loan-cohort",
+            "dimension": "delinquency_transition",
+            "member": "1-29 to 1-29",
+            "numerator": "109571",
+            "denominator": "170822",
+            "observations": 109571
+          },
+          {
+            "contract_id": "delinquency_roll_cure",
+            "component": "transition_count",
+            "report_period": "2026-08",
+            "correction_view": "latest",
+            "grain": "loan-cohort",
+            "dimension": "delinquency_transition",
+            "member": "1-29 to Attrition",
+            "numerator": "7294",
+            "denominator": "170822",
+            "observations": 7294
+          },
+          {
+            "contract_id": "delinquency_roll_cure",
+            "component": "transition_count",
+            "report_period": "2026-08",
+            "correction_view": "latest",
+            "grain": "loan-cohort",
+            "dimension": "delinquency_transition",
+            "member": "1-29 to Current",
+            "numerator": "53957",
+            "denominator": "170822",
+            "observations": 53957
+          },
+          {
+            "contract_id": "delinquency_roll_cure",
+            "component": "transition_count",
+            "report_period": "2026-08",
+            "correction_view": "latest",
+            "grain": "loan-cohort",
+            "dimension": "delinquency_transition",
+            "member": "Current to 1-29",
+            "numerator": "46471",
+            "denominator": "13087026",
+            "observations": 46471
+          },
+          {
+            "contract_id": "delinquency_roll_cure",
+            "component": "transition_count",
+            "report_period": "2026-08",
+            "correction_view": "latest",
+            "grain": "loan-cohort",
+            "dimension": "delinquency_transition",
+            "member": "Current to Attrition",
+            "numerator": "91429",
+            "denominator": "13087026",
+            "observations": 91429
+          },
+          {
+            "contract_id": "delinquency_roll_cure",
+            "component": "transition_count",
+            "report_period": "2026-08",
+            "correction_view": "latest",
+            "grain": "loan-cohort",
+            "dimension": "delinquency_transition",
+            "member": "Current to Current",
+            "numerator": "12949126",
+            "denominator": "13087026",
+            "observations": 12949126
+          }
+        ],
+        "provenance": [
+          {
+            "source_file": "fu260706.zip",
+            "report_period": "2026-07",
+            "source_family": "monthly-loan-level-1",
+            "partition_sha256": "bff73e24c248f440b802b8cdb9eacf2ff4373354175920c0b49c8956651268ed",
+            "scanned_rows": 13257848
+          },
+          {
+            "source_file": "fu260806.zip",
+            "report_period": "2026-08",
+            "source_family": "monthly-loan-level-1",
+            "partition_sha256": "856eaab6a4985ca8d887f6b2fe536f126361f3dd917cd11fc0a212a961da6e58",
+            "scanned_rows": 13246495
+          }
+        ]
+      }
+    }
   }
 }

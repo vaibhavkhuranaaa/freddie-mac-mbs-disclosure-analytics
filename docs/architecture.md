@@ -6,27 +6,29 @@
 flowchart LR
   A["Authorized Freddie Mac archives"] --> B["Exact package and schema validation"]
   B --> C["Disposition reconciliation and correction lineage"]
-  C --> D["Restricted issuance and security facts"]
+  C --> D["Governed issuance and security facts"]
   C --> E["Compressed loan-period partitions"]
   D --> F["Versioned metric engine"]
   E --> F
-  F --> G["Restricted local metric store"]
-  D --> H["Aggregate release payload"]
-  H --> I["Local static issuance dashboard"]
+  F --> G["Governed metric store"]
+  D --> H["Release payload"]
+  H --> I["Static issuance dashboard"]
 ```
 
-Python transformations enforce source contracts, validity windows, duplicate rules, explicit row dispositions, correction precedence, and reproducible backfill or incremental behavior. SQLite stores control and security facts. Loan facts remain in compressed period and source partitions so the engine can scan hundreds of millions of rows with bounded memory. The metric layer consolidates exact additive components, emits only catalog-supported formulas, and independently recomputes approved HHI, delinquency-threshold, modification-rate, and involuntary-removal-share outputs before restricted-local release.
+Python transformations enforce source contracts, validity windows, duplicate rules, explicit row dispositions, correction precedence, and reproducible backfill or incremental behavior. SQLite stores control and security facts. Loan facts remain in compressed period and source partitions so the engine can scan hundreds of millions of rows with bounded memory. The metric layer consolidates exact additive components, emits only catalog-supported formulas, and independently recomputes approved HHI, delinquency-threshold, modification-rate, involuntary-removal-share, and loan-transition outputs.
 
-Restricted storage resolves from `MBS_DATA_ROOT`, with an external `raw/` canonical archive set, one `current/` analytical release, isolated `build/` paths, and value-free `manifests/`. Storage preflight rejects repository analytical data, duplicate release state, temporary residue, or insufficient build headroom before work begins.
+M5.7 uses one temporary disk-backed stage with current/prior identity slices and open redefault cohorts. Identity is `(source_family, loan_id, security_id)`; source-family changes break continuity. Original and latest precedence resolve independently. Attrition remains in beginning denominators, while incomplete 12-month cohorts are counted and excluded from redefault denominators. Only compact transition components persist in the immutable release; the temporary identity store is deleted.
 
-M5.1 verified 125 canonical archives and 39 active-release files with zero checksum mismatches. Stable v1 storage is 40,173,821,505 bytes; the 34 GiB target remains the measured adoption gate for M5.3 compact-partition work.
+Restricted storage resolves from `MBS_DATA_ROOT`, with an external `raw/` canonical archive set, immutable `releases/`, isolated `build/` paths, recoverable `rollback/`, and value-free `manifests/`. One atomic manifest pointer selects the active release. Storage preflight rejects repository analytical data, duplicate active release state, temporary residue, unapproved rollback residue, or insufficient build headroom.
+
+M5.7 verified active release `m5-7-history-20260825` across 125 canonical archives, 106 M4 sources, 35 loan partitions, and the M5 metric store. Stable storage is 45,675,380,656 bytes under the approved 43 GiB ceiling. M4 and M5.7 remain byte-stable against their recorded release digests. The 5,817,237,504-byte history workspace and the owner-approved superseded M5.6 rollback are removed. Closure storage passes with one active release and zero temporary files. A new full build retains a separate headroom gate.
 
 ## Data boundaries
 
-- Raw archives, row-level facts, local databases, and restricted metric components remain outside the product repository and Git.
+- Raw archives, row-level facts, databases, and metric components remain outside Git until publication.
 - `contracts/` contains value-free source and metric contracts required to reproduce validation and calculations.
-- Current dashboard payload contains governed aggregates only.
-- Authorized analyst detail does not imply reviewer or public redistribution rights.
+- Current dashboard payload is an implemented product slice, not a separate publication boundary.
+- Target publication includes complete row-level source and derived data after distribution-rights verification.
 
 ## Target system
 
@@ -34,17 +36,32 @@ M5.1 verified 125 canonical archives and 39 active-release files with zero check
 flowchart LR
   A["Conformed facts"] --> B["Certified metric engine"]
   B --> C["Power BI semantic model"]
-  C --> D["Authorized analyst workflow"]
-  B --> E["Explicit reviewer allowlist"]
-  E --> F["Reviewer product"]
-  B --> G["Governed semantic API"]
+  C --> D["Full-detail decision workflow"]
+  B --> E["Governed semantic API"]
+  D --> F["Full-row publication"]
 ```
 
-M6 adds a Power BI Import star schema with explicit measures, single-direction relationships, original and latest correction views, and restricted-detail controls. M7 and M8 add the trust-to-investigation pages. API, AI, cloud, deployment, and publication remain later approval gates.
+Decision 0018 parks M6 until a Windows Power BI Desktop runtime is available. M7-M9 are complete through provider-neutral web and investigation contracts plus an authenticated governed API over the verified M5 engine. Decision 0019 completes the bounded cited-assistant evaluation with canonical provider inputs, exact evidence validation, deterministic prose, and a disabled-by-default runtime route. Decision 0020 verifies and tears down the private Azure release candidate. Power BI remains resumable against those contracts; publication remains a later approval gate.
+
+## Verified cloud release-candidate pattern
+
+```mermaid
+flowchart LR
+  A["Microsoft Entra"] --> B["HTTPS-only Container Apps ingress"]
+  B --> C["Single active product revision"]
+  D["Immutable private registry image"] --> C
+  C --> E["Derived product payload"]
+  C --> F["Runtime investigation SQLite"]
+  F --> G["Atomic Azure Files recovery mirror"]
+  C --> H["Request audit"]
+  C --> I["Log Analytics"]
+```
+
+The verified release candidate used a consumption environment with scale-to-zero and a one-replica maximum. SQLite ran on container-local storage because direct SMB database access failed under live locking. Every committed write copied a closed, consistent database file to the durable share; a stopped-and-started revision restored the exact recorded recovery point. All cloud and identity resources were deleted after evidence capture.
 
 ## Scale triggers
 
-- Keep local Python, SQLite, and compressed partitions while refresh time, query latency, and storage remain within measured needs.
+- Keep the current Python, SQLite, and compressed-partition stack while refresh time, query latency, and storage remain within measured needs.
 - Add an analytical engine only when M5 or M6 evidence shows a specific performance limit.
 - Add incremental refresh only after boundary, correction, and late-arriving tests pass.
 - Provision cloud infrastructure only after provider, identity, residency, recovery, budget, and teardown approval.
@@ -53,5 +70,6 @@ M6 adds a Power BI Import star schema with explicit measures, single-direction r
 
 - Unknown package, member, schema, period, type, or duplicate condition blocks publication.
 - Every physical record receives an explicit accepted, excluded, rejected, duplicate, quarantined, or published disposition.
+- The current acquired population must have zero ambiguous, ineligible, late, terminated, or unmatched loan joins; golden fixtures retain coverage for those fail-closed edge classifications.
 - Missing or invalid metric denominators suppress output instead of emitting a misleading value.
 - Unapproved field, methodology, external source, or release mode remains unreleased.

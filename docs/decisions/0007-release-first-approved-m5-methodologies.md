@@ -2,7 +2,7 @@
 
 ## Decision
 
-Release HHI concentration, 30+/60+/90+ delinquency rates, modification rate, and involuntary-removal share for restricted local use at formula version `m5.1.0`.
+Release HHI concentration, 30+/60+/90+ delinquency rates, modification rate, and involuntary-removal share into the governed metric engine at formula version `m5.1.0`.
 
 HHI uses complete visible state, seller, or servicer components on separate count and UPB bases. Delinquency thresholds exclude the explicit missing-days population and keep count and UPB bases separate. Modification rate uses the matching active loan population. Involuntary-removal share uses current-month disclosed removals over the adjacent prior-month active disclosed loan count or security UPB, with original and latest correction views separate.
 
@@ -16,7 +16,7 @@ Releasing all approved methodologies at once would require guessing missing prin
 
 ## Not done
 
-The remaining approved methodologies stay unreleased until their source and rule prerequisites pass. The v2 source fields remain outside conformed facts until exact provider rules and safe fixtures are implemented. Loan vintage and delinquent-loan-purchase inputs remain deferred. Reviewer, public, cloud, and deployment release modes remain unapproved.
+The remaining approved methodologies stay unreleased until their source and rule prerequisites pass. The v2 source fields remain outside conformed facts until exact provider rules and safe fixtures are implemented. Loan vintage and delinquent-loan-purchase inputs remain deferred. Publication, cloud, and deployment remain unapproved.
 
 ## Changed
 

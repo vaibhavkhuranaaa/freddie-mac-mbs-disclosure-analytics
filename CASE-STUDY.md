@@ -1,6 +1,6 @@
 # Freddie Mac MBS Disclosure Intelligence
 
-Status: verified issuance product, M4 conformed-source foundation, and supported M5 metric engine
+Status: verified provider-neutral decision product through M9
 
 ## Problem
 
@@ -12,27 +12,32 @@ Disclosure analytics fails business users when polished charts hide missing reco
 - 60,604 physical rows reconciled to 59,904 accepted/published observations and 700 documented exclusions.
 - Zero rejected rows and zero duplicate business keys.
 - Exact legacy and FICO/VS4 schemas with period-validity enforcement.
-- Aggregate-only release carrying build, source, schema, period, quality, and taxonomy metadata.
+- Release payload carrying build, source, schema, period, quality, and taxonomy metadata.
 - Active-data issuance/count/composition findings, explicit unmapped prefixes, evidence, limitations, and resilient accessible states.
 - Non-destructive automated verification and a fail-closed source-intake gate.
 - Approved contracts and exact inventory for 106 monthly-security/loan archives.
 - 693,640,933 M4 rows reconciled with zero rejected, duplicate, or quarantined records.
 - 9,240,038 security-period and 264,922,553 loan-period facts; every real loan join matched.
-- Identical backfill/incremental snapshot checksum and zero sampled restricted-value matches in tracked artifacts.
-- 54 versioned metric contracts classified as 27 supported, 13 methodology-gated, 11 field-contract extensions, and 3 external families.
-- All 27 supported contracts implemented over 264,922,553 loan rows and both 9,240,038-row security correction views, including approved HHI, delinquency-threshold, modification-rate, and involuntary-removal-share methods.
-- 684 segment/weighted parity checks, 32.5 MB measured peak RSS, and identical full/incremental metric checksum `54e128d0590f8e7c4ed1396c0d3626cb56b08390b670d10a5fbf184b15ed6341`.
+- Full, incremental, idempotence, stale-output, and active read-only M4 checks share snapshot `dbe035f51b4e7e163c5c53c5b6449ca62145877e408f7b3612cb3a1a2c1c881a`; sampled restricted-value matches in tracked artifacts are zero.
+- 54 versioned metric contracts classified as 38 supported, 11 methodology-gated, 2 field-contract extensions, and 3 external families.
+- All 38 supported contracts run over 264,922,553 loan rows and both 9,240,038-row security correction views, including nine M4 v2 field families plus roll, cure, new-delinquency, and redefault measures.
+- 1,816 segment, weighted, and transition parity checks plus 1,068 independent formula checks pass; full/incremental metric checksum is `786b09b022bc4ab24a3e78c13947fac05410a5d3e946b2b616debc188b47bcea`.
+- Exact comparability and transition rules are owner-approved, versioned as `m5-exact-methodology-v1`, and covered by safe golden cases.
+- Atomic M5.7 cutover is verified at 45,675,380,656 stable bytes under a 43 GiB measured ceiling. The owner-approved superseded M5.6 rollback was permanently removed after active-release verification.
+- A validated 20-period dashboard payload connects all 38 supported contracts to release, issuance, portfolio, credit, concentration, cohort, and evidence views.
+- The investigation workflow persists owner, priority, status, immutable release/filter/evidence context, resolution, and mutation audit separately from source facts.
+- The authenticated semantic API matches the product payload, rejects unauthenticated access, records request audit evidence without credentials, and passed 50 concurrent acceptance requests with 12.371 ms p95 latency.
 
 ## Product expansion
 
-The acquired restricted set includes 71 monthly-security and 35 monthly loan-level archives. M4 converts them into governed native-grain facts. M5 now implements every measure supported by approved fields; its remaining acceptance is blocked by explicit field and methodology approvals. M6–M8 build Power BI and nine stakeholder workflows: executive overview, release health/revisions, issuance/balance, factor/prepayment, delinquency/assistance, collateral/credit, geography/counterparties, vintage/cohorts, and investigation/methods.
+The acquired set includes 71 monthly-security and 35 monthly loan-level archives. M4 converts them into governed native-grain facts. M5 implements every currently supported measure, including nine M4 v2 field families and loan-history transitions, and closes on the approved reduced DPR boundary. M7-M9 deliver the provider-neutral dashboard, cohort and concentration evidence, governed investigation workflow, and semantic API. M6 Power BI work remains parked and resumable against the same contracts.
 
 The metric contract spans disclosure quality, issuance, outstanding balance, factor, runoff, approved SMM/CPR, delinquency transitions, modifications, deferrals, credit/collateral distributions, geography, seller/servicer concentration, and mission indicators. It explicitly separates implemented, methodology-gated, and external-data metrics.
 
 ## Decision value
 
-A nontechnical stakeholder should be able to decide whether a release is usable, identify a material change, isolate the segment/cohort driving it, recognize corrections or comparability issues, and assign an evidence-backed investigation without SQL. Authorized analysts retain full governed detail; a reviewer release is generated separately from an approved aggregate allowlist.
+A nontechnical stakeholder should be able to decide whether a release is usable, identify a material change, isolate the segment/cohort driving it, recognize corrections or comparability issues, and assign an evidence-backed investigation without SQL. Target publication retains full governed row-level detail.
 
 ## Boundaries
 
-The reviewer release remains issuance-only until M5–M8 evidence and explicit release approval are complete. M5 metric outputs are restricted local artifacts. Seventeen gated formulas remain unreleased and eleven measures await field-contract amendments. The product does not infer voluntary prepayment from total balance decline or claim price, yield, OAS, duration, convexity, valuation, trading, hedging, loss severity, borrower decisioning, or causation without separately governed data/methods. It is local and unpublished; cloud, AI, deployment, and publication are not approved.
+Eleven exact-method contracts remain unreleased; two field extensions and three external families remain source-gated. The product does not infer voluntary prepayment from total balance decline, relabel involuntary removals as delinquent purchases, or claim price, yield, OAS, duration, convexity, valuation, trading, hedging, loss severity, borrower decisioning, or causation without separately governed data and methods. Full-row publication occurs later after product, integrity, and distribution-rights gates pass.

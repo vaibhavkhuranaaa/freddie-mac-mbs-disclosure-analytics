@@ -2,29 +2,28 @@
 
 ## Implemented
 
-- M0 to M3: governed issuance ingestion, reconciliation, quality controls, aggregate payload, and accessible local dashboard.
-- M4: approved monthly-security and monthly-loan contracts, correction-aware conformed facts, reason-coded joins, restricted-output safety, and incremental parity.
-- Supported M5 boundary: 27 metric contracts with versioned additive, weighted, and approved derived components, score-model separation, segment reconciliation, and bounded-memory processing.
+- M0 to M3: governed issuance ingestion, reconciliation, quality controls, release payload, and accessible dashboard.
+- M4: approved v2 monthly-security and monthly-loan contracts, all 45 approved additions populated under provider rules, correction-aware conformed facts, current-population all-matched joins, restricted-output safety, and incremental parity.
+- Supported M5 boundary: 36 metric contracts with versioned additive, weighted, exact-value distribution, and approved derived components, native-grain/context separation, segment reconciliation, and bounded-memory processing.
 
-## Active milestone
+## Current milestone state
 
-M5 is in progress. Field and methodology approvals are recorded for restricted local processing. Four source-ready methodologies are implemented: HHI concentration, delinquency-threshold rates, modification rate, and involuntary-removal share. Thirteen methodology contracts and eleven field-extension measures remain unreleased until their exact source and rule prerequisites pass. Provider-supported loan vintage and delinquent-loan-purchase inputs remain deferred; external metrics remain absent.
+M5 and M7-M9 are complete on the owner-approved reduced DPR boundary. Nine field-backed families plus roll, cure, new-delinquency, and redefault measures are released; all 38 supported contracts reconcile across the full population and feed the provider-neutral web product, persistent investigation workflow, and authenticated semantic API. Eleven methodology contracts, two field extensions, and three external contracts remain explicitly unreleased. M6 Power BI work is parked under decision 0018.
 
 ## Planned
 
-- M6: certified Power BI semantic model.
-- M7: executive, release-health, issuance, factor, delinquency, and collateral pages.
-- M8: cohort, concentration, evidence, and investigation workflows.
-- M9: governed semantic API.
-- M10: optional cited assistant, only after separate AI and cost approval.
-- M11: private cloud release candidate, only after infrastructure and deployment approval.
-- M12: reviewer release and case study, only after publication approval.
+- M6: parked certified Power BI semantic model; resume when a Windows Power BI Desktop runtime is available.
+- M7: completed provider-neutral executive, release-health, issuance, portfolio, credit, and concentration views over the verified engine.
+- M8: completed cohort, evidence, concentration, and persistent investigation workflows.
+- M9: completed authenticated governed semantic API with parity, authorization, audit, and concurrency evidence.
+- M10: completed bounded cited-assistant evaluation with separate AI, outbound-context, and cost approval; runtime stays disabled by default.
+- M11: private cloud release candidate, completed and torn down after approved infrastructure, identity, recovery, load, rollback, cost, and teardown checks.
+- M12: full-data publication and case study after product, integrity, and distribution-rights gates.
 
-## Release modes
+## Publication mode
 
-- Authorized analyst mode may use approved restricted security-period and loan-period detail locally.
-- Reviewer mode requires a separate aggregate allowlist and explicit redistribution approval.
-- Current public repository contains code, value-free contracts, documentation, and safe fixtures only.
+- Target release publishes complete row-level source and derived data with provenance and correction lineage.
+- Data remains in governed external storage until publication gates pass.
 
 ## Out of scope
 

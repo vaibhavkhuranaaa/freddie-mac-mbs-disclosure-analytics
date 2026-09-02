@@ -13,6 +13,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import m4_conformance  # noqa: E402
 import m5_metric_engine  # noqa: E402
 import pipeline  # noqa: E402
+import verify_m5_metrics  # noqa: E402
 
 GOLDEN = json.loads((ROOT / "tests/fixtures/m5/golden_cases.json").read_text())
 
@@ -32,11 +33,11 @@ def add_m4_manifest(
         INSERT INTO source_manifest (
           source_id, source_file, source_family, member_name, report_period,
           publication_date, as_of_timestamp, archive_sha256, archive_size_bytes,
-          schema_version, pipeline_version, input_count, accepted_count,
+          schema_version, pipeline_version, build_fingerprint, input_count, accepted_count,
           excluded_count, rejected_count, duplicate_count, quarantined_count,
           published_count, partition_path, partition_sha256, partition_row_count,
           quality_status
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, ?, '0.4.0', ?, ?, 0, 0, 0, 0, ?, ?, ?, ?, 'pass')
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, ?, '0.5.0', 'm4-v2-fixture', ?, ?, 0, 0, 0, 0, ?, ?, ?, ?, 'pass')
         """,
         (
             source_id,
@@ -59,7 +60,8 @@ def add_m4_manifest(
 
 
 def loan_row(**overrides):
-    values = {
+    values = {column: "" for column in m4_conformance.LOAN_PARTITION_COLUMNS}
+    values.update({
         "report_period": "2026-01",
         "loan_id": "GLOAN01",
         "security_id": "GSEC01",
@@ -79,6 +81,27 @@ def loan_row(**overrides):
         "days_delinquent": "0",
         "modification_program": "",
         "current_deferred_upb_cents": "0",
+        "original_interest_rate_milli_pct": "5000",
+        "issuance_interest_rate_milli_pct": "4900",
+        "current_interest_rate_milli_pct": "5100",
+        "issuance_net_interest_rate_milli_pct": "4700",
+        "current_net_interest_rate_milli_pct": "4800",
+        "ltv_pct": "80",
+        "cltv_pct": "85",
+        "dti_pct": "35",
+        "first_time_homebuyer": "Y",
+        "loan_purpose": "P",
+        "occupancy_status": "P",
+        "number_of_units": "1",
+        "property_type": "SF",
+        "channel": "R",
+        "mortgage_insurance_pct": "20",
+        "mortgage_insurance_cancellation": "N",
+        "government_insured_guarantee": "FH",
+        "eltv_pct": "",
+        "alternative_resolution": "P",
+        "borrower_assistance_plan": "F",
+        "special_eligibility_program": "H",
         "property_state": "TX",
         "seller_name": "Golden Seller",
         "servicer_name": "Golden Servicer",
@@ -90,7 +113,7 @@ def loan_row(**overrides):
         "schema_version": "golden",
         "publication_date": "2026-01-07",
         "as_of_timestamp": "2026-01-07T23:59:59Z",
-    }
+    })
     values.update(overrides)
     return [values[column] for column in m4_conformance.LOAN_PARTITION_COLUMNS]
 
@@ -109,6 +132,27 @@ def write_partition(path):
             days_delinquent="90",
             modification_program="Golden Program",
             current_deferred_upb_cents="1000",
+            original_interest_rate_milli_pct="6000",
+            issuance_interest_rate_milli_pct="5900",
+            current_interest_rate_milli_pct="6100",
+            issuance_net_interest_rate_milli_pct="5700",
+            current_net_interest_rate_milli_pct="5800",
+            ltv_pct="90",
+            cltv_pct="95",
+            dti_pct="45",
+            first_time_homebuyer="N",
+            loan_purpose="R",
+            occupancy_status="I",
+            number_of_units="2",
+            property_type="CO",
+            channel="B",
+            mortgage_insurance_pct="0",
+            mortgage_insurance_cancellation="Y",
+            government_insured_guarantee="",
+            eltv_pct="100",
+            alternative_resolution="",
+            borrower_assistance_plan="N",
+            special_eligibility_program="F",
             property_state="CA",
             seller_name="Second Seller",
             servicer_name="Second Servicer",
@@ -128,6 +172,10 @@ def write_partition(path):
             source_row="5",
         ),
     ]
+    return write_rows(path, rows)
+
+
+def write_rows(path, rows):
     path.parent.mkdir(parents=True, exist_ok=True)
     with gzip.open(path, "wt", encoding="utf-8", newline="") as stream:
         writer = csv.writer(stream, lineterminator="\n")
@@ -148,8 +196,16 @@ class M5MetricEngineTests(unittest.TestCase):
         required = set(json.loads((ROOT / "contracts/m5-metric-catalog.json").read_text())["contract_required_fields"])
         self.assertTrue(all(required <= contract.keys() for contract in catalog.values()))
         self.assertIn("unreleased", catalog["smm"]["release_modes"]["authorized"])
-        self.assertIn("local aggregate", catalog["hhi_concentration"]["release_modes"]["authorized"])
+        self.assertIn("governed output", catalog["hhi_concentration"]["release_modes"]["authorized"])
         self.assertEqual(catalog["delinquency_threshold_rates"]["status"], "supported")
+        self.assertEqual(
+            catalog["delinquent_loan_purchases"]["resolution_status"],
+            "reclassified-unavailable",
+        )
+        self.assertIn(
+            "broader supported boundary",
+            catalog["delinquent_loan_purchases"]["source_lineage"][0],
+        )
         self.assertIn("absent", catalog["external_market_valuation_metrics"]["release_modes"]["authorized"])
 
     def test_formula_gates_are_deterministic_and_fail_closed(self):
@@ -176,6 +232,44 @@ class M5MetricEngineTests(unittest.TestCase):
                 self.assertIsNone(actual, case["id"])
             else:
                 self.assertAlmostEqual(actual, case["expected"], msg=case["id"])
+
+    def test_approved_exact_methodology_matches_golden_cases(self):
+        raw = json.loads((ROOT / "contracts/m5-metric-catalog.json").read_text())
+        rules = raw["methodology_rules"]
+        self.assertEqual(rules["status"], "approved")
+        self.assertEqual(rules["formula_version"], "m5.2.0")
+        self.assertEqual(rules["comparability"]["precedence"], ["fail", "warn", "pass"])
+        self.assertEqual(rules["data_quality"]["composite_score"], "not_approved")
+        self.assertIsNone(rules["data_quality"]["weights"])
+        self.assertEqual(rules["minimum_population"]["warn_below_observations"], 30)
+        self.assertEqual(rules["transition"]["delinquency_threshold_days"], 30)
+        self.assertEqual(rules["transition"]["redefault_window_months"], 12)
+        self.assertEqual(rules["psa"], {
+            "status": "deferred",
+            "convention": None,
+            "rule": rules["psa"]["rule"],
+        })
+        for case in GOLDEN["methodology"]["comparability"]:
+            self.assertEqual(
+                m5_metric_engine.comparability_status(case["failures"], case["warnings"]),
+                case["expected"], case["id"],
+            )
+        threshold = rules["transition"]["delinquency_threshold_days"]
+        for case in GOLDEN["methodology"]["transitions"]:
+            self.assertEqual(
+                m5_metric_engine.transition_event(
+                    case["prior_days"], case["current_days"], threshold
+                ),
+                case["expected"], case["id"],
+            )
+        window = rules["transition"]["redefault_window_months"]
+        for case in GOLDEN["methodology"]["redefault_windows"]:
+            self.assertEqual(
+                m5_metric_engine.within_month_window(
+                    case["start"], case["event"], window
+                ),
+                case["expected"], case["id"],
+            )
 
     def test_bands_missing_periods_and_score_models_remain_explicit(self):
         for case in GOLDEN["delinquency_bands"]:
@@ -217,6 +311,119 @@ class M5MetricEngineTests(unittest.TestCase):
         self.assertEqual(aggregate.deferred_upb, 1000)
         self.assertEqual(aggregate.deferred_denominator_upb, 30000)
         self.assertEqual(aggregate.segments["delinquency_band"]["90+"], [1, 20000])
+        self.assertEqual(aggregate.weighted["original_interest_rate_milli_pct"], [170000000, 30000, 2])
+        self.assertEqual(aggregate.weighted["ltv_pct"], [2600000, 30000, 2])
+        self.assertEqual(aggregate.segments["first_time_homebuyer"], {"Y": [1, 10000], "N": [1, 20000]})
+        self.assertEqual(
+            aggregate.segments["mortgage_insurance_status"],
+            {"Active coverage": [1, 10000], "Cancelled or expired": [1, 20000]},
+        )
+
+    def test_disk_backed_history_preserves_views_attrition_and_redefault(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            partition_root = root / "partitions"
+            sources = []
+
+            def add_source(period, name, rows):
+                relative = Path(period) / f"{name}.csv.gz"
+                write_rows(partition_root / relative, rows)
+                sources.append({
+                    "report_period": period,
+                    "source_family": "monthly-loan-level-1",
+                    "source_file": name,
+                    "partition_path": str(relative),
+                    "partition_row_count": len(rows),
+                })
+
+            add_source("2025-01", "original", [
+                loan_row(report_period="2025-01", loan_id="A", days_delinquent="60", current_upb_cents="100", source_file="original", as_of_timestamp="2025-01-07T00:00:00Z"),
+                loan_row(report_period="2025-01", loan_id="B", days_delinquent="0", current_upb_cents="200", source_file="original", source_row="3", as_of_timestamp="2025-01-07T00:00:00Z"),
+                loan_row(report_period="2025-01", loan_id="C", days_delinquent="30", current_upb_cents="300", source_file="original", source_row="4", as_of_timestamp="2025-01-07T00:00:00Z"),
+                loan_row(report_period="2025-01", loan_id="D", days_delinquent="0", current_upb_cents="400", source_file="original", source_row="5", as_of_timestamp="2025-01-07T00:00:00Z"),
+                loan_row(report_period="2025-01", loan_id="E", days_delinquent="90", current_upb_cents="500", source_file="original", source_row="6", as_of_timestamp="2025-01-07T00:00:00Z"),
+            ])
+            add_source("2025-01", "corrected", [
+                loan_row(report_period="2025-01", loan_id="A", days_delinquent="90", current_upb_cents="100", source_file="corrected", as_of_timestamp="2025-01-08T00:00:00Z"),
+            ])
+            february = [
+                loan_row(report_period="2025-02", loan_id="A", days_delinquent="0", current_upb_cents="90", source_file="february"),
+                loan_row(report_period="2025-02", loan_id="B", days_delinquent="30", current_upb_cents="190", source_file="february", source_row="3"),
+                loan_row(report_period="2025-02", loan_id="D", days_delinquent="0", current_upb_cents="390", modification_program="Program", source_file="february", source_row="4"),
+                loan_row(report_period="2025-02", loan_id="E", days_delinquent="0", current_upb_cents="490", source_file="february", source_row="5"),
+            ]
+            add_source("2025-02", "february", february)
+            for offset in range(1, 13):
+                month = 2 + offset
+                year = 2025 + (month - 1) // 12
+                month = (month - 1) % 12 + 1
+                period = f"{year:04d}-{month:02d}"
+                rows = [
+                    loan_row(report_period=period, loan_id="A", days_delinquent="30", current_upb_cents="80", source_file=period),
+                    loan_row(report_period=period, loan_id="D", days_delinquent="0", current_upb_cents="380", modification_program="Program", source_file=period, source_row="3"),
+                ]
+                add_source(period, period, rows)
+
+            rules = json.loads(
+                (ROOT / "contracts/m5-metric-catalog.json").read_text()
+            )["methodology_rules"]["transition"]
+
+            def run(items, output_path):
+                with sqlite3.connect(output_path) as db:
+                    db.executescript(m5_metric_engine.SCHEMA)
+                    m5_metric_engine.m5_transition_history.build(
+                        items, partition_root, Path(f"{output_path}.history"), db, rules
+                    )
+                    return list(db.execute(
+                        "SELECT * FROM transition_component ORDER BY 1,2,3,4,5,6,7"
+                    ))
+
+            ordered = run(sources, root / "ordered.sqlite")
+            reversed_rows = run(list(reversed(sources)), root / "reversed.sqlite")
+            self.assertEqual(ordered, reversed_rows)
+            with sqlite3.connect(root / "ordered.sqlite") as db:
+                self.assertEqual(
+                    db.execute(
+                        "SELECT numerator FROM transition_component WHERE component='transition_count' AND report_period='2025-02' AND correction_view='original' AND member='60-89 to Current'"
+                    ).fetchone()[0],
+                    "1",
+                )
+                self.assertEqual(
+                    db.execute(
+                        "SELECT numerator FROM transition_component WHERE component='transition_count' AND report_period='2025-02' AND correction_view='latest' AND member='90+ to Current'"
+                    ).fetchone()[0],
+                    "2",
+                )
+                self.assertEqual(
+                    db.execute(
+                        "SELECT numerator FROM transition_component WHERE component='transition_count' AND report_period='2025-02' AND correction_view='latest' AND member='30-59 to Attrition'"
+                    ).fetchone()[0],
+                    "1",
+                )
+                self.assertEqual(
+                    db.execute(
+                        "SELECT numerator, denominator FROM transition_component WHERE component='new_delinquency_count' AND report_period='2025-02' AND correction_view='latest'"
+                    ).fetchone(),
+                    ("1", "2"),
+                )
+                self.assertEqual(
+                    db.execute(
+                        "SELECT numerator, denominator FROM transition_component WHERE component='redefault_count' AND report_period='2025-02' AND correction_view='latest' AND member='cure'"
+                    ).fetchone(),
+                    ("1", "1"),
+                )
+                self.assertEqual(
+                    db.execute(
+                        "SELECT numerator, denominator FROM transition_component WHERE component='right_censored_count' AND report_period='2025-02' AND correction_view='latest' AND member='cure'"
+                    ).fetchone(),
+                    ("1", "2"),
+                )
+                self.assertEqual(
+                    db.execute(
+                        "SELECT numerator, denominator FROM transition_component WHERE component='redefault_count' AND report_period='2025-02' AND correction_view='latest' AND member='modification'"
+                    ).fetchone(),
+                    ("0", "1"),
+                )
 
     def test_small_backfill_incremental_parity_and_release_safety(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -312,6 +519,26 @@ class M5MetricEngineTests(unittest.TestCase):
                 self.assertGreater(
                     db.execute("SELECT COUNT(*) FROM metric_component WHERE released=1 AND contract_id='hhi_concentration'").fetchone()[0],
                     0,
+                )
+                for contract in (
+                    "weighted_rates", "assistance_resolution_share", "guarantee_mi_share",
+                    "ltv_metrics", "dti_metric", "loan_property_composition",
+                    "first_time_homebuyer_share", "mission_metrics",
+                    "green_social_eligibility",
+                ):
+                    self.assertGreater(
+                        db.execute(
+                            "SELECT COUNT(*) FROM metric_component WHERE released=1 AND contract_id=?",
+                            (contract,),
+                        ).fetchone()[0],
+                        0,
+                        contract,
+                    )
+                self.assertAlmostEqual(
+                    float(db.execute(
+                        "SELECT value FROM metric_component WHERE contract_id='weighted_rates' AND component='original_interest_rate_milli_pct'"
+                    ).fetchone()[0]),
+                    17 / 3,
                 )
                 self.assertEqual(
                     float(db.execute(
@@ -416,6 +643,16 @@ class M5MetricEngineTests(unittest.TestCase):
                 ))
                 self.assertEqual(len(summaries), 6)
                 self.assertTrue(all(total == denominator and rows == 2 for _, _, total, denominator, rows in summaries))
+            with sqlite3.connect(m4_path) as db:
+                db.execute(
+                    "UPDATE source_manifest SET build_fingerprint='different-v2'"
+                )
+            with self.assertRaisesRegex(
+                verify_m5_metrics.VerificationError, "active M4 v2"
+            ):
+                verify_m5_metrics.verify(
+                    output, m4_path, ROOT / "contracts/m5-metric-catalog.json"
+                )
 
 
 if __name__ == "__main__":

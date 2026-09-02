@@ -19,12 +19,12 @@ Status: current issuance schema, verified M4 conformed facts, and restricted M5 
 | --- | --- | --- | --- |
 | `report_month` | validated issuance source period | `YYYY-MM` | aggregate grouping |
 | `security_id` | Freddie Mac security identifier | text | restricted |
-| `security_type` | source Prefix | text | approved taxonomy aggregate only |
-| `issuance_upb` | investor security UPB at issuance | USD | aggregate only |
+| `security_type` | source Prefix | text | current application field; full-row publication target |
+| `issuance_upb` | investor security UPB at issuance | USD | current application field; full-row publication target |
 | `current_upb` | current UPB carried by the issuance source | USD | not longitudinal performance |
 | `factor` | factor carried by the issuance source | ratio | validation only in current release |
 | `revision_flag` | normalized source correction indicator | boolean | aggregate count |
-| `source_file`, `source_row` | local lineage | text/integer | restricted |
+| `source_file`, `source_row` | source lineage | text/integer | restricted |
 | `schema_version` | reviewed input contract version | text | safe metadata |
 
 The sample fixture contains compatibility-only fields used by pipeline tests. They are not certified business measures and do not appear in the reviewer metric catalog.
@@ -37,25 +37,26 @@ Identity fields record file/family, report period, archive/member checksum, acqu
 
 Records source, row/record reference, severity, rule code, and a value-free explanation. Informational exclusions remain visible; errors block publication.
 
-### M4 restricted control and facts
+### M4 control and facts
 
 | Object | Storage/grain | Implemented fields | Boundary |
 | --- | --- | --- | --- |
-| `source_manifest`, `row_disposition`, `source_issue` | one source/version and value-free disposition/issue summaries | source checksum/schema/period, accepted/excluded/rejected/duplicate/quarantine/published counts, partition checksum | restricted local; aggregate evidence only in Git |
-| `FactSecurityPeriodOriginal`, `FactSecurityPeriodLatest` | one security/factor period under original/latest precedence | restricted keys, status/correction, UPB/factor components, loan count, separate legacy/Classic FICO/VS4 fields, involuntary removal components | authorized only |
-| `FactLoanPeriod` compressed partitions | one loan/security/report period/source version | restricted keys, correction, UPB components, term/age, separate score systems, delinquency/modification/deferral, geography, seller/servicer, join reason, record/source hash | authorized only |
-| `join_reconciliation` | source family/report period/reason | matched, unmatched, ambiguous, late, ineligible, terminated counts | aggregate evidence; reviewer release still unapproved |
-| `restatement_lineage` | original-to-replacement source version | hashed business key, as-of precedence, changed-record flag | authorized only |
+| `source_manifest`, `row_disposition`, `source_issue` | one source/version and value-free disposition/issue summaries | source checksum/schema/period, accepted/excluded/rejected/duplicate/quarantine/published counts, partition checksum | governed release metadata |
+| `FactSecurityPeriodOriginal`, `FactSecurityPeriodLatest` | one security/factor period under original/latest precedence | keys, status/correction, UPB/factor components, loan count, separate legacy/Classic FICO/VS4 fields, involuntary removal components | full-row publication target |
+| `FactLoanPeriod` compressed partitions | one loan/security/report period/source version | keys, correction, UPB components, term/age, separate score systems, delinquency/modification/deferral, geography, seller/servicer, join reason, record/source hash | full-row publication target |
+| `join_reconciliation` | source family/report period/reason | matched, unmatched, ambiguous, late, ineligible, terminated counts | governed release metadata |
+| `restatement_lineage` | original-to-replacement source version | hashed business key, as-of precedence, changed-record flag | full-row publication target |
 
 Supplemental files remain at record-type-specific native grains. M4 validates and explicitly excludes their 419,478,342 records from `FactSecurityPeriod`/`FactLoanPeriod`; M5 may add a separate supplemental fact without flattening unlike grains.
 
-### M5 restricted metric store
+### M5 metric store
 
 | Object | Grain / purpose | Boundary |
 | --- | --- | --- |
-| `input_partition` | one compressed loan partition with checksum, expected/scanned rows, active/all UPB components, peak RSS, and catalog hash | restricted local; safe counts/checksums may enter evidence |
-| `partition_component` | one additive or weighted component per source partition, period, contract, dimension, and member | restricted local; seller/servicer members never enter tracked artifacts |
-| `metric_component` | consolidated security, loan, segment, and portfolio numerator/denominator with explicit released flag | restricted local; reviewer/public release not approved |
+| `input_partition` | one compressed loan partition with checksum, expected/scanned rows, active/all UPB components, peak RSS, and catalog hash | governed release metadata |
+| `partition_component` | one additive or weighted component per source partition, period, contract, dimension, and member | full-data publication target |
+| `transition_component` | compact original/latest roll, cure, new-delinquency, trigger-cohort, redefault, and right-censor components | full-data publication target |
+| `metric_component` | consolidated security, loan, segment, and portfolio numerator/denominator with explicit released flag | full-data publication target |
 | `run_metadata` | value-free catalog, count, memory, and normalized-snapshot evidence | safe metadata after verification |
 
 `numerator` and `denominator` are decimal-integer text so weighted products cannot overflow SQLite 64-bit integers. `value` is derived; reconciliation uses exact components. Balance snapshots remain period-grained and are never rolled up as additive flows.
@@ -92,7 +93,9 @@ Supplemental files remain at record-type-specific native grains. M4 validates an
 | `DimAssistanceProgram` | modification, deferral, alternative resolution, plan | no causal/success inference |
 | `DimSourceFile`, `DimSchemaVersion` | file/family/version/validity and acquisition metadata | lineage and comparability |
 
-## Public aggregate payload currently implemented
+## Current application payload
+
+This application payload does not limit the later publication boundary. Target publication includes complete row-level source and derived data.
 
 | Field | Meaning | Type/unit |
 | --- | --- | --- |

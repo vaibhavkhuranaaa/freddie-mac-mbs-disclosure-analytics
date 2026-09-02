@@ -8,9 +8,11 @@
 
 ## Information hierarchy
 
-- Page order follows trust → change → driver → comparability → action.
+- Page order follows trust, change, driver, comparability, and action.
 - Show release period, refresh time, data coverage, quality status, comparability status, and active filters persistently.
+- Group release period, coverage, correction view, metric version, refresh time, quality, and comparability into a compact trust-context ledger before affected measures; keep the labels stable across views and data providers.
 - Put failed quality/comparability states above and visually stronger than affected metrics.
+- When comparison context is not released, label comparability `Unavailable` and name the missing period or contract. Raw adjacent-period arithmetic may remain as explicitly descriptive context, but do not turn it into a certified comparison, imply equivalence, or substitute another period.
 - Limit a page to one primary message and no more than seven decision-bearing visuals.
 - Provide an evidence/drill-through path from every executive exception.
 
@@ -32,6 +34,7 @@
 ## Interaction
 
 - Global slicers: reporting/comparison period, product/term, vintage, purpose, occupancy, property type, geography, seller, servicer, score band/model, LTV band, delinquency band, and correction view.
+- Use provider-neutral view tabs named for the user's business question or evidence domain, never for a backend, release artifact, or implementation technology. Implement them as keyboard-operable tabs with one clearly selected state and preserved context when switching views.
 - Provide reset filters, current filter summary, drill-through, back navigation, metric definition, and export classification.
 - Do not rely on hover, hidden gestures, or cross-highlighting as the only way to understand a result.
 - Preserve user context when moving from an exception to evidence.
@@ -43,11 +46,14 @@
 - Never encode meaning by color alone; pair status colors with text and icons.
 - Every chart conclusion needs a text summary or accessible data table.
 - Loading, empty, partial, stale, non-comparable, error, and refusal states must name the cause and next action.
+- Treat semantic refusal as a governed product result, distinct from loading, empty, connectivity, and generic error states. Name the unavailable metric or contract, explain the release or policy boundary, preserve unaffected views, and offer only a valid recovery path; never fabricate a proxy.
+- Keep evidence as a semantic table at wide widths. At compact widths, reflow each row into a bordered record with every value paired to its visible column label; retain the accessible header structure and avoid horizontal page scrolling.
 - Validate at desktop and compact widths; no clipped labels, hidden controls, or horizontal page scrolling.
 
 ## Governance
 
 - No report-local calculation may bypass the certified semantic model.
-- Restricted identifiers and row-level detail appear only in authorized pages and exports.
-- Screenshots and reviewer artifacts use the approved release boundary, never the authorized model by convenience.
+- Before publication, source values and row-level analytical data stay outside Git and appear only in authorized pages and exports.
+- Publication targets complete row-level source and derived data after the explicit integrity, provenance, rights, and release gates pass.
+- Screenshots and validation artifacts use the approved release boundary, never a more permissive data source by convenience.
 - Apply these rules and `docs/BI_PRODUCT_SPEC.md` to every Power BI, static web, and portfolio-facing change.

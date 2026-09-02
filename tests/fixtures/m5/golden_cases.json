@@ -3,9 +3,9 @@
   "catalog": {
     "metrics": 54,
     "support_counts": {
-      "supported": 27,
-      "methodology-gated": 13,
-      "contract-extension-required": 11,
+      "supported": 38,
+      "methodology-gated": 11,
+      "contract-extension-required": 2,
       "external": 3
     }
   },
@@ -43,6 +43,26 @@
     {"period": "2025-11", "allowed_nonmissing": ["legacy_credit_score"]},
     {"period": "2025-12", "allowed_nonmissing": ["classic_fico", "vs4"]}
   ],
+  "methodology": {
+    "comparability": [
+      {"id": "fail-over-warn", "failures": 1, "warnings": 1, "expected": "fail"},
+      {"id": "warn", "failures": 0, "warnings": 1, "expected": "warn"},
+      {"id": "pass", "failures": 0, "warnings": 0, "expected": "pass"}
+    ],
+    "transitions": [
+      {"id": "cure", "prior_days": 60, "current_days": 0, "expected": "cure"},
+      {"id": "new-delinquency", "prior_days": 0, "current_days": 30, "expected": "new_delinquency"},
+      {"id": "partial-improvement", "prior_days": 90, "current_days": 60, "expected": "improvement"},
+      {"id": "same-band", "prior_days": 35, "current_days": 45, "expected": "stable"},
+      {"id": "attrition", "prior_days": 30, "current_days": null, "expected": "attrition"},
+      {"id": "missing-origin", "prior_days": null, "current_days": 30, "expected": "ineligible"}
+    ],
+    "redefault_windows": [
+      {"id": "inside", "start": "2025-01", "event": "2026-01", "expected": true},
+      {"id": "outside", "start": "2025-01", "event": "2026-02", "expected": false},
+      {"id": "same-month", "start": "2025-01", "event": "2025-01", "expected": false}
+    ]
+  },
   "engine_expectations": {
     "loan_rows": 4,
     "active_loan_rows": 2,

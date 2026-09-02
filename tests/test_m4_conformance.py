@@ -161,6 +161,46 @@ class M4ConformanceTests(unittest.TestCase):
         self.assertIn("legacy_credit_score", {field["target"] for field in loan["field_allowlist"]})
         self.assertIn("classic_fico", {field["target"] for field in loan["field_allowlist"]})
         self.assertIn("vs4", {field["target"] for field in loan["field_allowlist"]})
+        self.assertEqual(
+            len(m4_conformance.SECURITY_V2_COLUMNS), 14
+        )
+        self.assertEqual(len(m4_conformance.LOAN_V2_COLUMNS), 30)
+        self.assertIn("v2_field_statuses", m4_conformance.LOAN_PARTITION_COLUMNS)
+
+    def test_stale_v1_release_is_rejected_read_only(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "m4.sqlite"
+            db = sqlite3.connect(path)
+            db.executescript(m4_conformance.SCHEMA)
+            add_manifest(db, "legacy.zip", "2026-01-07T23:59:59Z")
+            db.commit()
+            db.close()
+            before = source_inventory.sha256_file(path)
+            with self.assertRaisesRegex(
+                m4_conformance.ConformanceError, "fingerprint"
+            ):
+                m4_conformance.assert_compatible_release(path, "v2-fingerprint")
+            self.assertEqual(source_inventory.sha256_file(path), before)
+
+    def test_real_population_join_expectation_rejects_stale_late_rows(self):
+        contract = source_inventory.load_contract(
+            ROOT / "contracts/m4-loan-source-contract.json"
+        )
+        summary = {
+            "joins": {
+                "ambiguous": 0,
+                "ineligible": 0,
+                "late": 1,
+                "matched": 3,
+                "terminated": 0,
+                "unmatched": 0,
+            }
+        }
+        with self.assertRaisesRegex(
+            m4_conformance.ConformanceError,
+            "real-population join expectation failed: late=1 expected=0",
+        ):
+            m4_conformance.verify_real_population(summary, contract)
 
     def test_golden_schema_boundaries_keep_score_models_separate(self):
         cases = {case["id"]: case for case in GOLDEN["schema_cases"]}

@@ -41,7 +41,7 @@ All measures follow `docs/BI_PRODUCT_SPEC.md` and `docs/metric-glossary.md`. Eac
 - SMM/CPR remain unavailable until unscheduled principal, scheduled principal, involuntary removal, corrections, and denominator timing are approved and tested.
 - External market, valuation, macroeconomic, liquidation, and recovery metrics remain absent without separate sources.
 
-The implemented M5 engine resolves `contracts/m5-metric-catalog.json`, streams each compressed loan partition independently, stores exact additive/weighted components, then consolidates them across source families. It reuses unchanged partition components only when partition checksum, catalog checksum, expected rows, and engine version match. Security calculations run separately for original-publication and latest-known views, and source-family schema transitions are explicit components. Approved count- and UPB-based HHI, delinquency-threshold rates, modification rates, and involuntary-removal shares are independently recomputed before restricted-local release. No bridge, runoff, SMM/CPR, roll/cure, or external metric is released.
+The implemented M5 engine resolves `contracts/m5-metric-catalog.json`, streams each compressed loan partition independently, stores exact additive/weighted components, then consolidates them across source families. It reuses unchanged partition components only when partition checksum, catalog checksum, expected rows, and engine version match. Security calculations run separately for original-publication and latest-known views, and source-family schema transitions are explicit components. A temporary SQLite stage resolves current/prior loan identities, original/latest precedence, attrition, cure and modification cohorts, and 12-month right censoring. Only compact transition components persist. Approved HHI, delinquency thresholds, modification, involuntary-removal, roll, cure, new-delinquency, and redefault formulas are independently recomputed before release. M5 closes on the approved reduced DPR boundary; no bridge, runoff, SMM/CPR, or external metric is released.
 
 ## BI and interpretation method
 
@@ -61,4 +61,4 @@ npm run verify:m5
 npm run check
 ```
 
-Raw files and local databases are restricted and ignored. The released payload contains aggregates and approved safe metadata only.
+Source and derived data stay outside Git during development. Target publication includes complete row-level source and derived data after product, integrity, and distribution-rights gates pass.

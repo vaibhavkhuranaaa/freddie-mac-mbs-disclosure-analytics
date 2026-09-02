@@ -2,7 +2,7 @@
 
 ## Current state
 
-The verified static issuance dashboard runs locally at `http://127.0.0.1:4173`. Git revision lineage exists, but no remote, hosted environment, cloud account connection, public visibility, or paid resource is configured.
+M11 deployed the governed application and derived product payload as an authenticated Azure Container Apps release candidate, verified it, and tore it down in the same session. No remote endpoint or cloud resource remains active.
 
 ## Local workflow
 
@@ -16,11 +16,21 @@ Power BI M6 begins as a local Import model. Power BI Service, gateway, tenant ro
 
 ## Deployment gates
 
-1. Complete M4–M9 data, metric, semantic-model, dashboard, investigation, and API evidence.
+1. Complete M4-M9 data, metric, semantic-model, dashboard, investigation, and API evidence.
 2. Approve provider/tenant, region, residency, identity, licensing, cost ceiling, retention, backup, recovery, and teardown for M11.
-3. Pass infrastructure, security, access, observability, load, failure-recovery, rollback, restore, and cost tests in a private pilot.
+3. Pass infrastructure, security, access, observability, load, failure-recovery, rollback, restore, and cost tests in a private pilot. M11 completed this gate on 2026-09-01.
 4. Approve the exact reviewer model/payload, host, visibility, checksum, source revision, screenshots, domain, budget, and teardown for M12.
 
 `netlify.toml` supports the current static application's no-build local/reviewer shape only. Its presence does not authorize deployment or public release.
 
 GitHub Actions runs the complete local verification path. A deployed release is complete only when exact source/infrastructure/application revisions, model/payload checksum, approvals, and a verified live URL are recorded.
+
+## Verified M11 shape
+
+- Azure Container Apps consumption plan in Central US, maximum one replica and scale-to-zero.
+- Microsoft Entra authentication on HTTPS-only ingress; spoofed identity headers and unauthenticated requests fail closed.
+- The application Bicep requires tenant ID, client ID, and a secure client-secret parameter, then deploys the `authConfigs/current` child resource with `Return401`; secrets must be supplied through an ephemeral parameter file and never committed.
+- Managed identity for immutable private-registry image pull; AI disabled.
+- SQLite runtime state mirrored atomically to Azure Files after committed writes and restored on startup.
+- Log Analytics for system and console telemetry plus application request audit.
+- Resource-group budget, same-session rollback test, and complete resource-group and Entra teardown.

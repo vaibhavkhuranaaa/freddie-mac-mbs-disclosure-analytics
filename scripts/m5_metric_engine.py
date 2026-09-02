@@ -21,9 +21,10 @@ from statistics import median
 from typing import Any, Iterable
 
 import pipeline
+import m5_transition_history
 from storage import StorageError, current_path, require_isolated_build
 
-PIPELINE_VERSION = "0.5.2"
+PIPELINE_VERSION = "0.7.0"
 TOP_N = 10
 MISSING = "Missing"
 REQUIRED_LOAN_COLUMNS = {
@@ -33,11 +34,61 @@ REQUIRED_LOAN_COLUMNS = {
     "updated_classic_fico", "updated_vs4", "days_delinquent",
     "modification_program", "current_deferred_upb_cents", "property_state",
     "seller_name", "servicer_name", "join_reason",
+    "original_interest_rate_milli_pct", "issuance_interest_rate_milli_pct",
+    "current_interest_rate_milli_pct", "issuance_net_interest_rate_milli_pct",
+    "current_net_interest_rate_milli_pct", "ltv_pct", "cltv_pct", "eltv_pct",
+    "dti_pct", "first_time_homebuyer", "loan_purpose", "occupancy_status",
+    "number_of_units", "property_type", "channel", "mortgage_insurance_pct",
+    "mortgage_insurance_cancellation", "government_insured_guarantee",
+    "alternative_resolution", "borrower_assistance_plan",
+    "special_eligibility_program",
 }
 SCORE_COLUMNS = (
     "legacy_credit_score", "classic_fico", "vs4",
     "updated_legacy_credit_score", "updated_classic_fico", "updated_vs4",
 )
+LOAN_WEIGHTED_FIELDS = {
+    "original_interest_rate_milli_pct": "weighted_rates",
+    "issuance_interest_rate_milli_pct": "weighted_rates",
+    "current_interest_rate_milli_pct": "weighted_rates",
+    "issuance_net_interest_rate_milli_pct": "weighted_rates",
+    "current_net_interest_rate_milli_pct": "weighted_rates",
+    "ltv_pct": "ltv_metrics",
+    "cltv_pct": "ltv_metrics",
+    "eltv_pct": "ltv_metrics",
+    "dti_pct": "dti_metric",
+}
+LOAN_SEGMENT_FIELDS = {
+    "ltv": ("ltv_metrics", "ltv_pct"),
+    "cltv": ("ltv_metrics", "cltv_pct"),
+    "eltv": ("ltv_metrics", "eltv_pct"),
+    "first_time_homebuyer": ("first_time_homebuyer_share", "first_time_homebuyer"),
+    "loan_purpose": ("loan_property_composition", "loan_purpose"),
+    "occupancy_status": ("loan_property_composition", "occupancy_status"),
+    "number_of_units": ("loan_property_composition", "number_of_units"),
+    "property_type": ("loan_property_composition", "property_type"),
+    "channel": ("loan_property_composition", "channel"),
+    "government_guarantee": ("guarantee_mi_share", "government_insured_guarantee"),
+    "alternative_resolution": ("assistance_resolution_share", "alternative_resolution"),
+    "borrower_assistance_plan": ("assistance_resolution_share", "borrower_assistance_plan"),
+    "special_eligibility_program": ("green_social_eligibility", "special_eligibility_program"),
+}
+DISTRIBUTION_DIMENSIONS = {
+    "delinquency_band", "prefix", "state", "seller", "servicer", "modification",
+    "ltv", "cltv", "eltv", "first_time_homebuyer", "loan_purpose",
+    "occupancy_status", "number_of_units", "property_type", "channel",
+    "government_guarantee", "mortgage_insurance_status", "alternative_resolution",
+    "borrower_assistance_plan", "special_eligibility_program",
+}
+SECURITY_WEIGHTED_FIELDS = {
+    "wa_net_interest_rate_milli_pct": "weighted_rates",
+    "wa_issuance_interest_rate_milli_pct": "weighted_rates",
+    "wa_current_interest_rate_milli_pct": "weighted_rates",
+    "wa_ltv_pct": "ltv_metrics",
+    "wa_cltv_pct": "ltv_metrics",
+    "wa_eltv_pct": "ltv_metrics",
+    "wa_dti_pct": "dti_metric",
+}
 
 SCHEMA = """
 PRAGMA foreign_keys = ON;
@@ -53,7 +104,8 @@ CREATE TABLE IF NOT EXISTS input_partition (
   active_rows INTEGER NOT NULL,
   active_current_upb_cents TEXT NOT NULL,
   peak_rss_bytes INTEGER NOT NULL,
-  catalog_sha256 TEXT NOT NULL
+  catalog_sha256 TEXT NOT NULL,
+  build_fingerprint TEXT NOT NULL
 );
 CREATE TABLE IF NOT EXISTS partition_component (
   source_file TEXT NOT NULL,
@@ -86,6 +138,20 @@ CREATE TABLE IF NOT EXISTS metric_component (
   PRIMARY KEY (contract_id, component, report_period,
                correction_view, grain, dimension, member)
 );
+CREATE TABLE IF NOT EXISTS transition_component (
+  contract_id TEXT NOT NULL,
+  component TEXT NOT NULL,
+  report_period TEXT NOT NULL,
+  correction_view TEXT NOT NULL,
+  grain TEXT NOT NULL,
+  dimension TEXT NOT NULL,
+  member TEXT NOT NULL,
+  numerator TEXT NOT NULL,
+  denominator TEXT,
+  observations INTEGER NOT NULL,
+  PRIMARY KEY (contract_id, component, report_period,
+               correction_view, grain, dimension, member)
+);
 CREATE TABLE IF NOT EXISTS run_metadata (
   key TEXT PRIMARY KEY,
   value TEXT NOT NULL
@@ -110,8 +176,36 @@ def catalog_sha256(catalog: dict[str, Any]) -> str:
     return hashlib.sha256(encoded).hexdigest()
 
 
+def metric_build_fingerprint(
+    catalog_hash: str,
+    m4_fingerprint: str,
+    security_contract_path: Path,
+    loan_contract_path: Path,
+) -> str:
+    identity = {
+        "pipeline_version": PIPELINE_VERSION,
+        "parser_sha256": sha256_file(Path(__file__)),
+        "transition_parser_sha256": sha256_file(Path(m5_transition_history.__file__)),
+        "storage_schema_sha256": hashlib.sha256(SCHEMA.encode()).hexdigest(),
+        "catalog_sha256": catalog_hash,
+        "m4_build_fingerprint": m4_fingerprint,
+        "security_contract_sha256": sha256_file(security_contract_path),
+        "loan_contract_sha256": sha256_file(loan_contract_path),
+    }
+    return hashlib.sha256(
+        json.dumps(identity, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+
+
 def load_catalog(path: Path) -> tuple[dict[str, dict[str, Any]], str]:
     catalog = json.loads(path.read_text(encoding="utf-8"))
+    methodology = catalog.get("methodology_rules", {})
+    required_methodology = {
+        "contract_id", "status", "approval_id", "effective_date", "formula_version",
+        "comparability", "data_quality", "minimum_population", "transition", "psa",
+    }
+    if required_methodology - methodology.keys() or methodology.get("status") != "approved":
+        raise MetricError("metric catalog lacks an approved exact methodology contract")
     statuses = set(catalog["status_values"])
     required = set(catalog["contract_required_fields"])
     defaults = catalog["contract_defaults"]
@@ -131,6 +225,10 @@ def load_catalog(path: Path) -> tuple[dict[str, dict[str, Any]], str]:
         technical_name = contract["technical_name"]
         if technical_name in resolved:
             raise MetricError("metric catalog contains a duplicate technical name")
+        if contract.get("methodology_status", "").startswith("approved") and (
+            contract["formula_version"] != methodology["formula_version"]
+        ):
+            raise MetricError("approved methodology metric has a stale formula version")
         resolved[technical_name] = contract
     return resolved, catalog_sha256(catalog)
 
@@ -145,6 +243,39 @@ def adjacent_month(prior: str, current: str, offset: int = 1) -> bool:
     prior_value = int(prior[:4]) * 12 + int(prior[5:])
     current_value = int(current[:4]) * 12 + int(current[5:])
     return current_value - prior_value == offset
+
+
+def comparability_status(failures: int, warnings: int) -> str:
+    if failures < 0 or warnings < 0:
+        raise MetricError("comparability condition counts cannot be negative")
+    return "fail" if failures else "warn" if warnings else "pass"
+
+
+def transition_event(
+    prior_days: int | None,
+    current_days: int | None,
+    delinquency_threshold: int,
+) -> str:
+    if prior_days is None:
+        return "ineligible"
+    if current_days is None:
+        return "attrition"
+    prior = delinquency_band(prior_days)
+    current = delinquency_band(current_days)
+    if prior_days >= delinquency_threshold and current_days == 0:
+        return "cure"
+    if prior_days == 0 and current_days >= delinquency_threshold:
+        return "new_delinquency"
+    order = {"Current": 0, "1-29": 1, "30-59": 2, "60-89": 3, "90+": 4}
+    return "stable" if prior == current else "worsening" if order[current] > order[prior] else "improvement"
+
+
+def within_month_window(start: str, event: str, months: int) -> bool:
+    if months <= 0:
+        raise MetricError("observation window must be positive")
+    start_value = int(start[:4]) * 12 + int(start[5:])
+    event_value = int(event[:4]) * 12 + int(event[5:])
+    return 0 < event_value - start_value <= months
 
 
 def delinquency_band(days: int | None) -> str:
@@ -308,6 +439,17 @@ def scan_loan_partition(path: Path, expected_period: str) -> LoanAggregate:
                 if value is not None:
                     aggregate.add_weighted(score, value, upb)
                     aggregate.add_segment(f"score:{score}", str(value), upb)
+            for name in LOAN_WEIGHTED_FIELDS:
+                aggregate.add_weighted(name, integer(row[positions[name]]), upb)
+            for dimension, (_, name) in LOAN_SEGMENT_FIELDS.items():
+                aggregate.add_segment(dimension, row[positions[name]], upb)
+            mi = integer(row[positions["mortgage_insurance_pct"]])
+            cancelled = row[positions["mortgage_insurance_cancellation"]]
+            mi_status = (
+                MISSING if mi is None else "Active coverage" if mi > 0
+                else "Cancelled or expired" if cancelled == "Y" else "No disclosed MI"
+            )
+            aggregate.add_segment("mortgage_insurance_status", mi_status, upb)
             days = integer(row[positions["days_delinquent"]])
             aggregate.add_segment("delinquency_band", delinquency_band(days), upb)
             aggregate.add_segment("prefix", row[positions["prefix"]], upb)
@@ -368,6 +510,8 @@ def loan_component_rows(aggregate: LoanAggregate) -> list[tuple[Any, ...]]:
     for name, (numerator, denominator, observations) in aggregate.weighted.items():
         if name in {"wala", "wam"}:
             contract = "weighted_age_maturity"
+        elif name in LOAN_WEIGHTED_FIELDS:
+            contract = LOAN_WEIGHTED_FIELDS[name]
         else:
             contract = "credit_score_model_metrics"
         rows.append(component_row(
@@ -381,6 +525,8 @@ def loan_component_rows(aggregate: LoanAggregate) -> list[tuple[Any, ...]]:
         "seller": "counterparty_composition",
         "servicer": "counterparty_composition",
         "modification": "modification_volume",
+        "mortgage_insurance_status": "guarantee_mi_share",
+        **{dimension: contract for dimension, (contract, _) in LOAN_SEGMENT_FIELDS.items()},
     }
     for dimension, members in aggregate.segments.items():
         contract = (
@@ -418,6 +564,7 @@ def insert_partition(
     source: sqlite3.Row,
     partition_root: Path,
     catalog_hash: str,
+    build_fingerprint: str,
 ) -> None:
     path = partition_root / source["partition_path"]
     if not path.is_file() or sha256_file(path) != source["partition_sha256"]:
@@ -432,12 +579,13 @@ def insert_partition(
         [(source["source_file"], *row) for row in loan_component_rows(aggregate)],
     )
     connection.execute(
-        "INSERT INTO input_partition VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO input_partition VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         (
             source["source_file"], source["report_period"], source["source_family"],
             source["partition_path"], source["partition_sha256"],
             source["partition_row_count"], aggregate.rows, str(aggregate.all_current_upb),
-            aggregate.active_rows, str(aggregate.active_upb), current_rss_bytes(), catalog_hash,
+            aggregate.active_rows, str(aggregate.active_upb), current_rss_bytes(),
+            catalog_hash, build_fingerprint,
         ),
     )
 
@@ -459,12 +607,9 @@ def consolidate_partitions(connection: sqlite3.Connection) -> None:
         if row[8] is not None:
             target[1] = int(target[1] or 0) + int(row[8])
         target[2] = int(target[2]) + int(row[9])
-    distribution_dimensions = {
-        "delinquency_band", "prefix", "state", "seller", "servicer", "modification"
-    }
     distribution_totals: dict[tuple[str, ...], int] = defaultdict(int)
     for key, values in grouped.items():
-        if key[5] in distribution_dimensions or key[5].startswith("score:"):
+        if key[5] in DISTRIBUTION_DIMENSIONS or key[5].startswith("score:"):
             distribution_totals[key[:6]] += int(values[0])
     for key, values in grouped.items():
         if key[:6] in distribution_totals:
@@ -478,6 +623,39 @@ def consolidate_partitions(connection: sqlite3.Connection) -> None:
             for key, values in grouped.items()
         ],
     )
+    for row in connection.execute(
+        """
+        SELECT contract_id, component, report_period, correction_view, grain,
+               dimension, member, numerator, denominator
+        FROM metric_component
+        WHERE contract_id='weighted_rates' AND denominator IS NOT NULL
+        """
+    ):
+        connection.execute(
+            """
+            UPDATE metric_component SET value=?
+            WHERE contract_id=? AND component=? AND report_period=?
+              AND correction_view=? AND grain=? AND dimension=? AND member=?
+            """,
+            (
+                format(int(row[7]) / int(row[8]) / 1000, ".15g"),
+                *row[:7],
+            ),
+        )
+
+
+def merge_transition_components(connection: sqlite3.Connection) -> None:
+    for row in connection.execute(
+        """
+        SELECT contract_id, component, report_period, correction_view, grain,
+               dimension, member, numerator, denominator, observations
+        FROM transition_component
+        """
+    ):
+        emit_metric(
+            connection, *row[:7], int(row[7]),
+            None if row[8] is None else int(row[8]), row[9],
+        )
 
 
 def emit_metric(
@@ -654,7 +832,12 @@ def security_rows(connection: sqlite3.Connection, view: str) -> Iterable[sqlite3
         SELECT report_period, security_id, prefix, security_status,
                correction_indicator, current_upb_cents, loan_count, factor_e8,
                legacy_credit_score, classic_fico, vs4,
-               involuntary_removal_upb_cents, involuntary_removal_count
+               involuntary_removal_upb_cents, involuntary_removal_count,
+               wa_net_interest_rate_milli_pct, wa_issuance_interest_rate_milli_pct,
+               wa_current_interest_rate_milli_pct, wa_ltv_pct, wa_cltv_pct,
+               wa_dti_pct, wa_eltv_pct, mission_density_score_centi,
+               mission_criteria_share_centi_pct, green_indicator, social_indicator,
+               mission_index_version
         FROM {view}
         ORDER BY security_id, report_period
         """
@@ -676,6 +859,8 @@ def build_security_metrics(
             "removal_upb_missing": 0, "removal_count_missing": 0,
             "prefix": defaultdict(lambda: [0, 0]),
             "scores": defaultdict(lambda: [0, 0, 0]),
+            "v2_weighted": defaultdict(lambda: [0, 0, 0]),
+            "v2_segments": defaultdict(lambda: defaultdict(lambda: [0, 0])),
         }
     )
     prior_id = prior_period = None
@@ -719,6 +904,27 @@ def build_security_metrics(
                     values[0] += current_upb * row[score]
                     values[1] += current_upb
                     values[2] += 1
+            for name in SECURITY_WEIGHTED_FIELDS:
+                if row[name] is not None and row[name] >= 0:
+                    values = target["v2_weighted"][name]
+                    values[0] += current_upb * row[name]
+                    values[1] += current_upb
+                    values[2] += 1
+            for dimension, name, scale in (
+                ("mission_density_score", "mission_density_score_centi", 100),
+                ("mission_criteria_share", "mission_criteria_share_centi_pct", 100),
+                ("green_indicator", "green_indicator", None),
+                ("social_indicator", "social_indicator", None),
+                ("mission_index_version", "mission_index_version", None),
+            ):
+                raw = row[name]
+                member = (
+                    MISSING if raw is None or raw == "" else
+                    format(raw / scale, ".2f") if scale else str(raw)
+                )
+                values = target["v2_segments"][dimension][member]
+                values[0] += 1
+                values[1] += current_upb
         if (
             row["security_id"] == prior_id and prior_period is not None
             and adjacent_month(prior_period, period) and prior_active and active
@@ -753,6 +959,32 @@ def build_security_metrics(
             emit_metric(output, "current_outstanding_balance_population", "security_prefix_upb", period, correction_view, "security-period", "prefix", prefix, upb, target["active_upb"], count)
         for score, (numerator, denominator, observations) in target["scores"].items():
             emit_metric(output, "credit_score_model_metrics", f"security_{score}", period, correction_view, "security-period", "score_model", score, numerator, denominator, observations)
+        for name, (numerator, denominator, observations) in target["v2_weighted"].items():
+            contract = SECURITY_WEIGHTED_FIELDS[name]
+            scale = 1000 if contract == "weighted_rates" else 1
+            emit_metric(
+                output, contract, f"security_{name}", period, correction_view,
+                "security-period", "portfolio", "All", numerator, denominator,
+                observations,
+                value=format(numerator / denominator / scale, ".15g"),
+            )
+        for dimension, members in target["v2_segments"].items():
+            contract = (
+                "mission_metrics"
+                if dimension.startswith("mission_")
+                else "green_social_eligibility"
+            )
+            for member, (count, upb) in members.items():
+                emit_metric(
+                    output, contract, f"{dimension}_count", period, correction_view,
+                    "security-period", dimension, member, count,
+                    target["active_count"], count,
+                )
+                emit_metric(
+                    output, contract, f"{dimension}_upb", period, correction_view,
+                    "security-period", dimension, member, upb,
+                    target["active_upb"], count,
+                )
     for period, (numerator, denominator, observations) in factor_changes.items():
         emit_metric(
             output, "factor_level_change", "factor_change", period, correction_view,
@@ -916,6 +1148,7 @@ def normalized_snapshot(connection: sqlite3.Connection) -> str:
     digest = hashlib.sha256()
     for table, query in (
         ("input_partition", "SELECT source_file, report_period, partition_sha256, expected_rows, scanned_rows, all_current_upb_cents, active_rows, active_current_upb_cents, catalog_sha256 FROM input_partition ORDER BY source_file"),
+        ("transition_component", "SELECT contract_id, component, report_period, correction_view, grain, dimension, member, numerator, denominator, observations FROM transition_component ORDER BY 1,2,3,4,5,6,7"),
         ("metric_component", "SELECT contract_id, component, report_period, correction_view, grain, dimension, member, numerator, denominator, observations, value, released FROM metric_component ORDER BY 1,2,3,4,5,6,7"),
     ):
         digest.update(table.encode())
@@ -929,6 +1162,7 @@ def verify(
     m4: sqlite3.Connection,
     catalog: dict[str, dict[str, Any]],
     security_rows_latest: int,
+    history_peak_bytes: int = 0,
 ) -> dict[str, Any]:
     expected_partitions, expected_loan_rows = m4.execute(
         "SELECT COUNT(*), COALESCE(SUM(partition_row_count),0) FROM source_manifest WHERE partition_path IS NOT NULL AND quality_status='pass'"
@@ -971,6 +1205,9 @@ def verify(
         "released_components": output.execute("SELECT COUNT(*) FROM metric_component WHERE released=1").fetchone()[0],
         "candidate_components": output.execute("SELECT COUNT(*) FROM metric_component WHERE released=0").fetchone()[0],
         "peak_rss_bytes": output.execute("SELECT COALESCE(MAX(peak_rss_bytes),0) FROM input_partition").fetchone()[0],
+        "history_rows": scanned_loan_rows,
+        "history_components": output.execute("SELECT COUNT(*) FROM transition_component").fetchone()[0],
+        "history_peak_bytes": history_peak_bytes,
         "snapshot_sha256": checksum,
     }
 
@@ -987,6 +1224,9 @@ def build(
     only_partitions: set[str] | None = None,
 ) -> dict[str, Any]:
     catalog, catalog_hash = load_catalog(catalog_path)
+    transition_rules = json.loads(
+        catalog_path.read_text(encoding="utf-8")
+    )["methodology_rules"]["transition"]
     security_contract = json.loads(security_contract_path.read_text(encoding="utf-8"))
     loan_contract = json.loads(loan_contract_path.read_text(encoding="utf-8"))
     if not m4_database.is_file() or not issuance_database.is_file():
@@ -1007,16 +1247,35 @@ def build(
         sources = list(m4.execute(
             "SELECT * FROM source_manifest WHERE partition_path IS NOT NULL AND quality_status='pass' ORDER BY report_period, source_family, source_file"
         ))
+        m4_fingerprints = {
+            row[0]
+            for row in m4.execute(
+                "SELECT DISTINCT build_fingerprint FROM source_manifest"
+            )
+        }
+        if len(m4_fingerprints) != 1 or not next(iter(m4_fingerprints)):
+            raise MetricError("M4 release is stale or lacks a v2 build fingerprint")
+        m4_fingerprint = next(iter(m4_fingerprints))
+        current_build_fingerprint = metric_build_fingerprint(
+            catalog_hash, m4_fingerprint, security_contract_path, loan_contract_path
+        )
         selected = [row for row in sources if not only_partitions or row["source_file"] in only_partitions]
         existing = {
             row["source_file"]: row
             for row in output.execute("SELECT * FROM input_partition")
         }
         prior_pipeline_row = output.execute(
-            "SELECT value FROM run_metadata WHERE key='pipeline_version'"
+            "SELECT value FROM run_metadata WHERE key='build_fingerprint'"
         ).fetchone()
         reusable_pipeline = (
-            prior_pipeline_row is not None and prior_pipeline_row[0] == PIPELINE_VERSION
+            prior_pipeline_row is not None
+            and prior_pipeline_row[0] == current_build_fingerprint
+        )
+        expected_sources = {row["source_file"]: row for row in sources}
+        history_reusable = reusable_pipeline and set(existing) == set(expected_sources) and all(
+            existing[name]["partition_sha256"] == source["partition_sha256"]
+            and existing[name]["expected_rows"] == source["partition_row_count"]
+            for name, source in expected_sources.items()
         )
         if only_partitions and not incremental:
             sources = selected
@@ -1026,10 +1285,14 @@ def build(
                 prior["partition_sha256"] == source["partition_sha256"]
                 and prior["expected_rows"] == source["partition_row_count"]
                 and prior["catalog_sha256"] == catalog_hash
+                and prior["build_fingerprint"] == current_build_fingerprint
             )
             if unchanged:
                 continue
-            insert_partition(output, source, partition_root, catalog_hash)
+            insert_partition(
+                output, source, partition_root, catalog_hash,
+                current_build_fingerprint,
+            )
             output.commit()
             print(
                 f"M5 loan partition {index}/{len(selected)}: "
@@ -1041,7 +1304,29 @@ def build(
             expected = {row["source_file"] for row in sources}
             if loaded != expected:
                 raise MetricError("output does not contain the complete approved loan partition set")
+        history_peak_bytes = 0
+        transition_contracts = {"delinquency_roll_cure", "new_delinquency_redefault"}
+        if all(catalog[name]["status"] == "supported" for name in transition_contracts):
+            prior_peak = output.execute(
+                "SELECT value FROM run_metadata WHERE key='history_peak_bytes'"
+            ).fetchone()
+            if history_reusable and output.execute(
+                "SELECT COUNT(*) FROM transition_component"
+            ).fetchone()[0]:
+                history_peak_bytes = 0 if prior_peak is None else int(json.loads(prior_peak[0]))
+            else:
+                try:
+                    history_summary = m5_transition_history.build(
+                        sources, partition_root, Path(f"{target}.history.sqlite"),
+                        output, transition_rules,
+                    )
+                except m5_transition_history.TransitionError as error:
+                    raise MetricError(str(error)) from error
+                history_peak_bytes = history_summary["history_peak_bytes"]
+        else:
+            output.execute("DELETE FROM transition_component")
         consolidate_partitions(output)
+        merge_transition_components(output)
         build_trust_metrics(output, m4, issuance, security_contract, loan_contract)
         build_issuance_metrics(output, issuance)
         security_original = build_security_metrics(output, m4, "FactSecurityPeriodOriginal", "original")
@@ -1062,12 +1347,17 @@ def build(
             emit_metric(output, "new_issuance_share_ending_book", "issuance_share", period, "latest", "portfolio", "portfolio", "All", issuance_upb, ending_upb)
         add_top_n_components(output)
         build_approved_derived_metrics(output)
-        summary = verify(output, m4, catalog, security_latest)
+        summary = verify(output, m4, catalog, security_latest, history_peak_bytes)
         output.execute("DELETE FROM run_metadata")
         output.executemany(
             "INSERT INTO run_metadata VALUES (?, ?)",
             [(key, json.dumps(value, sort_keys=True)) for key, value in summary.items()]
-            + [("pipeline_version", PIPELINE_VERSION), ("catalog_sha256", catalog_hash)],
+            + [
+                ("pipeline_version", PIPELINE_VERSION),
+                ("catalog_sha256", catalog_hash),
+                ("m4_build_fingerprint", m4_fingerprint),
+                ("build_fingerprint", current_build_fingerprint),
+            ],
         )
         output.commit()
     target.replace(output_database)

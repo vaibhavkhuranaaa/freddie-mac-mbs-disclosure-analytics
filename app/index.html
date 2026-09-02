@@ -3,37 +3,45 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Governed Freddie Mac MBS issuance monitoring with reconciled source quality and aggregate-only evidence." />
+    <meta name="description" content="Evidence-first Freddie Mac MBS disclosure intelligence with reconciled quality, change, and investigation workflows." />
     <title>Freddie Mac MBS Disclosure Intelligence</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <a class="skip-link" href="#main">Skip to issuance analysis</a>
+    <!-- DIRECTION: Extend the incumbent evidence-first disclosure product with sparse editorial views, persistent release context, and a direct trust-to-action sequence. Preserve the restrained green system, dense factual typography, and accessible tables. Avoid decorative dashboard grids, speculative claims, and hidden evidence paths. -->
+    <a class="skip-link" href="#main">Skip to disclosure analysis</a>
     <header class="site-header">
       <div>
-        <p class="product-label">Disclosure intelligence · issuance release</p>
-        <h1>Freddie Mac MBS issuance</h1>
+        <p class="product-label">Disclosure intelligence</p>
+        <h1>Freddie Mac MBS disclosures</h1>
       </div>
       <div class="header-meta" aria-label="Release scope">
-        <span>Aggregate-only reviewer mode</span>
-        <span>Dec 2024–Jun 2026</span>
+        <span>Verified release</span>
+        <span id="release-period">Dec 2024-Jun 2026</span>
       </div>
     </header>
 
     <main id="main">
       <section id="app-status" class="status-panel" data-kind="loading" aria-live="polite">
-        <div><strong>Loading governed issuance data</strong><span>Checking the released aggregate and quality gate.</span></div>
+        <div><strong>Loading governed issuance data</strong><span>Checking the verified release and quality gate.</span></div>
         <button id="retry" type="button" hidden>Retry loading</button>
       </section>
 
       <div id="dashboard-content" class="dashboard-content" hidden>
+        <nav class="view-switcher" role="tablist" aria-label="Analysis views">
+          <button id="issuance-tab" type="button" role="tab" data-view-target="issuance-view" aria-controls="issuance-view" aria-selected="true" tabindex="0">Release &amp; issuance</button>
+          <button id="portfolio-tab" type="button" role="tab" data-view-target="portfolio-view" aria-controls="portfolio-view" aria-selected="false" tabindex="-1">Portfolio &amp; credit</button>
+          <button id="investigation-tab" type="button" role="tab" data-view-target="investigation-view" aria-controls="investigation-view" aria-selected="false" tabindex="-1">Investigations</button>
+        </nav>
+
+        <section id="issuance-view" class="product-view" role="tabpanel" aria-labelledby="issuance-tab">
         <section class="story-intro" aria-labelledby="question-title">
           <div>
             <p class="section-label">Analyst decision</p>
             <h2 id="question-title">Where did issuance change, which term families explain it, and what needs investigation?</h2>
             <p>This release separates source health from market-activity signals. Every visible total traces to accepted records and documented exclusions.</p>
           </div>
-          <p class="source-note">Official month-end issuance files. Monthly aggregates only; no security-level rows are sent to the browser.</p>
+          <p class="source-note">Official month-end issuance files. <a href="https://github.com/vaibhavkhuranaaa/freddie-mac-mbs-disclosure-analytics/releases/tag/data-v1">Download the complete source and derived data release.</a></p>
         </section>
 
         <section class="quality-ledger" aria-labelledby="quality-title">
@@ -48,10 +56,10 @@
         </section>
 
         <dl class="metric-ledger" aria-label="Current issuance summary">
-          <div><dt>Latest securities</dt><dd id="latest-count">—</dd><small id="latest-count-note"></small></div>
-          <div><dt>Latest issuance UPB</dt><dd id="latest-upb">—</dd><small id="latest-upb-note"></small></div>
-          <div><dt>Observed-period UPB</dt><dd id="period-total">—</dd><small id="period-total-note"></small></div>
-          <div><dt>Highest observed month</dt><dd id="peak-upb">—</dd><small id="peak-upb-note"></small></div>
+          <div><dt>Latest securities</dt><dd id="latest-count">Loading</dd><small id="latest-count-note"></small></div>
+          <div><dt>Latest issuance UPB</dt><dd id="latest-upb">Loading</dd><small id="latest-upb-note"></small></div>
+          <div><dt>Observed-period UPB</dt><dd id="period-total">Loading</dd><small id="period-total-note"></small></div>
+          <div><dt>Highest observed month</dt><dd id="peak-upb">Loading</dd><small id="peak-upb-note"></small></div>
         </dl>
 
         <section class="analysis-grid" aria-label="Trend and investigation findings">
@@ -66,7 +74,7 @@
         <section class="mix-section" aria-labelledby="mix-title">
           <div class="section-intro"><p class="section-label">Latest-month composition</p><h2 id="mix-title">Issuance by official term-family mapping</h2><p id="mix-coverage"></p></div>
           <ol id="mix-list" class="mix-list"></ol>
-          <p class="method-note">CL/ZL, CT/ZT, CI/ZI, and CN/ZN follow Freddie Mac's <a id="mix-source" target="_blank" rel="noreferrer">Prefix Library summary</a>. Every other observed prefix remains “Other / Unmapped.”</p>
+          <p class="method-note">CL/ZL, CT/ZT, CI/ZI, and CN/ZN follow Freddie Mac's <a id="mix-source" target="_blank" rel="noreferrer">Prefix Library summary</a>. Every other observed prefix remains "Other / Unmapped."</p>
         </section>
 
         <section class="method-section" aria-labelledby="method-title">
@@ -78,9 +86,106 @@
           <div class="section-intro"><p class="section-label">Monthly evidence</p><h2 id="table-title">Observed issuance history</h2></div>
           <div class="table-wrap"><table><thead><tr><th>Month</th><th>Issued securities</th><th>Issuance UPB</th><th>Corrections</th></tr></thead><tbody id="table-body"></tbody></table></div>
         </section>
+        </section>
+
+        <section id="portfolio-view" class="product-view" role="tabpanel" aria-labelledby="portfolio-tab" hidden>
+          <section class="portfolio-intro">
+            <div>
+              <h2 id="portfolio-title">What changed in the outstanding portfolio, and where should review start?</h2>
+              <p>Full-population measures come directly from the verified M5 contract engine. Values remain descriptive and preserve their release, period, correction view, and metric version.</p>
+            </div>
+            <div class="release-stamp" id="semantic-stamp" aria-live="polite"></div>
+          </section>
+
+          <section id="semantic-unavailable" class="status-panel" data-kind="partial" hidden>
+            <div><strong id="semantic-unavailable-title">Portfolio measures are not connected</strong><span id="semantic-unavailable-detail">Run the governed product build and preview commands to load the external M5 release. Issuance remains available above.</span></div>
+          </section>
+
+          <div id="semantic-content" class="semantic-content" hidden>
+            <section class="context-bar" aria-label="Active portfolio context">
+              <div><span>Reporting period</span><strong id="portfolio-period"></strong><small id="portfolio-coverage"></small></div>
+              <div><span>Correction view</span><strong id="correction-view"></strong></div>
+              <div><span>Metric version</span><strong id="metric-version"></strong></div>
+              <div><span>Payload refreshed</span><strong id="portfolio-refreshed"></strong></div>
+              <div><span>Quality status</span><strong id="portfolio-quality"></strong><small id="portfolio-quality-detail"></small></div>
+              <div><span>Comparability status</span><strong id="comparability-status"></strong><small id="comparability-detail"></small></div>
+            </section>
+
+            <dl class="metric-ledger portfolio-ledger" aria-label="Latest portfolio summary">
+              <div><dt>Active loans</dt><dd id="portfolio-loans">Loading</dd><small id="portfolio-loans-note"></small></div>
+              <div><dt>Outstanding UPB</dt><dd id="portfolio-upb">Loading</dd><small id="portfolio-upb-note"></small></div>
+              <div><dt>Average loan balance</dt><dd id="average-loan">Loading</dd><small id="average-loan-note"></small></div>
+              <div><dt>Modification rate</dt><dd id="modification-rate">Loading</dd><small id="modification-rate-note"></small></div>
+            </dl>
+
+            <section class="portfolio-analysis" aria-label="Portfolio trend and review signals">
+              <article class="chart-panel">
+                <div class="panel-heading"><h2>Outstanding UPB trend</h2><p id="portfolio-chart-summary"></p></div>
+                <div id="portfolio-chart" class="chart" role="img"></div>
+              </article>
+              <aside class="findings-panel"><h2>Review signals</h2><div id="portfolio-findings" class="findings"></div></aside>
+            </section>
+
+            <section class="credit-strip" aria-labelledby="credit-title">
+              <div><h2 id="credit-title">Delinquency thresholds</h2><p>Latest disclosed share by loan count. Thresholds are nested, so do not add them together.</p></div>
+              <dl>
+                <div><dt>30+ days</dt><dd id="delinquency-30"></dd></div>
+                <div><dt>60+ days</dt><dd id="delinquency-60"></dd></div>
+                <div><dt>90+ days</dt><dd id="delinquency-90"></dd></div>
+              </dl>
+            </section>
+
+            <section class="table-section" aria-labelledby="concentration-title">
+              <div class="section-intro"><h2 id="concentration-title">Concentration evidence</h2><p>Top-ten share localizes where the disclosed portfolio is concentrated. HHI provides a consistent companion measure.</p></div>
+              <div class="table-wrap"><table><thead><tr><th>Dimension</th><th>Top-ten UPB share</th><th>Top-ten UPB</th><th>HHI</th><th>Review cue</th></tr></thead><tbody id="concentration-body"></tbody></table></div>
+            </section>
+
+            <section class="provenance-line" aria-label="Semantic release provenance">
+              <strong id="release-id"></strong><span id="release-proof"></span>
+            </section>
+          </div>
+        </section>
+
+        <section id="investigation-view" class="product-view" role="tabpanel" aria-labelledby="investigation-tab" hidden>
+          <section class="investigation-intro">
+            <div><h2>Turn a disclosed signal into an owned, reproducible investigation</h2><p>Cases preserve release context and exact evidence pointers separately from source facts. A case can change status or resolution, but its source evidence cannot be rewritten.</p></div>
+            <p>Loopback API only. The bearer token remains in browser memory and is never written to storage.</p>
+          </section>
+
+          <section id="transition-evidence" class="table-section" aria-labelledby="transition-title" hidden>
+            <div class="section-intro"><h2 id="transition-title">Adjacent-month loan transition evidence</h2><p id="transition-summary"></p></div>
+            <div class="table-wrap"><table><thead><tr><th>Transition</th><th>Loans</th><th>Eligible origin</th><th>Share</th><th>Correction view</th></tr></thead><tbody id="transition-body"></tbody></table></div>
+            <p id="transition-provenance" class="transition-provenance"></p>
+          </section>
+
+          <form id="case-access" class="access-form">
+            <div><label for="case-actor">Analyst or team</label><input id="case-actor" name="actor" autocomplete="username" required /></div>
+            <div><label for="case-token">API token</label><input id="case-token" name="token" type="password" autocomplete="off" minlength="16" required /></div>
+            <button type="submit">Connect investigations</button>
+            <p id="case-access-status" aria-live="polite">Enter the actor recorded in audit history and the loopback API token.</p>
+          </form>
+
+          <div id="case-workspace" class="case-workspace" hidden>
+            <form id="case-create" class="case-create">
+              <div class="case-form-heading"><h2>Open an investigation</h2><p>Choose a released signal, assign it, and state the bounded question to resolve.</p></div>
+              <div><label for="case-signal">Evidence signal</label><select id="case-signal" required></select></div>
+              <div><label for="case-owner">Owner</label><input id="case-owner" required /></div>
+              <div><label for="case-priority">Priority</label><select id="case-priority"><option value="medium">Medium</option><option value="high">High</option><option value="low">Low</option></select></div>
+              <div class="case-summary-field"><label for="case-summary">Investigation question</label><textarea id="case-summary" rows="3" required></textarea></div>
+              <div id="case-evidence-preview" class="case-evidence-preview"></div>
+              <button type="submit">Create investigation</button>
+              <p id="case-create-status" aria-live="polite"></p>
+            </form>
+
+            <section class="case-list-section" aria-labelledby="case-list-title">
+              <div><h2 id="case-list-title">Investigation ledger</h2><p>Newest updates first. Resolutions append an audited state change while evidence remains fixed.</p></div>
+              <div id="case-list" class="case-list"></div>
+            </section>
+          </div>
+        </section>
       </div>
     </main>
-    <footer><span>Governed local case study using authorized Freddie Mac disclosures.</span><span>Not a valuation, trading, hedging, or lending-decision tool.</span></footer>
+    <footer><span>Independent analytics project using Freddie Mac disclosures; not affiliated with or endorsed by Freddie Mac.</span><span>Not a valuation, trading, hedging, or lending-decision tool.</span></footer>
     <script type="module" src="app.js"></script>
   </body>
 </html>

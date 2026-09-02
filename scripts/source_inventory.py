@@ -6,7 +6,7 @@ from __future__ import annotations
 import argparse
 import copy
 import csv
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ThreadPoolExecutor
 import hashlib
 import json
 import re
@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Any
 
 import pipeline
+import m4_field_rules
 from storage import manifest_path, raw_path
 
 PENDING_STATUS = "authorized-data-pending-machine-contract-approval"
@@ -60,7 +61,7 @@ def load_contract(path: Path) -> dict[str, Any]:
     missing = sorted(required - set(contract))
     if missing:
         raise InventoryError(f"contract missing keys: {', '.join(missing)}")
-    if contract["version"] != 1:
+    if contract["version"] not in {1, 2}:
         raise InventoryError("unsupported contract version")
     if contract["status"] not in CONTRACT_STATUSES:
         raise InventoryError("unsupported contract status")
@@ -96,6 +97,11 @@ def load_contract(path: Path) -> dict[str, Any]:
                 + ", ".join(missing_governance)
             )
         validate_field_allowlist(contract["field_allowlist"])
+        if contract["version"] == 2:
+            try:
+                m4_field_rules.validate_contract(contract)
+            except m4_field_rules.FieldRuleError as error:
+                raise InventoryError(str(error)) from error
 
     family_ids = [
         family.get("id")
@@ -127,6 +133,18 @@ def load_contract_bundle(paths: list[Path]) -> dict[str, Any]:
     ]
     bundle["intended_measures"] = [
         measure for contract in contracts for measure in contract["intended_measures"]
+    ]
+    bundle["field_contracts"] = [
+        field for contract in contracts for field in contract.get("field_contracts", [])
+    ]
+    bundle["schema_profiles"] = {
+        name: windows
+        for contract in contracts
+        for name, windows in contract.get("schema_profiles", {}).items()
+    }
+    bundle["provider_guides"] = [
+        contract.get("provider_guide") for contract in contracts
+        if contract.get("provider_guide")
     ]
     bundle["status"] = (
         APPROVED_STATUS
@@ -542,13 +560,8 @@ def match_family(item: dict[str, Any], family: dict[str, Any]) -> bool:
 
 
 def contract_signature(contract: dict[str, Any]) -> str:
-    payload = {
-        "version": contract["version"],
-        "status": contract["status"],
-        "source_families": contract["source_families"],
-    }
     return hashlib.sha256(
-        json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        json.dumps(contract, sort_keys=True, separators=(",", ":")).encode("utf-8")
     ).hexdigest()
 
 
@@ -565,6 +578,12 @@ def load_inventory_cache(path: Path | None) -> dict[str, Any]:
 def save_inventory_cache(path: Path | None, cache: dict[str, Any]) -> None:
     if path is None:
         return
+    if path.is_file():
+        try:
+            if json.loads(path.read_text(encoding="utf-8")) == cache:
+                return
+        except (OSError, json.JSONDecodeError):
+            pass
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(cache, sort_keys=True), encoding="utf-8")
 
@@ -615,7 +634,7 @@ def build_inventory(
         ):
             uncached.append(path)
     if len(uncached) > 4:
-        with ProcessPoolExecutor(max_workers=4) as executor:
+        with ThreadPoolExecutor(max_workers=4) as executor:
             inspected = executor.map(inspect_zip, uncached, repeat(contract))
             preinspected = {
                 path.name: item for path, item in zip(uncached, inspected)
