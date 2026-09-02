@@ -246,15 +246,17 @@ class SourceInventoryTests(unittest.TestCase):
                 source_inventory.load_contract(path)
 
     def test_repository_approved_contracts_and_raw_inventory_are_ready(self):
+        raw = storage.raw_path()
+        manifest = storage.manifest_path("source-inventory.json")
+        if not raw.is_dir() or not manifest.is_file():
+            self.skipTest("external governed data store is not available")
         contract = source_inventory.load_contract_bundle(
             [
                 ROOT / "contracts/m4-source-contract.json",
                 ROOT / "contracts/m4-loan-source-contract.json",
             ]
         )
-        inventory = source_inventory.build_inventory(
-            storage.raw_path(), contract, storage.manifest_path("source-inventory.json")
-        )
+        inventory = source_inventory.build_inventory(raw, contract, manifest)
         self.assertEqual(inventory["m4_readiness"]["status"], "ready")
         self.assertEqual(inventory["summary"]["governed_issuance"], 19)
         self.assertEqual(inventory["summary"]["approved_m4"], 106)
